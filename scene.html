@@ -29,6 +29,7 @@
         background: radial-gradient(120% 80% at 10% 0%, #efe6ff 0%, #e7ecff 45%, #f3edff 100%);
         position: relative;
         overflow-x: hidden;
+        overscroll-behavior-y: none;
       }
       .aurora {
         position: fixed;
@@ -44,6 +45,11 @@
       }
       .wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 32px 32px 80px; }
       .brand { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+      .home-link {
+        color: var(--violet-deep); font-size: 13px; font-weight: 700;
+        text-decoration: none; margin-left: auto; align-self: center;
+      }
+      .home-link:hover { text-decoration: underline; }
       .brand-name {
         font-size: 26px; font-weight: 800; letter-spacing: -0.01em;
         background: linear-gradient(120deg, var(--violet), var(--accent));
@@ -200,6 +206,7 @@
       <div class="brand">
         <span class="brand-name">Rehearse</span>
         <span class="brand-zh">预演</span>
+        <a class="home-link" href="/" title="返回首页">‹ 首页</a>
       </div>
       <p class="tagline">说出你接下来要面对的场景，我先帮你把这场对话走一遍。</p>
 

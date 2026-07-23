@@ -28,6 +28,7 @@
         background: radial-gradient(120% 70% at 12% 0%, #efe6ff 0%, #e7ecff 45%, #f3edff 100%);
         min-height: 100vh;
         position: relative;
+        overscroll-behavior-y: none;
       }
       .aurora {
         position: fixed; inset: -30% -10% auto -10%; height: 420px; z-index: 0; pointer-events: none;
@@ -40,6 +41,11 @@
       /* 两个 tab 共用同一宽度，来回切换不跳变（与场景三列网格一致）。 */
       .wrap { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 36px 20px 70px; }
       header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
+      .home-link {
+        flex: none; color: var(--violet-deep); font-size: 13px; font-weight: 700;
+        text-decoration: none; padding: 4px 0;
+      }
+      .home-link:hover { text-decoration: underline; }
       h1 {
         font-size: 24px; margin: 0; font-weight: 800;
         background: linear-gradient(120deg, var(--violet), var(--accent));
@@ -255,6 +261,7 @@
     <div class="aurora"></div>
     <div class="wrap">
       <header>
+        <a class="home-link" href="/" title="返回首页">‹ 首页</a>
         <h1 id="pageTitle">我的收藏</h1>
         <span class="count" id="count"></span>
       </header>

@@ -20,7 +20,7 @@
         margin: 0; min-height: 100vh; color: var(--ink);
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
         background: radial-gradient(120% 80% at 10% 0%, #efe6ff 0%, #e7ecff 45%, #f3edff 100%);
-        position: relative; overflow-x: hidden;
+        position: relative; overflow-x: hidden; overscroll-behavior-y: none;
       }
       .aurora {
         position: fixed; inset: -30% -20% auto -20%; height: 420px; z-index: 0; pointer-events: none;
@@ -173,6 +173,7 @@
         <span id="chatScene" class="scene-label"></span>
         <span id="roleTag" class="role-tag"></span>
         <span class="spacer"></span>
+        <a href="/" class="pill" title="返回首页">‹ 首页</a>
         <button id="swapBtn" class="pill" type="button">🔄 互换角色</button>
         <button id="restartBtn" class="pill" type="button">↻ 重练</button>
       </div>

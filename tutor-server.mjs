@@ -365,7 +365,8 @@ function callClaude(userText) {
 
 function callSceneClaude(userText) {
   // 场景生成更重（整段剧本+卡片），超时与输出上限都放宽。
-  return callModel(SCENE_SYSTEM_PROMPT, userText, { timeoutMs: 120000, maxTokens: 4096 });
+  // maxTokens 提到 8192：中英混合下 8-10 轮对话+8-14 张卡常逼近 4096，截断会导致 JSON 不完整。
+  return callModel(SCENE_SYSTEM_PROMPT, userText, { timeoutMs: 120000, maxTokens: 8192 });
 }
 
 function callExtractClaude(userText) {
@@ -704,10 +705,16 @@ async function handleScene(req, res) {
     return;
   }
   const payload = JSON.stringify({ scene: input });
-  const modelOutput = await callSceneClaude(payload);
-  const parsed = parseSceneJson(modelOutput);
+  // 场景输出结构深、体量大，偶发被截断或含裸引号导致 JSON 解析失败。
+  // 失败时自动重试一次（无状态，代价可控），把偶发的格式异常概率再压低一档。
+  let parsed = null;
+  let lastRaw = "";
+  for (let attempt = 0; attempt < 2 && !parsed; attempt++) {
+    lastRaw = await callSceneClaude(payload);
+    parsed = parseSceneJson(lastRaw);
+  }
   if (!parsed) {
-    console.error("场景解析失败，模型原始返回：\n", modelOutput);
+    console.error("场景解析失败（已重试1次），模型原始返回：\n", lastRaw);
     sendJson(res, 502, { error: "模型返回格式异常" });
     return;
   }
