@@ -627,6 +627,11 @@ const STATIC_FILES = {
   "/quiz.html": "text/html; charset=utf-8",
   "/quiz.js": "application/javascript; charset=utf-8",
   "/styles.css": "text/css; charset=utf-8",
+  "/manifest.webmanifest": "application/manifest+json; charset=utf-8",
+  "/icons/icon16.png": "image/png",
+  "/icons/icon32.png": "image/png",
+  "/icons/icon48.png": "image/png",
+  "/icons/icon128.png": "image/png",
 };
 function serveStatic(res, url) {
   const type = STATIC_FILES[url];

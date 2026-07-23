@@ -16,6 +16,6 @@ services:
       - key: ANTHROPIC_AUTH_TOKEN
         sync: false              # 你的 OpenRouter key，面板里填
       - key: TUTOR_MODEL
-        value: anthropic/claude-3.5-sonnet   # 可改成任意 OpenRouter 模型名
+        value: google/gemini-2.5-flash   # 地道判断/JSON 输出稳，性价比高；可换任意 OpenRouter 模型名
       - key: TUTOR_ACCESS_KEY
         sync: false              # 你自定义的访问口令，面板里填

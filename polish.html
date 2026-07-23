@@ -6,12 +6,37 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#0d0b1a" />
+    <link rel="manifest" href="manifest.webmanifest" />
     <title>Nuance · 语差</title>
     <link rel="stylesheet" href="styles.css" />
     <style>
-      /* 手机网页版：popup 在浏览器里是固定小宽度，这里放开成自适应全屏。 */
-      html, body { margin: 0; }
-      .app { max-width: 640px; width: auto; min-height: 100vh; box-sizing: border-box; }
+      /* 手机网页版：popup 在浏览器里是固定小宽度，这里放开成自适应全屏。
+         styles.css 给扩展弹窗写死了 body{width:460px}，网页版必须覆盖掉，否则整页锁死成窄栏。 */
+      html, body {
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+      }
+      .app {
+        max-width: 640px;
+        width: 100%;
+        margin: 0 auto;              /* 宽屏时居中，窄屏时占满 */
+        min-height: 100vh;
+        box-sizing: border-box;
+        padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+      }
+      .aurora { inset: -30% -10% auto -10%; }
+      /* 触摸友好：输入框和按钮在手机上更高、字更大，避免 iOS 聚焦时自动放大 */
+      .textarea { min-height: 120px; font-size: 16px; }
+      .scene-select { font-size: 16px; padding: 8px 12px; }
+      .button { padding: 10px 24px; font-size: 16px; }
+      .result-text { font-size: 15px; }
+      /* 场景/语气/严格度三组下拉在窄屏换行排布，不再挤成一行 */
+      @media (max-width: 520px) {
+        .scene-row { flex-wrap: wrap; }
+        .scene-row .scene-select { flex: 1 1 40%; min-width: 120px; }
+      }
     </style>
   </head>
   <body>
