@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#0d0b1a" />
+    <title>Nuance · 语差</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* 手机网页版：popup 在浏览器里是固定小宽度，这里放开成自适应全屏。 */
+      html, body { margin: 0; }
+      .app { max-width: 640px; width: auto; min-height: 100vh; box-sizing: border-box; }
+    </style>
+  </head>
+  <body>
+    <div class="aurora"></div>
+    <main class="app">
+      <div class="brand">
+        <span class="brand-logo" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="nuanceGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#7c5cff"/>
+                <stop offset="1" stop-color="#c44bff"/>
+              </linearGradient>
+            </defs>
+            <rect x="2" y="2" width="28" height="28" rx="9" fill="url(#nuanceGrad)"/>
+            <path d="M10 22V10l12 12V10" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="brand-name">Nuance</span>
+        <span class="brand-zh">语差</span>
+        <a id="openCollection" class="collection-link brand-collection" href="collection.html">我的收藏 ›</a>
+        <a id="openScene" class="collection-link brand-collection" href="scene.html">场景预演 ›</a>
+      </div>
+
+      <section class="panel" aria-label="翻译输入">
+        <textarea
+          id="sourceText"
+          class="textarea"
+          rows="3"
+          placeholder="用英文说一句话，练习地道表达......"
+        ></textarea>
+
+        <div class="scene-row">
+          <label class="scene-label" for="sceneSelect">场景</label>
+          <select id="sceneSelect" class="scene-select">
+            <option value="">通用</option>
+            <option value="面试">面试</option>
+            <option value="客户沟通">客户沟通</option>
+            <option value="向老板汇报">向老板汇报</option>
+            <option value="恋爱聊天">恋爱聊天</option>
+            <option value="论文写作">论文写作</option>
+            <option value="工作邮件">工作邮件</option>
+          </select>
+          <label class="scene-label" for="toneSelect">语气</label>
+          <select id="toneSelect" class="scene-select">
+            <option value="">自然</option>
+            <option value="礼貌">礼貌</option>
+            <option value="专业">专业</option>
+            <option value="友好">友好</option>
+            <option value="热情">热情</option>
+            <option value="强势">强势</option>
+            <option value="简洁">简洁</option>
+            <option value="委婉">委婉</option>
+          </select>
+          <label class="scene-label" for="strictnessSelect">严格度</label>
+          <select id="strictnessSelect" class="scene-select">
+            <option value="strict">严格挑剔</option>
+            <option value="easy">鼓励务实</option>
+          </select>
+        </div>
+
+        <div class="action-row">
+          <span id="directionBadge" class="direction-hint"></span>
+          <button id="translateButton" class="button button-primary" type="button">翻译</button>
+          <button id="tutorButton" class="button button-accent" type="button">说的对吗？</button>
+        </div>
+      </section>
+
+      <section class="panel result-panel" aria-label="输出结果">
+        <div class="result-head">
+          <span class="result-label">结果</span>
+          <div class="result-tools">
+            <button id="saveButton" class="tool-btn tool-save" type="button" title="收藏这条润色" hidden>☆ 收藏</button>
+            <button id="copyButton" class="tool-btn tool-copy" type="button" title="复制" disabled>⧉ 复制</button>
+          </div>
+        </div>
+        <div id="resultText" class="result-text" aria-live="polite">
+          翻译或润色结果......
+        </div>
+      </section>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

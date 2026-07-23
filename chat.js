@@ -7,6 +7,19 @@
 const SERVER_ORIGIN = location.protocol.startsWith("http") ? location.origin : "http://127.0.0.1:8770";
 const CHAT_API = `${SERVER_ORIGIN}/chat`;
 const EXTRACT_API = `${SERVER_ORIGIN}/extract`;
+// 访问口令：与 scene.js 一致，?key=xxx 记到 localStorage 后自动带上。
+const TUTOR_KEY = (() => {
+  try {
+    const fromUrl = new URLSearchParams(location.search).get("key");
+    if (fromUrl) localStorage.setItem("tutorAccessKey", fromUrl);
+    return localStorage.getItem("tutorAccessKey") || "";
+  } catch (_) { return ""; }
+})();
+function apiHeaders() {
+  const h = { "Content-Type": "application/json" };
+  if (TUTOR_KEY) h["x-tutor-key"] = TUTOR_KEY;
+  return h;
+}
 const STORAGE_KEY = "sceneSaves";
 const SCRIPT_KEY = "sceneScripts"; // 场景完整剧本（收藏时由预演页落库）
 const HANDOFF_KEY = "chatHandoff";
@@ -234,7 +247,7 @@ async function advance() {
   try {
     const resp = await fetch(CHAT_API, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: apiHeaders(),
       body: JSON.stringify({ scene, script, history, learnerRole: learnerRoleLabel(), aiRole: aiRoleLabel() }),
     });
     const data = await resp.json();
@@ -314,7 +327,7 @@ async function saveWeak(index, btn) {
   try {
     const resp = await fetch(EXTRACT_API, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: apiHeaders(),
       body: JSON.stringify({ scene, speaker: "你", text: w.better }),
     });
     const card = await resp.json();

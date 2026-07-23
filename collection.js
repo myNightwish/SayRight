@@ -9,14 +9,23 @@ const clearAllBtn = document.querySelector("#clearAll");
 
 let allItems = [];
 
+const hasChromeStorage = typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
+
 function getCorrections() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(STORAGE_KEY, (res) => resolve(res[STORAGE_KEY] || {}));
+    if (hasChromeStorage) {
+      chrome.storage.local.get(STORAGE_KEY, (res) => resolve(res[STORAGE_KEY] || {}));
+    } else {
+      try { resolve(JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")); }
+      catch (_) { resolve({}); }
+    }
   });
 }
 
 function setCorrections(map) {
-  return chrome.storage.local.set({ [STORAGE_KEY]: map });
+  if (hasChromeStorage) return chrome.storage.local.set({ [STORAGE_KEY]: map });
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(map)); } catch (_) {}
+  return Promise.resolve();
 }
 
 function escapeHtml(str) {
@@ -273,12 +282,14 @@ listNavEl.addEventListener("click", (event) => {
   item.classList.add("active");
 });
 
-// 在插件里新增收藏时，实时刷新列表
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area !== "local") return;
-  if (changes[STORAGE_KEY]) load();
-  if (changes[SCENE_KEY]) loadScenes();
-});
+// 在插件里新增收藏时，实时刷新列表（仅插件环境有该 API）
+if (hasChromeStorage) {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "local") return;
+    if (changes[STORAGE_KEY]) load();
+    if (changes[SCENE_KEY]) loadScenes();
+  });
+}
 
 load();
 
@@ -302,11 +313,18 @@ const sceneFilters = {};
 
 function getScenes() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(SCENE_KEY, (res) => resolve(res[SCENE_KEY] || {}));
+    if (hasChromeStorage) {
+      chrome.storage.local.get(SCENE_KEY, (res) => resolve(res[SCENE_KEY] || {}));
+    } else {
+      try { resolve(JSON.parse(localStorage.getItem(SCENE_KEY) || "{}")); }
+      catch (_) { resolve({}); }
+    }
   });
 }
 function setScenes(map) {
-  return chrome.storage.local.set({ [SCENE_KEY]: map });
+  if (hasChromeStorage) return chrome.storage.local.set({ [SCENE_KEY]: map });
+  try { localStorage.setItem(SCENE_KEY, JSON.stringify(map)); } catch (_) {}
+  return Promise.resolve();
 }
 
 function switchTab(tab) {

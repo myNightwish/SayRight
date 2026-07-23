@@ -12,8 +12,25 @@ const resultText = document.querySelector("#resultText");
 const PLACEHOLDER_RESULT = "翻译或润色结果......";
 const TRANSLATE_LABEL = "翻译";
 const COPY_LABEL = "⧉ 复制";
-// 润色（tutor）走本地 Node 桥接服务，由它调用 Claude Agent SDK。
-const TUTOR_ENDPOINT = "http://127.0.0.1:8770/polish";
+// 润色（tutor）走桥接服务。插件里是本机 127.0.0.1；若将来页面被 server 托管访问则跟随来源。
+const SERVER_ORIGIN =
+  typeof location !== "undefined" && location.protocol.startsWith("http")
+    ? location.origin
+    : "http://127.0.0.1:8770";
+const TUTOR_ENDPOINT = `${SERVER_ORIGIN}/polish`;
+// 访问口令：公网部署后带上 x-tutor-key。?key=xxx 首次记到 localStorage。本机自用留空。
+const TUTOR_KEY = (() => {
+  try {
+    const fromUrl = new URLSearchParams(location.search).get("key");
+    if (fromUrl) localStorage.setItem("tutorAccessKey", fromUrl);
+    return localStorage.getItem("tutorAccessKey") || "";
+  } catch (_) { return ""; }
+})();
+function apiHeaders() {
+  const h = { "Content-Type": "application/json" };
+  if (TUTOR_KEY) h["x-tutor-key"] = TUTOR_KEY;
+  return h;
+}
 // 润色收藏：tutor 自己的收藏，存在 chrome.storage.local 的 corrections 键下，
 // 与划词收藏插件（favorites 键）互不影响。
 const STORAGE_KEY = "corrections";
@@ -146,7 +163,7 @@ async function polishExpression(text, scene, tone, strictness) {
   try {
     response = await fetch(TUTOR_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: apiHeaders(),
       body: JSON.stringify({ text, scene, tone, strictness }),
     });
   } catch (_) {
@@ -257,14 +274,23 @@ function correctionKey(input) {
   return (input || "").trim().toLowerCase();
 }
 
+const hasChromeStorage = typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
+
 function getCorrections() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(STORAGE_KEY, (res) => resolve(res[STORAGE_KEY] || {}));
+    if (hasChromeStorage) {
+      chrome.storage.local.get(STORAGE_KEY, (res) => resolve(res[STORAGE_KEY] || {}));
+    } else {
+      try { resolve(JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")); }
+      catch (_) { resolve({}); }
+    }
   });
 }
 
 function setCorrections(map) {
-  return chrome.storage.local.set({ [STORAGE_KEY]: map });
+  if (hasChromeStorage) return chrome.storage.local.set({ [STORAGE_KEY]: map });
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(map)); } catch (_) {}
+  return Promise.resolve();
 }
 
 // 根据当前润色结果是否已收藏，刷新星标外观。

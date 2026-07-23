@@ -54,39 +54,71 @@ loadBaiduCcEnv();
 const BASE_URL = (process.env.ANTHROPIC_BASE_URL || "https://api.anthropic.com").replace(/\/$/, "");
 const AUTH_TOKEN =
   process.env.ANTHROPIC_AUTH_TOKEN ||
+  process.env.OPENROUTER_API_KEY ||
+  process.env.OPENAI_API_KEY ||
   process.env.DUCC_AUTH_TOKEN ||
   process.env.ANTHROPIC_API_KEY ||
   "";
 // 模型名不写死——网关渠道会变更（如 'Claude Sonnet 4.5' 已下线）。默认跟随 ANTHROPIC_MODEL，
 // 都没有时退回官方 Opus 4.8 的 id。可用 TUTOR_MODEL 覆盖。
 const TUTOR_MODEL = process.env.TUTOR_MODEL || process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
+// API 格式：'anthropic'（/v1/messages，百度网关/官方 Claude）或 'openai'（/chat/completions，OpenRouter/OpenAI/Gemini兼容层）。
+// 部署到 Render 用 OpenRouter 时设 API_STYLE=openai。默认 anthropic，兼容本机现状。
+const API_STYLE = (process.env.API_STYLE || "anthropic").toLowerCase() === "openai" ? "openai" : "anthropic";
 // 访问口令：一旦部署到公网，任何人都能 POST /polish 刷你的 key。设了 TUTOR_ACCESS_KEY 后，
 // 所有模型接口都要求请求头 x-tutor-key 匹配才放行。本机自用可不设（留空即不校验）。
 // 手机首次访问用 http://你的域名/scene.html?key=你的口令，前端会把它记到 localStorage 并自动带上。
 const ACCESS_KEY = process.env.TUTOR_ACCESS_KEY || "";
-console.log("模型:", TUTOR_MODEL, "| 网关:", BASE_URL, "| 令牌:", AUTH_TOKEN ? "已注入" : "缺失(请设 ANTHROPIC_AUTH_TOKEN)", "| 访问口令:", ACCESS_KEY ? "已启用" : "未设(公网部署务必设置)");
+console.log("模型:", TUTOR_MODEL, "| 格式:", API_STYLE, "| 网关:", BASE_URL, "| 令牌:", AUTH_TOKEN ? "已注入" : "缺失(请设 ANTHROPIC_AUTH_TOKEN)", "| 访问口令:", ACCESS_KEY ? "已启用" : "未设(公网部署务必设置)");
 
-// 直接调用 Messages API，返回模型输出的纯文本（拼接所有 text block）。
-// 无状态：每次请求独立，天然支持并发，无需常驻会话/串行排队。
-// system 用数组 + cache_control 开启 prompt caching：重复的长 system prompt 命中缓存后按 10% 计费。
+// 直接调用模型，返回模型输出的纯文本。无状态：每次请求独立，天然支持并发。
+// 支持两种 API 格式，由 API_STYLE 决定：
+//   anthropic —— POST /v1/messages，x-api-key 鉴权，system 数组 + prompt caching（重复长 system 按 10% 计费）。
+//   openai    —— POST /chat/completions，Bearer 鉴权，system 作为 messages 首条。OpenRouter/OpenAI/Gemini 兼容层通用。
 async function callModel(systemPrompt, userText, { timeoutMs = 60000, maxTokens = 2048 } = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(`${BASE_URL}/v1/messages`, {
-      method: "POST",
-      headers: {
+    let endpoint, headers, body, extractText;
+    if (API_STYLE === "openai") {
+      endpoint = `${BASE_URL}/chat/completions`;
+      headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${AUTH_TOKEN}`,
+      };
+      body = {
+        model: TUTOR_MODEL,
+        max_tokens: maxTokens,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userText },
+        ],
+      };
+      extractText = (data) => data?.choices?.[0]?.message?.content || "";
+    } else {
+      endpoint = `${BASE_URL}/v1/messages`;
+      headers = {
         "Content-Type": "application/json",
         "x-api-key": AUTH_TOKEN,
         "anthropic-version": "2023-06-01",
         "anthropic-beta": "prompt-caching-2024-07-31",
-      },
-      body: JSON.stringify({
+      };
+      body = {
         model: TUTOR_MODEL,
         max_tokens: maxTokens,
         system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
         messages: [{ role: "user", content: userText }],
-      }),
+      };
+      extractText = (data) =>
+        (data.content || [])
+          .filter((b) => b && b.type === "text" && typeof b.text === "string")
+          .map((b) => b.text)
+          .join("");
+    }
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
       signal: controller.signal,
     });
     if (!res.ok) {
@@ -94,10 +126,7 @@ async function callModel(systemPrompt, userText, { timeoutMs = 60000, maxTokens 
       throw new Error(`模型服务异常 (${res.status}) ${errText.slice(0, 200)}`);
     }
     const data = await res.json();
-    return (data.content || [])
-      .filter((b) => b && b.type === "text" && typeof b.text === "string")
-      .map((b) => b.text)
-      .join("");
+    return extractText(data);
   } catch (error) {
     if (error?.name === "AbortError") throw new Error("模型响应超时");
     throw error;
@@ -583,19 +612,29 @@ function sendJson(res, status, payload) {
   res.end(body);
 }
 
-// 静态文件托管：只放行白名单文件（手机经 Safari 访问对练/预演用），
+// 静态文件托管：只放行白名单文件（手机经浏览器访问各页面用），
 // 避免暴露 .env、tutor-server.mjs 等敏感文件。
 const STATIC_FILES = {
+  "/": "text/html; charset=utf-8", // 根路径 → polish 主功能页（手机首页）
+  "/polish.html": "text/html; charset=utf-8",
+  "/popup.js": "application/javascript; charset=utf-8",
   "/scene.html": "text/html; charset=utf-8",
   "/scene.js": "application/javascript; charset=utf-8",
   "/chat.html": "text/html; charset=utf-8",
   "/chat.js": "application/javascript; charset=utf-8",
+  "/collection.html": "text/html; charset=utf-8",
+  "/collection.js": "application/javascript; charset=utf-8",
+  "/quiz.html": "text/html; charset=utf-8",
+  "/quiz.js": "application/javascript; charset=utf-8",
+  "/styles.css": "text/css; charset=utf-8",
 };
 function serveStatic(res, url) {
   const type = STATIC_FILES[url];
   if (!type) return false;
+  // 根路径映射到 polish.html。
+  const fileName = url === "/" ? "polish.html" : url.replace(/^\//, "");
   try {
-    const data = fs.readFileSync(path.join(STATIC_DIR, url.replace(/^\//, "")));
+    const data = fs.readFileSync(path.join(STATIC_DIR, fileName));
     res.writeHead(200, {
       "Content-Type": type,
       "Access-Control-Allow-Origin": "*",

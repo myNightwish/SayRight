@@ -1,0 +1,21 @@
+# Render 部署蓝图：一个 Node Web 服务，跑 tutor-server.mjs。
+# 敏感值（key/口令）不写在这里，注册后在 Render 面板的 Environment 里手填。
+services:
+  - type: web
+    name: sayright
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node tutor-server.mjs
+    envVars:
+      # ↓ 这几个标 sync:false 的，需要你在 Render 面板手动填写（不进 git）
+      - key: API_STYLE
+        value: openai            # 用 OpenRouter/OpenAI 兼容格式
+      - key: ANTHROPIC_BASE_URL
+        value: https://openrouter.ai/api/v1
+      - key: ANTHROPIC_AUTH_TOKEN
+        sync: false              # 你的 OpenRouter key，面板里填
+      - key: TUTOR_MODEL
+        value: anthropic/claude-3.5-sonnet   # 可改成任意 OpenRouter 模型名
+      - key: TUTOR_ACCESS_KEY
+        sync: false              # 你自定义的访问口令，面板里填

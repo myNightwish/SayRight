@@ -7,6 +7,21 @@
 const SERVER_ORIGIN = location.protocol.startsWith("http") ? location.origin : "http://127.0.0.1:8770";
 const API = `${SERVER_ORIGIN}/scene`;
 const EXTRACT_API = `${SERVER_ORIGIN}/extract`;
+// 访问口令：公网部署后后端要求请求头 x-tutor-key。首次用 ?key=xxx 打开会记到 localStorage，
+// 之后所有请求自动带上，无需每次手填。本机自用（后端没设口令）时留空即可。
+const TUTOR_KEY = (() => {
+  try {
+    const fromUrl = new URLSearchParams(location.search).get("key");
+    if (fromUrl) localStorage.setItem("tutorAccessKey", fromUrl);
+    return localStorage.getItem("tutorAccessKey") || "";
+  } catch (_) { return ""; }
+})();
+// 统一请求头：JSON + 可选口令。所有调后端的 fetch 都用它。
+function apiHeaders() {
+  const h = { "Content-Type": "application/json" };
+  if (TUTOR_KEY) h["x-tutor-key"] = TUTOR_KEY;
+  return h;
+}
 // 场景预演收藏：存在 chrome.storage.local 的 sceneSaves 键下，与润色收藏(corrections)、
 // 划词收藏(favorites)互相隔离——不同插件功能的数据各存各的键，收藏页按 tab 分开展示。
 const STORAGE_KEY = "sceneSaves";
@@ -234,7 +249,7 @@ async function saveLine(index, btn) {
   try {
     const resp = await fetch(EXTRACT_API, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: apiHeaders(),
       body: JSON.stringify({ scene: currentScene, speaker: turn.speaker, text: turn.text }),
     });
     const card = await resp.json();
@@ -403,7 +418,7 @@ async function rehearse(scene) {
   try {
     const resp = await fetch(API, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: apiHeaders(),
       body: JSON.stringify({ scene: value }),
     });
     const data = await resp.json();

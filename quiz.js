@@ -4,7 +4,24 @@
 //   判定走后端 /judge（意图命中，非字面比对）；连不上时退回本地词级比对兜底。
 const STORAGE_KEY = "corrections";
 const GOOGLE_ENDPOINT = "https://translate.googleapis.com/translate_a/single";
-const JUDGE_API = "http://127.0.0.1:8770/judge";
+const SERVER_ORIGIN =
+  typeof location !== "undefined" && location.protocol.startsWith("http")
+    ? location.origin
+    : "http://127.0.0.1:8770";
+const JUDGE_API = `${SERVER_ORIGIN}/judge`;
+// 访问口令：公网部署后带上 x-tutor-key。?key=xxx 首次记到 localStorage。本机自用留空。
+const TUTOR_KEY = (() => {
+  try {
+    const fromUrl = new URLSearchParams(location.search).get("key");
+    if (fromUrl) localStorage.setItem("tutorAccessKey", fromUrl);
+    return localStorage.getItem("tutorAccessKey") || "";
+  } catch (_) { return ""; }
+})();
+function apiHeaders() {
+  const h = { "Content-Type": "application/json" };
+  if (TUTOR_KEY) h["x-tutor-key"] = TUTOR_KEY;
+  return h;
+}
 const PASS_THRESHOLD = 0.85; // 本地兜底比对的过关命中率
 
 const stageEl = document.querySelector("#stage");
@@ -23,9 +40,16 @@ function escapeHtml(str) {
   }[c]));
 }
 
+const hasChromeStorage = typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
+
 function getCorrections() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(STORAGE_KEY, (res) => resolve(res[STORAGE_KEY] || {}));
+    if (hasChromeStorage) {
+      chrome.storage.local.get(STORAGE_KEY, (res) => resolve(res[STORAGE_KEY] || {}));
+    } else {
+      try { resolve(JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")); }
+      catch (_) { resolve({}); }
+    }
   });
 }
 
@@ -335,7 +359,7 @@ async function submit() {
   try {
     const resp = await fetch(JUDGE_API, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: apiHeaders(),
       body: JSON.stringify({ intent: current.intent || current.situation || "", accepted, yours: your, mode }),
     });
     if (resp.ok) judged = await resp.json();
