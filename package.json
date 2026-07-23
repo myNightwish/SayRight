@@ -1,0 +1,10 @@
+{
+  "name": "english-practice-tutor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "本地桥接服务：直接调用 Anthropic Messages API 为表达练习插件提供地道表达润色",
+  "scripts": {
+    "tutor": "node tutor-server.mjs"
+  }
+}

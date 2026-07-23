@@ -1,0 +1,6 @@
+.claude/
+node_modules/
+library.json
+.env
+.env.*
+.DS_Store

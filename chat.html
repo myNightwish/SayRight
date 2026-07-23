@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>对练 · Rehearse</title>
+    <style>
+      :root {
+        --violet: #7c5cff; --violet-deep: #5b3fd6; --violet-soft: #a98bff; --accent: #c44bff;
+        --ink: #1b1733; --muted: #6f6a8a; --error: #d6336c;
+        --glass: rgba(255,255,255,0.62); --glass-strong: rgba(255,255,255,0.8); --glass-border: rgba(255,255,255,0.7);
+        --shadow: 0 16px 40px rgba(70,40,160,0.16);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; min-height: 100vh; color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+        background: radial-gradient(120% 80% at 10% 0%, #efe6ff 0%, #e7ecff 45%, #f3edff 100%);
+        position: relative; overflow-x: hidden;
+      }
+      .aurora {
+        position: fixed; inset: -30% -20% auto -20%; height: 420px; z-index: 0; pointer-events: none;
+        background:
+          radial-gradient(40% 60% at 25% 30%, rgba(124,92,255,0.5), transparent 70%),
+          radial-gradient(35% 55% at 75% 20%, rgba(196,75,255,0.4), transparent 70%),
+          radial-gradient(45% 60% at 55% 70%, rgba(92,140,255,0.36), transparent 70%);
+        filter: blur(40px);
+      }
+      .wrap { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 24px 20px 70px; }
+      .topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+      .brand-name {
+        font-size: 22px; font-weight: 800;
+        background: linear-gradient(120deg, var(--violet), var(--accent));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      }
+      .scene-label {
+        font-size: 13px; font-weight: 700; color: var(--violet-deep);
+        background: rgba(124,92,255,0.12); border-radius: 8px; padding: 5px 12px;
+      }
+      .role-tag {
+        font-size: 12px; font-weight: 700; color: #1f7a5a;
+        background: rgba(31,157,107,0.12); border-radius: 8px; padding: 5px 10px;
+      }
+      .spacer { flex: 1; }
+      .pill {
+        border: 1px solid var(--glass-border); background: var(--glass-strong); color: var(--muted);
+        border-radius: 10px; padding: 7px 14px; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none;
+      }
+      .pill:hover { color: var(--violet-deep); }
+      .section-title {
+        display: flex; align-items: center; gap: 8px; margin: 0 0 12px;
+        font-size: 15px; font-weight: 800; color: var(--ink);
+      }
+      .section-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+      .panel {
+        background: var(--glass); backdrop-filter: blur(18px);
+        border: 1px solid var(--glass-border); border-radius: 20px; box-shadow: var(--shadow);
+        padding: 18px; margin-bottom: 18px;
+      }
+      .hidden { display: none; }
+      /* ===== 上：对话窗口 ===== */
+      .chat-thread { display: flex; flex-direction: column; gap: 14px; min-height: 300px; }
+      .msg { display: flex; gap: 10px; max-width: 86%; animation: msgIn .42s cubic-bezier(.2,.8,.2,1); }
+      @keyframes msgIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+      .msg.them { align-self: flex-start; }
+      .msg.me { align-self: flex-end; flex-direction: row-reverse; }
+      .avatar {
+        flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; font-size: 18px;
+        background: rgba(31,157,107,0.16); position: relative;
+      }
+      .msg.me .avatar { background: rgba(124,92,255,0.18); }
+      .avatar.speaking::after {
+        content: ""; position: absolute; inset: -4px; border-radius: 50%;
+        border: 2px solid rgba(31,157,107,0.5); animation: wave 1.1s ease-out infinite;
+      }
+      @keyframes wave { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(1.5); opacity: 0; } }
+      .msg-body { border-radius: 14px; padding: 10px 14px; border: 1px solid transparent; }
+      .msg.them .msg-body { background: rgba(31,157,107,0.1); border-color: rgba(31,157,107,0.22); }
+      .msg.me .msg-body { background: rgba(124,92,255,0.12); border-color: rgba(124,92,255,0.24); }
+      .msg .en { font-size: 15px; line-height: 1.55; }
+      .msg .en .speak { border: none; background: none; cursor: pointer; font-size: 14px; color: var(--violet); opacity: .5; margin-left: 4px; }
+      .msg .en .speak:hover { opacity: 1; }
+      .msg .zh { font-size: 12px; color: var(--muted); margin-top: 4px; }
+      .typing { display: inline-flex; gap: 4px; padding: 4px 2px; }
+      .typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--violet-soft); animation: blink 1.2s infinite both; }
+      .typing span:nth-child(2) { animation-delay: .2s; }
+      .typing span:nth-child(3) { animation-delay: .4s; }
+      @keyframes blink { 0%,80%,100% { opacity: .3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+      .feedback {
+        align-self: flex-end; max-width: 86%; margin-top: -6px;
+        background: rgba(196,75,255,0.08); border: 1px solid rgba(196,75,255,0.2);
+        border-radius: 12px; padding: 10px 12px; font-size: 13px; overflow: hidden; animation: fbIn .4s ease;
+      }
+      @keyframes fbIn { from { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; } to { opacity: 1; max-height: 200px; } }
+      .feedback .fb-better { color: var(--violet-deep); font-weight: 700; font-size: 14px; }
+      .feedback .fb-better .speak { border: none; background: none; cursor: pointer; color: var(--violet); margin-left: 4px; }
+      .feedback .fb-tip { color: var(--muted); line-height: 1.5; margin-top: 4px; }
+      .ok-flash { align-self: flex-end; color: #1f9d6b; font-size: 13px; font-weight: 700; animation: okFlash 1.8s ease forwards; }
+      @keyframes okFlash { 0% { opacity: 0; transform: scale(.8); } 15% { opacity: 1; transform: scale(1); } 70% { opacity: 1; } 100% { opacity: 0; } }
+      .chat-hint {
+        font-size: 13px; color: var(--violet-deep); background: rgba(124,92,255,0.1);
+        border: 1px solid rgba(124,92,255,0.2); border-radius: 10px; padding: 8px 12px; margin: 14px 0 8px; animation: fbIn .3s ease;
+      }
+      .composer { margin-top: 8px; }
+      .spotlight {
+        display: flex; gap: 10px; padding: 6px; border-radius: 16px;
+        background: var(--glass-strong); border: 1px solid var(--glass-border); transition: box-shadow .3s;
+      }
+      .spotlight.active { box-shadow: 0 0 0 3px rgba(124,92,255,0.25); animation: breathe 2.4s ease-in-out infinite; }
+      @keyframes breathe { 0%,100% { box-shadow: 0 0 0 3px rgba(124,92,255,0.18); } 50% { box-shadow: 0 0 0 6px rgba(124,92,255,0.28); } }
+      .spotlight.waiting { opacity: .55; }
+      #chatInput { flex: 1; border: none; background: none; outline: none; padding: 10px 12px; font-size: 15px; color: var(--ink); font-family: inherit; }
+      .chat-send { border: none; border-radius: 12px; padding: 0 20px; font-size: 15px; font-weight: 700; color: #fff; cursor: pointer; background: linear-gradient(120deg, var(--violet), var(--accent)); }
+      .chat-send:disabled { opacity: .5; cursor: default; }
+      /* ===== 中：不够地道复盘 ===== */
+      .weak-card {
+        background: var(--glass-strong); border: 1px solid rgba(196,75,255,0.22); border-radius: 12px;
+        padding: 12px 14px; margin-bottom: 10px; position: relative;
+      }
+      .weak-said { color: var(--muted); font-size: 13px; }
+      .weak-said .tag { color: var(--error); font-weight: 700; margin-right: 6px; }
+      .weak-better { color: var(--violet-deep); font-weight: 700; font-size: 15px; margin-top: 4px; }
+      .weak-better .speak { border: none; background: none; cursor: pointer; color: var(--violet); margin-left: 4px; }
+      .weak-tip { color: var(--muted); font-size: 12px; line-height: 1.5; margin-top: 4px; }
+      .weak-save { position: absolute; top: 12px; right: 12px; border: none; background: none; font-size: 18px; cursor: pointer; color: var(--violet); opacity: .6; }
+      .weak-save:hover, .weak-save.saved { opacity: 1; }
+      .empty { color: var(--muted); font-size: 13px; }
+      /* ===== 下：原始剧本（可折叠） ===== */
+      .script-fold > summary { cursor: pointer; list-style: none; margin-bottom: 0; user-select: none; }
+      .script-fold > summary::-webkit-details-marker { display: none; }
+      .script-fold[open] > summary { margin-bottom: 12px; }
+      .fold-hint { font-size: 12px; font-weight: 600; color: var(--muted); margin-left: 6px; }
+      .script-fold[open] .fold-hint::after { content: " ▴"; }
+      .script-fold[open] .fold-hint { font-size: 0; }
+      .script-fold[open] .fold-hint::after { content: "点击收起 ▴"; font-size: 12px; }
+      /* 原始剧本：复用对话气泡的左右分边 + 配色，比裸文字更清晰 */
+      .script-turn { display: flex; gap: 8px; margin-bottom: 12px; max-width: 88%; }
+      .script-turn.them { margin-right: auto; }
+      .script-turn.me { margin-left: auto; flex-direction: row-reverse; }
+      .script-turn .s-avatar {
+        flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; font-size: 15px;
+        background: rgba(31,157,107,0.16);
+      }
+      .script-turn.me .s-avatar { background: rgba(124,92,255,0.18); }
+      .script-turn .s-bubble {
+        border-radius: 12px; padding: 8px 12px; border: 1px solid transparent;
+        display: flex; align-items: flex-start; gap: 6px;
+      }
+      .script-turn.them .s-bubble { background: rgba(31,157,107,0.1); border-color: rgba(31,157,107,0.22); }
+      .script-turn.me .s-bubble { background: rgba(124,92,255,0.12); border-color: rgba(124,92,255,0.24); }
+      .script-turn .stext { font-size: 14px; line-height: 1.55; }
+      .script-turn .speak { flex: none; border: none; background: none; cursor: pointer; color: var(--violet); opacity: .5; font-size: 13px; }
+      .script-turn .speak:hover { opacity: 1; }
+      .toast {
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+        background: rgba(27,23,51,0.9); color: #fff; padding: 10px 18px; border-radius: 999px;
+        font-size: 14px; z-index: 5; opacity: 0; transition: opacity .2s; pointer-events: none;
+      }
+      .toast.show { opacity: 1; }
+    </style>
+  </head>
+  <body>
+    <div class="aurora"></div>
+    <div class="wrap">
+      <div class="topbar">
+        <span class="brand-name">对练</span>
+        <span id="chatScene" class="scene-label"></span>
+        <span id="roleTag" class="role-tag"></span>
+        <span class="spacer"></span>
+        <button id="swapBtn" class="pill" type="button">🔄 互换角色</button>
+        <button id="restartBtn" class="pill" type="button">↻ 重练</button>
+      </div>
+
+      <!-- 上：对话窗口 -->
+      <section class="panel">
+        <div class="section-title"><span class="dot"></span>对话</div>
+        <div id="chatThread" class="chat-thread"></div>
+        <div id="chatHint" class="chat-hint hidden"></div>
+        <div class="composer">
+          <div id="chatSpotlight" class="spotlight waiting">
+            <input id="chatInput" type="text" placeholder="轮到你了，用英文回应……" autocomplete="off" />
+            <button id="chatSend" class="chat-send" type="button">发送</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 中：不够地道的句子（对练结束后出现） -->
+      <section id="weakPanel" class="panel hidden">
+        <div class="section-title"><span class="dot"></span>这场里你可以说得更地道的地方</div>
+        <div id="weakList"></div>
+      </section>
+
+      <!-- 下：原始剧本（默认折叠，点标题展开） -->
+      <section id="scriptPanel" class="panel hidden">
+        <details class="script-fold">
+          <summary class="section-title"><span class="dot"></span>原始剧本（对照）<span class="fold-hint">点击展开 ▾</span></summary>
+          <div id="scriptList"></div>
+        </details>
+      </section>
+    </div>
+    <div id="toast" class="toast"></div>
+    <script src="chat.js"></script>
+  </body>
+</html>
