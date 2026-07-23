@@ -10,7 +10,7 @@ rm -f "$OUT"
 
 zip -r "$OUT" \
   manifest.json \
-  config.js auth.js \
+  config.js auth.js sync.js \
   popup.html popup.js \
   collection.html collection.js \
   scene.html scene.js \

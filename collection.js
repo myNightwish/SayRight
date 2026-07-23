@@ -260,12 +260,15 @@ listEl.addEventListener("click", async (event) => {
   const map = await getCorrections();
   delete map[key];
   await setCorrections(map);
+  if (window.NuanceSync) window.NuanceSync.recordDelete(key);
   await load();
 });
 
 clearAllBtn.addEventListener("click", async () => {
   if (!allItems.length) return;
   if (!confirm("确定清空全部润色收藏吗？此操作不可撤销。")) return;
+  // 每个 key 记墓碑，确保清空能同步到其他设备，而不是被别端旧数据复活。
+  if (window.NuanceSync) allItems.forEach((it) => window.NuanceSync.recordDelete(it.key));
   await setCorrections({});
   await load();
 });
@@ -290,6 +293,9 @@ if (hasChromeStorage) {
     if (changes[SCENE_KEY]) loadScenes();
   });
 }
+
+// 云同步写回本地后，重渲染两个 tab（拉到别的设备新增/删除的收藏）。
+window.addEventListener("nuance:synced", () => { load(); loadScenes(); });
 
 load();
 
@@ -461,12 +467,14 @@ sceneListEl.addEventListener("click", async (event) => {
   const map = await getScenes();
   delete map[key];
   await setScenes(map);
+  if (window.NuanceSync) window.NuanceSync.recordDelete(key);
   await loadScenes();
 });
 
 clearScenesBtn.addEventListener("click", async () => {
   if (!sceneItems.length) return;
   if (!confirm("确定清空全部场景收藏吗？此操作不可撤销。")) return;
+  if (window.NuanceSync) sceneItems.forEach((it) => window.NuanceSync.recordDelete(it.key));
   await setScenes({});
   await loadScenes();
 });

@@ -320,6 +320,7 @@ async function saveWeak(index, btn) {
     btn.classList.remove("saved");
     btn.textContent = "☆";
     await setSaves(map);
+    if (window.NuanceSync) window.NuanceSync.recordDelete(lineKey);
     toast(canPersist ? "已取消收藏" : "已取消（未能保存）");
     return;
   }

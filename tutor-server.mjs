@@ -15,6 +15,7 @@ import http from "node:http";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 // 端口跟随环境变量：Render/Fly 等平台会通过 PORT 注入分配的端口，必须监听它；
@@ -112,6 +113,96 @@ console.log(
   "| 令牌:", AUTH_TOKEN ? "已注入" : "缺失(请设 ANTHROPIC_AUTH_TOKEN)",
   "| 访问口令:", ACCESS_KEY_REQUIRED ? `已启用(${ACCESS_KEYS.size}个, 每日配额${DAILY_QUOTA || "不限"})` : "未设(公网部署务必设置)"
 );
+
+// ============ 收藏云同步存储层 ============
+// 目标：同一口令的所有设备（手机浏览器 + N 台电脑插件）共享同一份收藏，
+// 打开即拉取最新、收藏即上行；多端是「结合」而非「替代/无脑累加」：
+//   - 三类数据(corrections/sceneSaves/sceneScripts)都是「以业务 key 索引的对象」，
+//     合并 = 按 key 求并集，同 key 取 savedAt 更新的一条 → 不重复。
+//   - 删除用「墓碑」传播：某端删掉的 key 记一条 {deletedAt}，合并时若墓碑比数据新就抹掉 → 不会「删了又被别端旧数据复活」。
+// 存储后端优先 Upstash Redis（免费、持久、REST 免依赖）；未配置则退回进程内存（Render 休眠/重部会丢，仅供本地验证）。
+const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL || "";
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || "";
+const SYNC_PERSISTENT = Boolean(UPSTASH_URL && UPSTASH_TOKEN);
+const memStore = new Map(); // 内存兜底：bucketKey -> stateObject
+console.log("| 收藏同步:", SYNC_PERSISTENT ? "Upstash 已启用(持久)" : "内存态(重启即失，配 UPSTASH_REDIS_REST_* 可持久)");
+
+// 按口令分桶：不同口令的人各自独立，互不可见。无口令(本机自用)统一放 "local"。
+function bucketOf(provided) {
+  const raw = (ACCESS_KEY_REQUIRED ? provided : "local") || "local";
+  // 口令可能含特殊字符，hash 成安全的 redis key。
+  return "nuance:sync:" + crypto.createHash("sha256").update(raw).digest("hex").slice(0, 24);
+}
+const EMPTY_STATE = () => ({ corrections: {}, sceneSaves: {}, sceneScripts: {}, tombstones: {} });
+
+async function loadState(bucket) {
+  if (!SYNC_PERSISTENT) return memStore.get(bucket) || EMPTY_STATE();
+  try {
+    const r = await fetch(`${UPSTASH_URL}/get/${encodeURIComponent(bucket)}`, {
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` },
+    });
+    const j = await r.json();
+    if (j && j.result) return JSON.parse(j.result);
+  } catch (e) {
+    console.warn("[sync] 读取失败，暂用空态:", e?.message || e);
+  }
+  return EMPTY_STATE();
+}
+async function saveState(bucket, state) {
+  if (!SYNC_PERSISTENT) { memStore.set(bucket, state); return; }
+  try {
+    // Upstash REST: POST body 作为 SET 的值，避免超长 URL。
+    await fetch(`${UPSTASH_URL}/set/${encodeURIComponent(bucket)}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify(state),
+    });
+  } catch (e) {
+    console.warn("[sync] 写入失败:", e?.message || e);
+  }
+}
+
+// 合并两个「key→item」的 map：并集；同 key 保留 savedAt 更大的。
+function mergeMap(base, incoming) {
+  const out = { ...base };
+  for (const [k, v] of Object.entries(incoming || {})) {
+    if (!v || typeof v !== "object") continue;
+    const cur = out[k];
+    if (!cur || (v.savedAt || 0) >= (cur.savedAt || 0)) out[k] = v;
+  }
+  return out;
+}
+// 墓碑合并：同 key 取更新的 deletedAt。
+function mergeTombstones(base, incoming) {
+  const out = { ...base };
+  for (const [k, t] of Object.entries(incoming || {})) {
+    const at = typeof t === "number" ? t : (t && t.deletedAt) || 0;
+    if (!at) continue;
+    if (!out[k] || at > out[k]) out[k] = at;
+  }
+  return out;
+}
+// 用墓碑抹掉被删的 key：仅当墓碑时间 >= 该 key 的 savedAt（否则说明删除后又有更新的收藏，保留）。
+function applyTombstones(map, tombstones) {
+  for (const [k, at] of Object.entries(tombstones || {})) {
+    const item = map[k];
+    if (item && (item.savedAt || 0) <= at) delete map[k];
+  }
+}
+// 核心：把客户端上行的一份数据并入服务端已有状态，返回合并后的完整状态。
+function mergeStates(server, client) {
+  const tombstones = mergeTombstones(server.tombstones, client.tombstones);
+  const merged = {
+    corrections: mergeMap(server.corrections, client.corrections),
+    sceneSaves: mergeMap(server.sceneSaves, client.sceneSaves),
+    sceneScripts: mergeMap(server.sceneScripts, client.sceneScripts),
+    tombstones,
+  };
+  applyTombstones(merged.corrections, tombstones);
+  applyTombstones(merged.sceneSaves, tombstones);
+  // sceneScripts 用场景名做 key，与 sceneSaves 的删除不强绑定，这里不按同一批墓碑抹除。
+  return merged;
+}
 
 
 // 直接调用模型，返回模型输出的纯文本。无状态：每次请求独立，天然支持并发。
@@ -665,6 +756,7 @@ const STATIC_FILES = {
   "/privacy.html": "text/html; charset=utf-8",
   "/config.js": "application/javascript; charset=utf-8",
   "/auth.js": "application/javascript; charset=utf-8",
+  "/sync.js": "application/javascript; charset=utf-8",
   "/popup.js": "application/javascript; charset=utf-8",
   "/scene.html": "text/html; charset=utf-8",
   "/scene.js": "application/javascript; charset=utf-8",
@@ -715,7 +807,24 @@ function readBody(req) {
   });
 }
 
-// ---- 路由 ----
+// 收藏云同步：客户端上行本地三类数据 + 墓碑，服务端合并后回传完整最新态。
+// 请求体：{ corrections, sceneSaves, sceneScripts, tombstones }
+// 响应体：合并后的 { corrections, sceneSaves, sceneScripts, tombstones }
+async function handleSync(req, res, bucket) {
+  const client = await readBody(req);
+  const clientState = {
+    corrections: (client && client.corrections) || {},
+    sceneSaves: (client && client.sceneSaves) || {},
+    sceneScripts: (client && client.sceneScripts) || {},
+    tombstones: (client && client.tombstones) || {},
+  };
+  const server = await loadState(bucket);
+  const merged = mergeStates(server, clientState);
+  await saveState(bucket, merged);
+  sendJson(res, 200, merged);
+}
+
+
 
 // 统一的「调用模型 + 解析 JSON」重试封装。
 // 模型偶发吐出非法 JSON（裸引号/多余说明文字/被截断），单次失败并不代表必然失败，
@@ -876,6 +985,16 @@ const server = http.createServer(async (req, res) => {
   try {
     // GET 静态页：手机 Safari 直接访问的各页面（scene/chat/polish 等）
     if (req.method === "GET" && serveStatic(res, url)) return;
+    // 收藏同步：单独处理。要求口令有效（防陌生人写你的桶），但不计入每日模型配额
+    // （同步在打开页面/切后台时频繁发生，不该消耗练习额度）。
+    if (req.method === "POST" && url === "/sync") {
+      const provided = req.headers["x-tutor-key"] || "";
+      if (ACCESS_KEY_REQUIRED && !ACCESS_KEYS.has(provided)) {
+        sendJson(res, 401, { error: "访问口令无效" });
+        return;
+      }
+      return await handleSync(req, res, bucketOf(provided));
+    }
     // 模型接口统一鉴权：设了访问口令时，POST 接口必须带一个有效的 x-tutor-key，否则 401。
     // 口令有效但当日配额用尽 → 429（防止一个口令被多人共享刷爆你的额度）。
     // 静态页不校验（让手机能先打开页面，页面再带 key 请求接口）。
