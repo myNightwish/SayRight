@@ -3,8 +3,10 @@
 //       或 chat.html?scene=场景名 直达 → 用该场景已收藏的句子拼主线。
 // 三段式：上=对话窗口（沉浸动效），中=对练结束后「不够地道」复盘（可收藏），下=原始剧本对照。
 
-// 接口地址跟随页面来源（手机经 server 托管访问时自动指向电脑 IP，无需手填）。
-const SERVER_ORIGIN = location.protocol.startsWith("http") ? location.origin : "http://127.0.0.1:8770";
+// 接口地址：H5 跟随 location.origin；插件（chrome-extension://）打到 config.js 的线上域名。
+const SERVER_ORIGIN = location.protocol.startsWith("http")
+  ? location.origin
+  : (window.NUANCE_REMOTE_ORIGIN || "http://127.0.0.1:8770");
 const CHAT_API = `${SERVER_ORIGIN}/chat`;
 const EXTRACT_API = `${SERVER_ORIGIN}/extract`;
 // 访问口令：与 scene.js 一致，?key=xxx 记到 localStorage 后自动带上。

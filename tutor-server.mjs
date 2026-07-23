@@ -609,7 +609,7 @@ function sendJson(res, status, payload) {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, x-tutor-key",
   });
   res.end(body);
 }
@@ -619,6 +619,7 @@ function sendJson(res, status, payload) {
 const STATIC_FILES = {
   "/": "text/html; charset=utf-8", // 根路径 → polish 主功能页（手机首页）
   "/polish.html": "text/html; charset=utf-8",
+  "/config.js": "application/javascript; charset=utf-8",
   "/auth.js": "application/javascript; charset=utf-8",
   "/popup.js": "application/javascript; charset=utf-8",
   "/scene.html": "text/html; charset=utf-8",

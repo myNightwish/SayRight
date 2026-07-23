@@ -7,7 +7,7 @@ const GOOGLE_ENDPOINT = "https://translate.googleapis.com/translate_a/single";
 const SERVER_ORIGIN =
   typeof location !== "undefined" && location.protocol.startsWith("http")
     ? location.origin
-    : "http://127.0.0.1:8770";
+    : (window.NUANCE_REMOTE_ORIGIN || "http://127.0.0.1:8770");
 const JUDGE_API = `${SERVER_ORIGIN}/judge`;
 // 访问口令：公网部署后带上 x-tutor-key。?key=xxx 首次记到 localStorage。本机自用留空。
 const TUTOR_KEY = (() => {

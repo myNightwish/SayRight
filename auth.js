@@ -23,11 +23,23 @@
 
   const origFetch = window.fetch.bind(window);
 
-  // 判断是否是「打到本服务、需要口令」的请求：同源且是 POST（模型接口都是 POST）。
+  // 判断是否是「打到本服务、需要口令」的请求。
+  // 两种场景都要覆盖：
+  //   H5 网页版：同源 POST（接口都在自己域名下）。
+  //   插件：页面是 chrome-extension:// 协议，请求跨域打到 config.js 的线上域名，
+  //         这时按目标 origin 是否等于线上服务地址来判断。
+  function isServiceOrigin(u) {
+    if (u.origin === location.origin) return true;
+    try {
+      const remote = window.NUANCE_REMOTE_ORIGIN;
+      if (remote && u.origin === new URL(remote).origin) return true;
+    } catch (_) {}
+    return false;
+  }
   function needsKey(url, opts) {
     try {
       const u = new URL(url, location.href);
-      if (u.origin !== location.origin) return false; // 跨域（如 Google 翻译）不碰
+      if (!isServiceOrigin(u)) return false; // 第三方（如 Google 翻译）不碰
       const method = (opts && opts.method ? opts.method : "GET").toUpperCase();
       return method === "POST";
     } catch (_) { return false; }

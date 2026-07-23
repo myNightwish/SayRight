@@ -12,11 +12,12 @@ const resultText = document.querySelector("#resultText");
 const PLACEHOLDER_RESULT = "翻译或润色结果......";
 const TRANSLATE_LABEL = "翻译";
 const COPY_LABEL = "⧉ 复制";
-// 润色（tutor）走桥接服务。插件里是本机 127.0.0.1；若将来页面被 server 托管访问则跟随来源。
+// 润色（tutor）走桥接服务。H5 网页版跟随 location.origin；
+// 插件（chrome-extension:// 协议）没有自己的后端，打到 config.js 的线上域名。
 const SERVER_ORIGIN =
   typeof location !== "undefined" && location.protocol.startsWith("http")
     ? location.origin
-    : "http://127.0.0.1:8770";
+    : (typeof window !== "undefined" && window.NUANCE_REMOTE_ORIGIN) || "http://127.0.0.1:8770";
 const TUTOR_ENDPOINT = `${SERVER_ORIGIN}/polish`;
 // 访问口令：公网部署后带上 x-tutor-key。?key=xxx 首次记到 localStorage。本机自用留空。
 const TUTOR_KEY = (() => {

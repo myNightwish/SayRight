@@ -2,9 +2,11 @@
 // 输入一个未来场景 → 调本地 /scene → 渲染「对话剧本 + 抽卡」两段。
 // 历史话题缓存在 localStorage，刷新不丢；对练在独立页 chat.html 打开。
 
-// 接口地址跟随页面来源：经 server 托管访问（http://电脑IP:8770/scene.html）时取 location.origin，
-// 手机和电脑共用一份、无需手填 IP；file:// 直接打开时回退本机。
-const SERVER_ORIGIN = location.protocol.startsWith("http") ? location.origin : "http://127.0.0.1:8770";
+// 接口地址：H5 网页版由本服务托管，跟随 location.origin（手机/电脑共用、无需填 IP）；
+// 插件（chrome-extension:// 协议）没有自己的后端，打到 config.js 里配置的线上域名。
+const SERVER_ORIGIN = location.protocol.startsWith("http")
+  ? location.origin
+  : (window.NUANCE_REMOTE_ORIGIN || "http://127.0.0.1:8770");
 const API = `${SERVER_ORIGIN}/scene`;
 const EXTRACT_API = `${SERVER_ORIGIN}/extract`;
 // 访问口令：公网部署后后端要求请求头 x-tutor-key。首次用 ?key=xxx 打开会记到 localStorage，

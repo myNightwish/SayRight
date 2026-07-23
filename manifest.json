@@ -7,6 +7,7 @@
   "host_permissions": [
     "https://translate.googleapis.com/*",
     "https://api.mymemory.translated.net/*",
+    "https://say-50s9.onrender.com/*",
     "http://127.0.0.1:8770/*"
   ],
   "icons": {
