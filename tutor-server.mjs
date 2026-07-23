@@ -121,8 +121,11 @@ console.log(
 //     合并 = 按 key 求并集，同 key 取 savedAt 更新的一条 → 不重复。
 //   - 删除用「墓碑」传播：某端删掉的 key 记一条 {deletedAt}，合并时若墓碑比数据新就抹掉 → 不会「删了又被别端旧数据复活」。
 // 存储后端优先 Upstash Redis（免费、持久、REST 免依赖）；未配置则退回进程内存（Render 休眠/重部会丢，仅供本地验证）。
-const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL || "";
-const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || "";
+// ⚠️ 临时联调：把 Upstash 凭证写成兜底默认值（仍然「环境变量优先」，Render 上配了就用配的）。
+// 注意 SayRight 是公开仓库 —— 一旦提交推送，这个 token 会永久留在公开 git 历史里。
+// 联调确认同步能通之后，请到 Upstash 控制台 Rotate 掉这个 token，并把下面两行改回纯 process.env。
+const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL || "https://magical-yak-173317.upstash.io";
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || "gQAAAAAAAqUFAAIgcDFlMDZmN2ExNzRlMzc0YTkwYTM1NDY1ZGJkY2RlMzJmMg";
 const SYNC_PERSISTENT = Boolean(UPSTASH_URL && UPSTASH_TOKEN);
 const memStore = new Map(); // 内存兜底：bucketKey -> stateObject
 console.log("| 收藏同步:", SYNC_PERSISTENT ? "Upstash 已启用(持久)" : "内存态(重启即失，配 UPSTASH_REDIS_REST_* 可持久)");
