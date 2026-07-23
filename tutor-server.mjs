@@ -364,9 +364,10 @@ function callClaude(userText) {
 }
 
 function callSceneClaude(userText) {
-  // 场景生成更重（整段剧本+卡片），超时与输出上限都放宽。
-  // maxTokens 提到 8192：中英混合下 8-10 轮对话+8-14 张卡常逼近 4096，截断会导致 JSON 不完整。
-  return callModel(SCENE_SYSTEM_PROMPT, userText, { timeoutMs: 120000, maxTokens: 8192 });
+  // 场景生成更重（整段剧本+卡片），超时放宽到 120s。
+  // 偶发格式异常多为模型吐出非法 JSON（裸引号/多余说明文字），并非单纯截断，
+  // 因此不靠堆高 maxTokens，而是在 handler 里统一走「最多 3 次重试」兜底。
+  return callModel(SCENE_SYSTEM_PROMPT, userText, { timeoutMs: 120000, maxTokens: 4096 });
 }
 
 function callExtractClaude(userText) {
@@ -670,6 +671,22 @@ function readBody(req) {
 }
 
 // ---- 路由 ----
+
+// 统一的「调用模型 + 解析 JSON」重试封装。
+// 模型偶发吐出非法 JSON（裸引号/多余说明文字/被截断），单次失败并不代表必然失败，
+// 重跑一次往往就正常。这里对所有接口统一最多重试 3 次；仍失败才报格式异常。
+async function callAndParse(callFn, parseFn, label) {
+  let lastRaw = "";
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    lastRaw = await callFn();
+    const parsed = parseFn(lastRaw);
+    if (parsed) return parsed;
+    if (attempt < 3) console.warn(`[${label}] 第 ${attempt} 次解析失败，重试…`);
+  }
+  console.error(`[${label}] 连续 3 次解析失败，模型最后一次原始返回：\n`, lastRaw);
+  return null;
+}
+
 async function handlePolish(req, res) {
   const { text, scene, tone, strictness } = await readBody(req);
   const input = (text || "").trim();
@@ -685,11 +702,12 @@ async function handlePolish(req, res) {
     tone: (tone || "").trim(),
     strictness: strictness === "easy" ? "easy" : "strict",
   });
-  const modelOutput = await callClaude(payload);
-  const parsed = parseStrictJson(modelOutput);
+  const parsed = await callAndParse(
+    () => callClaude(payload),
+    parseStrictJson,
+    "polish"
+  );
   if (!parsed) {
-    // 解析失败时打出模型原始返回，便于定位（构式/槽位里的方括号是否破坏了 JSON 等）。
-    console.error("解析失败，模型原始返回：\n", modelOutput);
     sendJson(res, 502, { error: "模型返回格式异常" });
     return;
   }
@@ -705,16 +723,12 @@ async function handleScene(req, res) {
     return;
   }
   const payload = JSON.stringify({ scene: input });
-  // 场景输出结构深、体量大，偶发被截断或含裸引号导致 JSON 解析失败。
-  // 失败时自动重试一次（无状态，代价可控），把偶发的格式异常概率再压低一档。
-  let parsed = null;
-  let lastRaw = "";
-  for (let attempt = 0; attempt < 2 && !parsed; attempt++) {
-    lastRaw = await callSceneClaude(payload);
-    parsed = parseSceneJson(lastRaw);
-  }
+  const parsed = await callAndParse(
+    () => callSceneClaude(payload),
+    parseSceneJson,
+    "scene"
+  );
   if (!parsed) {
-    console.error("场景解析失败（已重试1次），模型原始返回：\n", lastRaw);
     sendJson(res, 502, { error: "模型返回格式异常" });
     return;
   }
@@ -734,10 +748,12 @@ async function handleExtract(req, res) {
     speaker: (speaker || "").trim(),
     text: line,
   });
-  const modelOutput = await callExtractClaude(payload);
-  const parsed = parseCardJson(modelOutput);
+  const parsed = await callAndParse(
+    () => callExtractClaude(payload),
+    parseCardJson,
+    "extract"
+  );
   if (!parsed) {
-    console.error("抽卡解析失败，模型原始返回：\n", modelOutput);
     sendJson(res, 502, { error: "模型返回格式异常" });
     return;
   }
@@ -765,10 +781,12 @@ async function handleChat(req, res) {
     learnerRole: (learnerRole || "你").trim() || "你",
     aiRole: (aiRole || "对方").trim() || "对方",
   });
-  const modelOutput = await callChatClaude(payload);
-  const parsed = parseChatJson(modelOutput);
+  const parsed = await callAndParse(
+    () => callChatClaude(payload),
+    parseChatJson,
+    "chat"
+  );
   if (!parsed) {
-    console.error("对练解析失败，模型原始返回：\n", modelOutput);
     sendJson(res, 502, { error: "模型返回格式异常" });
     return;
   }
@@ -792,10 +810,12 @@ async function handleJudge(req, res) {
     yours: answer,
     mode: mode === "transfer" ? "transfer" : "replay",
   });
-  const modelOutput = await callJudgeClaude(payload);
-  const parsed = parseJudgeJson(modelOutput);
+  const parsed = await callAndParse(
+    () => callJudgeClaude(payload),
+    parseJudgeJson,
+    "judge"
+  );
   if (!parsed) {
-    console.error("判定解析失败，模型原始返回：\n", modelOutput);
     sendJson(res, 502, { error: "模型返回格式异常" });
     return;
   }

@@ -34,10 +34,23 @@
       .scene-select { font-size: 16px; padding: 8px 12px; }
       .button { padding: 10px 24px; font-size: 16px; }
       .result-text { font-size: 15px; }
-      /* 场景/语气/严格度三组下拉在窄屏换行排布，不再挤成一行 */
-      @media (max-width: 520px) {
-        .scene-row { flex-wrap: wrap; }
-        .scene-row .scene-select { flex: 1 1 40%; min-width: 120px; }
+      /* 每组「标签+下拉」的容器；宽屏时横向自适应，窄屏时纵向堆叠 */
+      .scene-row .scene-field { display: flex; align-items: center; gap: 6px; flex: 1 1 auto; min-width: 0; }
+      .scene-row .scene-field .scene-select { flex: 1; }
+      /* 窄屏（手机）：整体放松间距，去掉「挤」的观感 */
+      @media (max-width: 560px) {
+        .app { padding: 12px 14px calc(16px + env(safe-area-inset-bottom)); }
+        .panel { padding: 16px; border-radius: 20px; margin-bottom: 14px; }
+        .textarea { min-height: 132px; }
+        /* 场景/语气/严格度：每组「标签+下拉」独立成块、纵向堆叠，标签不再和下拉挤在一行 */
+        .scene-row { flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+        .scene-row .scene-field {
+          flex: 1 1 calc(50% - 6px); display: flex; flex-direction: column;
+          align-items: stretch; gap: 5px; min-width: 0;
+        }
+        .scene-row .scene-field .scene-label { font-size: 12px; }
+        .scene-row .scene-field .scene-select { width: 100%; }
+        .action-row { margin-top: 16px; gap: 10px; }
       }
     </style>
   </head>
@@ -72,32 +85,38 @@
         ></textarea>
 
         <div class="scene-row">
-          <label class="scene-label" for="sceneSelect">场景</label>
-          <select id="sceneSelect" class="scene-select">
-            <option value="">通用</option>
-            <option value="面试">面试</option>
-            <option value="客户沟通">客户沟通</option>
-            <option value="向老板汇报">向老板汇报</option>
-            <option value="恋爱聊天">恋爱聊天</option>
-            <option value="论文写作">论文写作</option>
-            <option value="工作邮件">工作邮件</option>
-          </select>
-          <label class="scene-label" for="toneSelect">语气</label>
-          <select id="toneSelect" class="scene-select">
-            <option value="">自然</option>
-            <option value="礼貌">礼貌</option>
-            <option value="专业">专业</option>
-            <option value="友好">友好</option>
-            <option value="热情">热情</option>
-            <option value="强势">强势</option>
-            <option value="简洁">简洁</option>
-            <option value="委婉">委婉</option>
-          </select>
-          <label class="scene-label" for="strictnessSelect">严格度</label>
-          <select id="strictnessSelect" class="scene-select">
-            <option value="strict">严格挑剔</option>
-            <option value="easy">鼓励务实</option>
-          </select>
+          <div class="scene-field">
+            <label class="scene-label" for="sceneSelect">场景</label>
+            <select id="sceneSelect" class="scene-select">
+              <option value="">通用</option>
+              <option value="面试">面试</option>
+              <option value="客户沟通">客户沟通</option>
+              <option value="向老板汇报">向老板汇报</option>
+              <option value="恋爱聊天">恋爱聊天</option>
+              <option value="论文写作">论文写作</option>
+              <option value="工作邮件">工作邮件</option>
+            </select>
+          </div>
+          <div class="scene-field">
+            <label class="scene-label" for="toneSelect">语气</label>
+            <select id="toneSelect" class="scene-select">
+              <option value="">自然</option>
+              <option value="礼貌">礼貌</option>
+              <option value="专业">专业</option>
+              <option value="友好">友好</option>
+              <option value="热情">热情</option>
+              <option value="强势">强势</option>
+              <option value="简洁">简洁</option>
+              <option value="委婉">委婉</option>
+            </select>
+          </div>
+          <div class="scene-field">
+            <label class="scene-label" for="strictnessSelect">严格度</label>
+            <select id="strictnessSelect" class="scene-select">
+              <option value="strict">严格挑剔</option>
+              <option value="easy">鼓励务实</option>
+            </select>
+          </div>
         </div>
 
         <div class="action-row">
