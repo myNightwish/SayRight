@@ -65,11 +65,54 @@ const TUTOR_MODEL = process.env.TUTOR_MODEL || process.env.ANTHROPIC_MODEL || "c
 // API 格式：'anthropic'（/v1/messages，百度网关/官方 Claude）或 'openai'（/chat/completions，OpenRouter/OpenAI/Gemini兼容层）。
 // 部署到 Render 用 OpenRouter 时设 API_STYLE=openai。默认 anthropic，兼容本机现状。
 const API_STYLE = (process.env.API_STYLE || "anthropic").toLowerCase() === "openai" ? "openai" : "anthropic";
-// 访问口令：一旦部署到公网，任何人都能 POST /polish 刷你的 key。设了 TUTOR_ACCESS_KEY 后，
-// 所有模型接口都要求请求头 x-tutor-key 匹配才放行。本机自用可不设（留空即不校验）。
+// 访问口令：一旦部署到公网，任何人都能 POST /polish 刷你的 key。设了口令后，
+// 所有模型接口都要求请求头 x-tutor-key 匹配某一个有效口令才放行。本机自用可不设（留空即不校验）。
 // 手机首次访问用 http://你的域名/scene.html?key=你的口令，前端会把它记到 localStorage 并自动带上。
-const ACCESS_KEY = process.env.TUTOR_ACCESS_KEY || "";
-console.log("模型:", TUTOR_MODEL, "| 格式:", API_STYLE, "| 网关:", BASE_URL, "| 令牌:", AUTH_TOKEN ? "已注入" : "缺失(请设 ANTHROPIC_AUTH_TOKEN)", "| 访问口令:", ACCESS_KEY ? "已启用" : "未设(公网部署务必设置)");
+//
+// 防共享设计：支持「多口令 + 每口令每日配额」。
+//   - TUTOR_ACCESS_KEYS：逗号分隔，给每个用户发一个不同口令（如 alice-x9,bob-k3,carol-7q）。
+//     兼容旧的 TUTOR_ACCESS_KEY（单口令）。两者合并去重。
+//   - TUTOR_DAILY_QUOTA：每个口令每天允许的请求数（默认 200，设 0 表示不限）。
+//   把口令一人一个发出去，谁把口令转给别人用，那个口令的配额会被两个人一起消耗、很快见底，
+//   你能从日志看出异常并单独把这个口令从环境变量里删掉吊销，不影响其他人。
+function parseKeys(...vals) {
+  const set = new Set();
+  for (const v of vals) {
+    if (!v) continue;
+    for (const k of String(v).split(",")) {
+      const t = k.trim();
+      if (t) set.add(t);
+    }
+  }
+  return set;
+}
+const ACCESS_KEYS = parseKeys(process.env.TUTOR_ACCESS_KEYS, process.env.TUTOR_ACCESS_KEY);
+const ACCESS_KEY_REQUIRED = ACCESS_KEYS.size > 0; // 有任一口令即开启鉴权
+const DAILY_QUOTA = Number(process.env.TUTOR_DAILY_QUOTA || 200); // 每口令每日请求上限，0=不限
+
+// 每口令的当日用量（内存态，进程重启即清零；免费实例休眠也会清零，够用）。
+const usage = new Map(); // key -> { day: "YYYY-MM-DD", count: n }
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+// 返回 { ok, reason }。ok=false 时 reason 为 "invalid" | "quota"。
+function checkKey(provided) {
+  if (!ACCESS_KEY_REQUIRED) return { ok: true };
+  if (!provided || !ACCESS_KEYS.has(provided)) return { ok: false, reason: "invalid" };
+  if (DAILY_QUOTA > 0) {
+    const day = todayStr();
+    let u = usage.get(provided);
+    if (!u || u.day !== day) { u = { day, count: 0 }; usage.set(provided, u); }
+    if (u.count >= DAILY_QUOTA) return { ok: false, reason: "quota" };
+    u.count += 1;
+    if (u.count === DAILY_QUOTA) console.warn(`[quota] 口令 ${provided} 今日已达上限 ${DAILY_QUOTA}`);
+  }
+  return { ok: true };
+}
+console.log(
+  "模型:", TUTOR_MODEL, "| 格式:", API_STYLE, "| 网关:", BASE_URL,
+  "| 令牌:", AUTH_TOKEN ? "已注入" : "缺失(请设 ANTHROPIC_AUTH_TOKEN)",
+  "| 访问口令:", ACCESS_KEY_REQUIRED ? `已启用(${ACCESS_KEYS.size}个, 每日配额${DAILY_QUOTA || "不限"})` : "未设(公网部署务必设置)"
+);
+
 
 // 直接调用模型，返回模型输出的纯文本。无状态：每次请求独立，天然支持并发。
 // 支持两种 API 格式，由 API_STYLE 决定：
@@ -619,6 +662,7 @@ function sendJson(res, status, payload) {
 const STATIC_FILES = {
   "/": "text/html; charset=utf-8", // 根路径 → polish 主功能页（手机首页）
   "/polish.html": "text/html; charset=utf-8",
+  "/privacy.html": "text/html; charset=utf-8",
   "/config.js": "application/javascript; charset=utf-8",
   "/auth.js": "application/javascript; charset=utf-8",
   "/popup.js": "application/javascript; charset=utf-8",
@@ -832,12 +876,18 @@ const server = http.createServer(async (req, res) => {
   try {
     // GET 静态页：手机 Safari 直接访问的各页面（scene/chat/polish 等）
     if (req.method === "GET" && serveStatic(res, url)) return;
-    // 模型接口统一鉴权：设了访问口令时，POST 接口必须带正确的 x-tutor-key，否则 401。
+    // 模型接口统一鉴权：设了访问口令时，POST 接口必须带一个有效的 x-tutor-key，否则 401。
+    // 口令有效但当日配额用尽 → 429（防止一个口令被多人共享刷爆你的额度）。
     // 静态页不校验（让手机能先打开页面，页面再带 key 请求接口）。
-    if (req.method === "POST" && ACCESS_KEY) {
+    if (req.method === "POST" && ACCESS_KEY_REQUIRED) {
       const provided = req.headers["x-tutor-key"] || "";
-      if (provided !== ACCESS_KEY) {
-        sendJson(res, 401, { error: "访问口令无效" });
+      const r = checkKey(provided);
+      if (!r.ok) {
+        if (r.reason === "quota") {
+          sendJson(res, 429, { error: "今日使用次数已达上限，请明天再来" });
+        } else {
+          sendJson(res, 401, { error: "访问口令无效" });
+        }
         return;
       }
     }

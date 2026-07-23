@@ -25,8 +25,20 @@
         <span class="brand-name">Nuance</span>
         <span class="brand-zh">语差</span>
         <a id="openCollection" class="collection-link brand-collection" href="collection.html" target="_blank">我的收藏 ›</a>
-        <a id="openScene" class="collection-link brand-collection" href="scene.html" target="_blank">场景预演 ›</a>
+        <a id="openScene" class="collection-link" href="scene.html" target="_blank">场景预演 ›</a>
+        <button id="openSettings" class="settings-gear" type="button" title="设置" aria-label="设置">⚙</button>
       </div>
+
+      <section id="settingsPanel" class="panel settings-panel" aria-label="设置" hidden>
+        <label class="settings-label" for="accessKeyInput">访问口令</label>
+        <p class="settings-hint">首次使用请填入你收到的专属口令。口令仅保存在本机，用于访问在线服务。</p>
+        <div class="settings-row">
+          <input id="accessKeyInput" class="settings-input" type="text" placeholder="输入访问口令……" autocomplete="off" spellcheck="false" />
+          <button id="saveKeyButton" class="button button-primary settings-save" type="button">保存</button>
+        </div>
+        <div id="settingsStatus" class="settings-status" aria-live="polite"></div>
+      </section>
+
 
       <section class="panel" aria-label="翻译输入">
         <textarea

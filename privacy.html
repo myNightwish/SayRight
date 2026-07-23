@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuance 语差 · 隐私政策</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.7;
+      color: #1f2328;
+      background: #fff;
+    }
+    h1 { font-size: 28px; margin-bottom: 4px; }
+    h2 { font-size: 20px; margin-top: 36px; border-bottom: 1px solid #e2e4e8; padding-bottom: 6px; }
+    .updated { color: #6b7280; font-size: 14px; margin-bottom: 24px; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 15px; }
+    th, td { border: 1px solid #e2e4e8; padding: 8px 12px; text-align: left; }
+    th { background: #f6f8fa; }
+    code {
+      background: #f0f1f3; padding: 2px 6px; border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 90%;
+    }
+    strong { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      body { color: #e6edf3; background: #0d1117; }
+      h2 { border-color: #30363d; }
+      th { background: #161b22; }
+      th, td { border-color: #30363d; }
+      code { background: #161b22; }
+      .updated { color: #8b949e; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Nuance 语差 · 隐私政策</h1>
+  <p class="updated">最后更新：2026-07-23</p>
+
+  <p>
+    Nuance 语差（以下简称"本扩展"）是一款帮助你练习地道英文表达的工具。本扩展的设计原则是
+    <strong>数据本地化、最小化采集、仅在你主动操作时发起请求</strong>。
+  </p>
+
+  <h2>我们收集什么</h2>
+  <p><strong>本扩展不收集、不存储、不上传任何个人身份信息，也没有账号系统。</strong></p>
+  <p>
+    你的收藏（润色结果、场景演练、句式骨架、练习记录）与偏好设置（场景、语气、严格度、访问口令）
+    仅保存在你浏览器本机的 <code>chrome.storage.local</code>（或页面 <code>localStorage</code>）中，
+    不会同步或上传到任何服务器。卸载扩展或清空收藏即可删除这些数据。
+  </p>
+
+  <h2>文本如何被处理</h2>
+  <p>
+    本扩展的润色、场景预演、对话演练等功能由 AI 模型完成。当你<strong>主动点击"翻译 / 说的对吗 / 预演 / 发送"</strong>等按钮时，
+    本扩展会把<strong>你当次输入的那段文本</strong>发送到我们的服务端，服务端再转发给第三方大模型服务商生成结果。
+    过程中<strong>只传输你本次要练习的文本内容</strong>，不附带身份、账号、浏览历史或页面其他内容。
+  </p>
+  <table>
+    <thead>
+      <tr><th>接收方</th><th>用途</th><th>触发时机</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>say-50s9.onrender.com</code>（本扩展服务端）</td>
+        <td>接收你输入的文本，调用模型生成润色 / 场景 / 对话结果</td>
+        <td>你点击润色、预演、发送等按钮时</td>
+      </tr>
+      <tr>
+        <td>第三方大模型服务商（经服务端转发）</td>
+        <td>生成语言点评与地道表达</td>
+        <td>同上</td>
+      </tr>
+      <tr>
+        <td><code>translate.googleapis.com</code> / <code>api.mymemory.translated.net</code></td>
+        <td>基础中英互译</td>
+        <td>你使用"翻译"功能时</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    我们的服务端<strong>不落库、不保存你的文本</strong>，仅在处理当次请求时使用；请求完成即释放。
+    发送给模型服务商的数据受其各自隐私条款约束，本扩展不将这些文本用于任何其他目的。
+  </p>
+
+  <h2>关于访问口令</h2>
+  <p>
+    为防止服务被滥用，部分功能需要一个访问口令。口令仅用于<strong>识别请求是否被授权</strong>，
+    不关联你的任何个人信息，仅保存在你本机。它不是账号，也不采集你的身份。
+  </p>
+
+  <h2>权限说明</h2>
+  <ul>
+    <li><strong>storage</strong>：在本机保存你的收藏与偏好设置。</li>
+    <li><strong>clipboardWrite</strong>：让你一键复制润色结果到剪贴板。</li>
+    <li>
+      <strong>host_permissions</strong>：仅限本扩展服务端与上述翻译接口，用于发送你主动输入的练习文本并取回结果。
+      本扩展<strong>不注入任意网页、不读取你浏览的页面内容</strong>。
+    </li>
+  </ul>
+  <p>本扩展不使用任何分析、广告、追踪类 SDK。</p>
+
+  <h2>联系</h2>
+  <p>如有隐私相关问题，请通过 Chrome 网上应用店的开发者邮箱联系。</p>
+</body>
+</html>

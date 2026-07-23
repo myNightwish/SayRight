@@ -459,5 +459,49 @@ try {
 strictnessSelect.addEventListener("change", () => {
   try { localStorage.setItem("tutorStrictness", strictnessSelect.value); } catch (_) {}
 });
+
+// --- 设置：访问口令输入 ---
+// 口令存 localStorage（auth.js 的 fetch 拦截器在请求时实时读它，改完立即生效，无需重载弹窗）。
+// 同时镜像到 chrome.storage.local，插件重装/清缓存后仍在，启动时回填。
+(function initSettings() {
+  const settingsBtn = document.querySelector("#openSettings");
+  const settingsPanel = document.querySelector("#settingsPanel");
+  const keyInput = document.querySelector("#accessKeyInput");
+  const saveKeyBtn = document.querySelector("#saveKeyButton");
+  const statusEl = document.querySelector("#settingsStatus");
+  if (!settingsBtn || !settingsPanel || !keyInput || !saveKeyBtn) return;
+
+  const LS_KEY = "tutorAccessKey";
+  const readLocal = () => { try { return localStorage.getItem(LS_KEY) || ""; } catch (_) { return ""; } };
+  function writeKey(v) {
+    try { localStorage.setItem(LS_KEY, v); } catch (_) {}
+    if (hasChromeStorage) { try { chrome.storage.local.set({ [LS_KEY]: v }); } catch (_) {} }
+  }
+
+  // 回填：优先 localStorage；没有再看 chrome.storage（重装后恢复）。
+  keyInput.value = readLocal();
+  if (!keyInput.value && hasChromeStorage) {
+    try {
+      chrome.storage.local.get(LS_KEY, (res) => {
+        const v = res && res[LS_KEY];
+        if (v) { keyInput.value = v; try { localStorage.setItem(LS_KEY, v); } catch (_) {} }
+      });
+    } catch (_) {}
+  }
+
+  settingsBtn.addEventListener("click", () => {
+    settingsPanel.hidden = !settingsPanel.hidden;
+    if (!settingsPanel.hidden) { keyInput.focus(); statusEl.textContent = ""; statusEl.className = "settings-status"; }
+  });
+
+  function save() {
+    const v = keyInput.value.trim();
+    writeKey(v);
+    statusEl.textContent = v ? "✓ 已保存，可以开始使用了" : "已清空口令";
+    statusEl.className = "settings-status ok";
+  }
+  saveKeyBtn.addEventListener("click", save);
+  keyInput.addEventListener("keydown", (e) => { if (e.key === "Enter") save(); });
+})();
 // 打开弹窗时自动聚焦输入框（autofocus 在 Chrome 弹窗里偶尔失效，下一帧兜底）
 requestAnimationFrame(() => sourceText.focus());

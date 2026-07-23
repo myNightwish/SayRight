@@ -81,6 +81,30 @@ body {
 /* 我的收藏：靠右贴在品牌行末尾 */
 .brand-collection { margin-left: auto; }
 
+/* 设置齿轮：品牌行最右侧 */
+.settings-gear {
+  border: none; background: none; cursor: pointer;
+  font-size: 17px; line-height: 1; color: var(--muted);
+  padding: 2px 4px; border-radius: 8px; transition: color .14s, background .14s;
+}
+.settings-gear:hover { color: var(--violet-deep); background: rgba(124, 92, 255, 0.12); }
+
+/* 设置面板 */
+.settings-panel { margin-bottom: 10px; }
+.settings-label { display: block; font-size: 13px; font-weight: 700; color: var(--ink); }
+.settings-hint { margin: 4px 0 10px; font-size: 12px; line-height: 1.5; color: var(--muted); }
+.settings-row { display: flex; gap: 8px; }
+.settings-input {
+  flex: 1; min-width: 0; padding: 9px 12px; font: inherit; font-size: 14px;
+  border: 1px solid var(--glass-border); border-radius: 12px;
+  background: rgba(255, 255, 255, 0.65); color: var(--ink); outline: none;
+  transition: border-color .16s, box-shadow .16s;
+}
+.settings-input:focus { border-color: var(--violet); box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.16); }
+.settings-save { flex: none; padding: 9px 16px; }
+.settings-status { margin-top: 8px; font-size: 12px; min-height: 16px; color: var(--muted); }
+.settings-status.ok { color: #1f9d6b; }
+
 /* 玻璃面板 */
 .panel {
   margin-bottom: 10px;
