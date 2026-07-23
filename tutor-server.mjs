@@ -617,6 +617,7 @@ function sendJson(res, status, payload) {
 const STATIC_FILES = {
   "/": "text/html; charset=utf-8", // 根路径 → polish 主功能页（手机首页）
   "/polish.html": "text/html; charset=utf-8",
+  "/auth.js": "application/javascript; charset=utf-8",
   "/popup.js": "application/javascript; charset=utf-8",
   "/scene.html": "text/html; charset=utf-8",
   "/scene.js": "application/javascript; charset=utf-8",
