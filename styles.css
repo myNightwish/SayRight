@@ -361,6 +361,31 @@ body {
   line-height: 1.55;
   margin-bottom: 6px;
 }
+/* 地道说法旁的朗读按钮：与文字基线对齐，hover 变深 */
+.polish-speak {
+  border: none; background: none; cursor: pointer;
+  font-size: 15px; color: var(--violet); padding: 0; margin-left: 6px;
+  vertical-align: middle;
+}
+.polish-speak:hover { opacity: 0.7; }
+
+/* 记忆提示行：夹在输入卡与结果卡之间的独立小卡，出结果后显示。
+   收藏时可选填「唤醒这句话的情境」，将来抽卡复习的题面。
+   放两卡中间，手机端不必滑到最底即可填。一行精简小标题 + 输入框。 */
+.memo-row {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 10px;
+}
+.memo-label { font-size: 12px; font-weight: 800; color: var(--violet-deep); padding-left: 2px; }
+.memo-input {
+  width: 100%;
+  padding: 10px 14px; font: inherit; font-size: 14px;
+  border: 1px solid rgba(124, 92, 255, 0.35); border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7); color: var(--ink); outline: none;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+.memo-input:focus { border-color: var(--violet); box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.15); }
+.memo-input::placeholder { color: #a59fc0; }
 
 .polish-note {
   color: var(--muted);

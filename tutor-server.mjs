@@ -286,6 +286,7 @@ function buildSystemPrompt() {
     "- Be honest and critical. Do NOT inflate. 'It works / people would understand' is NOT good enough — only truly natural, idiomatic phrasing passes.",
     "- Set natural=true ONLY if a native speaker would say it essentially as-is with no edits. If you would change even one word for naturalness, natural=false.",
     "- Score TIGHT (see rubric). When in doubt, score lower.",
+    "- BUT being strict does NOT mean manufacturing problems. If the sentence is already native-level, say so plainly — do NOT invent a near-equivalent variant just to have something to 'improve'. A fabricated marginal edit is a FAILURE, not strictness. Strictness = catching REAL non-native issues, not inventing fake ones.",
   ].join("\n");
   const personaEasy = [
     "PERSONA — ENCOURAGING PRACTICAL COACH:",
@@ -341,6 +342,7 @@ function buildSystemPrompt() {
     "",
     "HONESTY:",
     "- If the original is already exactly how a native would say it, return it as 'better' (unchanged) and say so in note; do not invent a change.",
+    "- If the ONLY difference you can find between the original and your 'better' is negligible — a variant a native would say just as readily (e.g. 'a mess' vs 'in a mess', 'I think' vs 'I feel like'), or the original is already at native level — then KEEP the original as 'better' unchanged, set natural=true, and in note simply confirm it's already idiomatic (optionally: '也可以说 ...' for the variant, framed as an equal alternative, NOT as a correction). Do NOT present an equivalent rephrasing as an improvement, and do NOT lower the scores for a difference that doesn't exist. Forcing a change here is exactly the 'manufactured problem' failure.",
     "- If there are MULTIPLE equally-natural ways, pick the best 'better' but mention an alternative in note ('也可以说 ...'). Don't pretend there's only one right answer.",
     "",
     "OUTPUT FORMAT — follow EXACTLY, no deviation, for EVERY message:",

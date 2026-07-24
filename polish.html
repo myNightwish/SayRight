@@ -129,6 +129,15 @@
         </div>
       </section>
 
+      <!-- 记忆提示：夹在输入卡和结果卡之间，出结果后才显示。
+           放这里手机端不用滑到最底就能填，且它本就是收藏时的题面锚点。
+           一个精简小标题引导，详细用途留在 placeholder。 -->
+      <div id="memoRow" class="memo-row" hidden>
+        <label class="memo-label" for="memoInput">🧠 记忆提示 · 让复习更贴合</label>
+        <input id="memoInput" class="memo-input" type="text" autocomplete="off"
+          placeholder="什么情境下你想说这句？收藏后作为复习题面（选填）…" />
+      </div>
+
       <section class="panel result-panel" aria-label="输出结果">
         <div class="result-head">
           <span class="result-label">结果</span>

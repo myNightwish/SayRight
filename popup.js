@@ -8,6 +8,8 @@ const tutorButton = document.querySelector("#tutorButton");
 const copyButton = document.querySelector("#copyButton");
 const saveButton = document.querySelector("#saveButton");
 const resultText = document.querySelector("#resultText");
+const memoInput = document.querySelector("#memoInput");
+const memoRow = document.querySelector("#memoRow");
 
 const PLACEHOLDER_RESULT = "翻译或润色结果......";
 const TRANSLATE_LABEL = "翻译";
@@ -68,6 +70,48 @@ function escapeHtml(str) {
 // 把构式里的 [槽位] 高亮：先转义，再把 [...] 包成高亮 span。
 function highlightSlots(str) {
   return escapeHtml(str).replace(/\[([^\[\]]*)\]/g, '<span class="slot">[$1]</span>');
+}
+
+// 发音：朗读地道说法。优先 macOS 自带高质量美音（与收藏页/练习页一致）。
+const PREFERRED_VOICES = [
+  "Evan（优化音质）", "Evan (Enhanced)", "Ava（高音质）", "Ava (Premium)",
+  "Allison（优化音质）", "Samantha（优化音质）", "Samantha (Enhanced)", "Samantha", "Alex",
+];
+let cachedVoice = null;
+
+function pickVoice() {
+  if (cachedVoice) return cachedVoice;
+  const synth = window.speechSynthesis;
+  const voices = synth ? synth.getVoices() : [];
+  if (!voices.length) return null;
+  const isUS = (v) => /en[-_]US/i.test(v.lang);
+  for (const name of PREFERRED_VOICES) {
+    const v = voices.find((vv) => vv.name === name);
+    if (v) return (cachedVoice = v);
+  }
+  const hq = voices.find((v) => isUS(v) && /高音质|优化音质|enhanced|premium/i.test(v.name));
+  if (hq) return (cachedVoice = hq);
+  return (cachedVoice = voices.find(isUS) || null);
+}
+
+if (window.speechSynthesis) {
+  window.speechSynthesis.addEventListener("voiceschanged", () => {
+    cachedVoice = null;
+    pickVoice();
+  });
+}
+
+function speak(text) {
+  try {
+    const synth = window.speechSynthesis;
+    if (!synth || !text) return;
+    synth.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "en-US";
+    const voice = pickVoice();
+    if (voice) utter.voice = voice;
+    synth.speak(utter);
+  } catch (_) { /* 忽略 */ }
 }
 
 // 渲染可复用表达块（chunks）。兼容老数据：construct 字符串当单个 skeleton 块。
@@ -260,8 +304,13 @@ function renderPolish(result) {
   }
 
   // 逻辑顺序：先「对方印象」（这句给人的感觉）→ 再「该场景语气下更好的说法」标题 → 紧接正确表达。
-  const html = `${impression}<div class="polish-better">${better}</div>${chunksHtml}${scoresHtml}${note}${tonesHtml}`;
+  // 地道说法带一个 🔊 朗读按钮，随时能听发音。
+  const html = `${impression}<div class="polish-better">${better}<button class="speak polish-speak" id="betterSpeak" title="朗读">🔊</button></div>${chunksHtml}${scoresHtml}${note}${tonesHtml}`;
   setResult(result.better || "", html);
+
+  // 朗读地道说法
+  const betterSpeak = resultText.querySelector("#betterSpeak");
+  if (betterSpeak) betterSpeak.addEventListener("click", () => speak(result.better || ""));
 
   // 绑定语气切换
   if (Array.isArray(result.tones) && result.tones.length) {
@@ -310,12 +359,16 @@ function setCorrections(map) {
 async function refreshSaveButton() {
   if (!currentPolish) {
     saveButton.hidden = true;
+    if (memoRow) memoRow.hidden = true;
     return;
   }
   saveButton.hidden = false;
+  if (memoRow) memoRow.hidden = false;
   const map = await getCorrections();
-  const saved = Boolean(map[correctionKey(currentPolish.input)]);
-  saveButton.classList.toggle("active", saved);
+  const saved = map[correctionKey(currentPolish.input)];
+  // 已收藏：把存过的记忆提示回填到输入框，方便查看/修改；未收藏时清空，用占位提示引导新填。
+  if (memoInput) memoInput.value = saved ? (saved.situation || "") : "";
+  saveButton.classList.toggle("active", Boolean(saved));
   saveButton.textContent = saved ? "★ 已收藏" : "☆ 收藏";
   saveButton.title = saved ? "取消收藏" : "收藏这条润色";
 }
@@ -327,7 +380,11 @@ async function toggleSave() {
   const map = await getCorrections();
   if (map[key]) {
     delete map[key];
+    if (memoInput) memoInput.value = "";
   } else {
+    // 记忆提示：用户选填的「唤醒这句话的情境」优先；没填则回退到模型生成的 situation。
+    // 这条 situation 正是抽卡复述练习的题面——用户自己的记忆锚点比机器造的更贴合。
+    const userMemo = (memoInput && memoInput.value.trim()) || "";
     // 收藏「表达意图」：除原句/better/note 外，存场景、意图、印象、评分、语气版本，
     // 为将来与 Trace 的「应用可视化」打通保留结构。
     map[key] = {
@@ -335,7 +392,7 @@ async function toggleSave() {
       scene: currentPolish.scene || "通用",
       tone: currentPolish.tone || "自然",
       intent: currentPolish.intent || "",
-      situation: currentPolish.situation || "",
+      situation: userMemo || currentPolish.situation || "",
       situations: Array.isArray(currentPolish.situations) ? currentPolish.situations : [],
       better: currentPolish.better || "",
       chunks: Array.isArray(currentPolish.chunks) ? currentPolish.chunks : [],
