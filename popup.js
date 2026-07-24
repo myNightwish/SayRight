@@ -99,6 +99,7 @@ function renderChunks(result) {
 //  - html 为可选富文本（润色结果用），不传则按纯文本展示
 function setResult(copyText, html) {
   currentResult = copyText || "";
+  resultText.classList.remove("loading"); // 写真实结果时清掉加载态
   if (html != null) {
     resultText.innerHTML = html;
     resultText.classList.add("has-result");
@@ -109,6 +110,17 @@ function setResult(copyText, html) {
     resultText.classList.remove("rich");
   }
   copyButton.disabled = !currentResult;
+}
+
+// 加载态：置灰 + 呼吸脉冲 + 三个跳动的点，明确区别于「已出结果」。
+// 注意不走 setResult，避免被 has-result 点亮成正式结果的深色实线样式。
+function setLoading(msg) {
+  currentResult = "";
+  resultText.innerHTML =
+    `<span class="loading-line">${escapeHtml(msg)}<span class="loading-dots"><i></i><i></i><i></i></span></span>`;
+  resultText.classList.remove("has-result", "rich");
+  resultText.classList.add("loading");
+  copyButton.disabled = true;
 }
 
 function updateInputMeta() {
@@ -360,7 +372,7 @@ async function handleTranslate() {
   setCopyButtonState("idle");
   currentPolish = null;        // 翻译结果不可收藏
   refreshSaveButton();
-  setResult("翻译中…");
+  setLoading("翻译中…");
 
   try {
     const translatedText = await translateText(text, direction);
@@ -388,7 +400,7 @@ async function handleTutor() {
   setCopyButtonState("idle");
   currentPolish = null;
   refreshSaveButton();
-  setResult("正在分析地道表达…");
+  setLoading("正在分析地道表达…");
 
   try {
     const result = await polishExpression(text, sceneSelect.value, toneSelect.value, strictnessSelect.value);
