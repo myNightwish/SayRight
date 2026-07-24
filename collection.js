@@ -150,39 +150,63 @@ function cardHtml(item) {
         .join("")}</div>`
     : "";
 
-  // 语气版本（折叠在卡片底部，按需查看）
+  // 语气版本：作为展开区内容之一。每种语气一行、标签点亮、可单独朗读。
   let tonesHtml = "";
   if (Array.isArray(item.tones) && item.tones.length) {
     const rows = item.tones.map((t) =>
-      `<div class="tone-row"><span class="tone-name">${escapeHtml(t.label)}</span><span class="tone-val">${escapeHtml(t.text)}</span></div>`
+      `<div class="tone-row">
+        <span class="tone-name">${escapeHtml(t.label)}</span>
+        <span class="tone-val">${escapeHtml(t.text)}</span>
+        <button class="speak tone-speak" data-speak-text="${escapeHtml(t.text)}" title="朗读">🔊</button>
+      </div>`
     ).join("");
-    tonesHtml = `<details class="tones-fold"><summary>其它语气（${item.tones.length}）</summary>${rows}</details>`;
+    tonesHtml = `<div class="tones-block">
+      <div class="tones-title">换个语气这样说 · ${item.tones.length} 种</div>
+      ${rows}
+    </div>`;
   }
 
+  // 展开区里有多少「额外信息」，用来在摘要上给个小标记（让人知道点开有货）。
+  const extras = [construct, impression, scoresHtml, inputLine, note, tonesHtml].filter(Boolean).length;
+  const toneCount = Array.isArray(item.tones) ? item.tones.length : 0;
+  const moreHint = toneCount
+    ? `<span class="more-hint">含 ${toneCount} 种语气</span>`
+    : (extras ? `<span class="more-hint">展开看详情</span>` : "");
+
+  // 整张卡片折叠：<details> 默认收起，只显示摘要（场景标签 + 意图 + 地道说法）。
+  // 点标题展开才显示构式/评分/语气/笔记等，一屏能扫更多条、按需深入。
   return `
-    <div class="card" data-key="${escapeHtml(item.key)}">
-      <div class="card-head">
-        <div class="title-wrap">
-          ${sceneTag}
-          ${toneTag}
-          <span class="intent-title">${escapeHtml(title)}</span>
+    <details class="card" data-key="${escapeHtml(item.key)}">
+      <summary class="card-summary">
+        <div class="card-head">
+          <div class="title-wrap">
+            ${sceneTag}
+            ${toneTag}
+            <span class="intent-title">${escapeHtml(title)}</span>
+          </div>
+          <span class="meta">${stamp}</span>
         </div>
-        <span class="meta">${stamp}</span>
+        <div class="better">
+          ${escapeHtml(item.better || "")}
+          <button class="speak" data-speak="${escapeHtml(item.key)}" title="朗读">🔊</button>
+        </div>
+        <div class="summary-foot">
+          ${moreHint}
+          <span class="chevron" aria-hidden="true">▾</span>
+        </div>
+      </summary>
+      <div class="card-body">
+        ${construct}
+        ${impression}
+        ${scoresHtml}
+        ${inputLine}
+        ${note}
+        ${tonesHtml}
+        <div class="card-actions">
+          <button class="btn-del" data-remove="${escapeHtml(item.key)}">删除</button>
+        </div>
       </div>
-      <div class="better">
-        ${escapeHtml(item.better || "")}
-        <button class="speak" data-speak="${escapeHtml(item.key)}" title="朗读">🔊</button>
-      </div>
-      ${construct}
-      ${impression}
-      ${scoresHtml}
-      ${inputLine}
-      ${note}
-      ${tonesHtml}
-      <div class="card-actions">
-        <button class="btn-del" data-remove="${escapeHtml(item.key)}">删除</button>
-      </div>
-    </div>
+    </details>
   `;
 }
 
@@ -248,6 +272,13 @@ async function load() {
 }
 
 listEl.addEventListener("click", async (event) => {
+  // 语气行的朗读按钮：读该语气版本自己的文本。
+  const toneSpeak = event.target.closest(".tone-speak");
+  if (toneSpeak) {
+    speak(toneSpeak.getAttribute("data-speak-text") || "");
+    return;
+  }
+
   const speakKey = event.target.getAttribute("data-speak");
   if (speakKey) {
     const item = allItems.find((it) => it.key === speakKey);

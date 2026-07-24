@@ -17,7 +17,10 @@
         width: 100%;
         max-width: 100%;
         min-height: 100vh;
-        overflow-x: hidden;
+        /* 用 clip 而非 hidden：只裁掉横向溢出（背景流光），
+           不会把 html/body 变成滚动容器——用 hidden 会让 overflow-y 被强制算成 auto，
+           html 和 body 都成了滚动容器，桌面端整页就滚不动了。 */
+        overflow-x: clip;
         overscroll-behavior-y: none;   /* 禁掉下拉回弹，去掉「网页划来划去」的感觉 */
       }
       .app {

@@ -64,11 +64,12 @@
       }
       .input-row { display: flex; gap: 10px; }
       #sceneInput {
-        flex: 1; border: 1px solid var(--glass-border); border-radius: 12px;
+        flex: 1; border: 1px solid rgba(124, 92, 255, 0.35); border-radius: 12px;
         background: var(--glass-strong); padding: 12px 14px; font-size: 15px; color: var(--ink);
         font-family: inherit; outline: none;
+        transition: border-color .16s ease, box-shadow .16s ease;
       }
-      #sceneInput:focus { border-color: var(--violet-soft); }
+      #sceneInput:focus { border-color: var(--violet); box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.15); }
       .btn {
         border: none; border-radius: 12px; padding: 0 20px; font-size: 15px; font-weight: 700;
         color: #fff; cursor: pointer; background: linear-gradient(120deg, var(--violet), var(--accent));
