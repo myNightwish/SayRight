@@ -86,6 +86,13 @@
       .msg .en .speak { border: none; background: none; cursor: pointer; font-size: 14px; color: var(--violet); opacity: .5; margin-left: 4px; }
       .msg .en .speak:hover { opacity: 1; }
       .msg .zh { font-size: 12px; color: var(--muted); margin-top: 4px; }
+      /* 先听后看：对方气泡默认遮盖文字，点 👁 才显示；🔊 常驻可复听 */
+      .msg.them .msg-body { position: relative; padding-right: 48px; }
+      .msg-ctrls { position: absolute; top: 8px; right: 10px; display: flex; gap: 8px; }
+      .msg-ctrls button { border: none; background: none; cursor: pointer; font-size: 14px; opacity: .55; padding: 0; line-height: 1; }
+      .msg-ctrls button:hover { opacity: 1; }
+      .msg.them .en, .msg.them .zh { transition: filter .25s ease, opacity .25s ease; }
+      .msg.them.masked .en, .msg.them.masked .zh { filter: blur(7px); opacity: .5; user-select: none; }
       .typing { display: inline-flex; gap: 4px; padding: 4px 2px; }
       .typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--violet-soft); animation: blink 1.2s infinite both; }
       .typing span:nth-child(2) { animation-delay: .2s; }
@@ -163,6 +170,52 @@
         font-size: 14px; z-index: 5; opacity: 0; transition: opacity .2s; pointer-events: none;
       }
       .toast.show { opacity: 1; }
+
+      /* ===== 陪伴角色（仅日常对练 talk-mode 显示）===== */
+      .companion { display: none; }
+      body.talk-mode .companion {
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        margin: 2px auto 14px;
+      }
+      .companion .cat-wrap {
+        width: 128px; height: 128px; position: relative;
+        filter: drop-shadow(0 10px 20px rgba(124,92,255,0.22));
+        animation: catBreathe 3.4s ease-in-out infinite;
+        transition: transform .35s cubic-bezier(.2,.8,.2,1);
+      }
+      @keyframes catBreathe { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-3px) scale(1.015); } }
+      .companion .cat { width: 100%; height: 100%; overflow: visible; }
+      .companion .cat-name {
+        font-size: 12px; font-weight: 700; color: var(--violet-deep);
+        background: rgba(124,92,255,0.12); border-radius: 999px; padding: 3px 12px;
+      }
+      /* 眨眼：平时睁眼，定时快速闭合一下 */
+      .companion .eyes-open { animation: catBlink 4.2s infinite; transform-origin: center; }
+      @keyframes catBlink {
+        0%, 92%, 100% { transform: scaleY(1); }
+        95%, 97% { transform: scaleY(0.12); }
+      }
+      .companion .eyes-happy, .companion .brows { opacity: 0; transition: opacity .2s; }
+      .companion .mouth { transform-origin: 64px 90px; transition: transform .2s; }
+      .companion .cheek { opacity: .5; transition: opacity .3s; }
+
+      /* 说话：嘴一张一合 + 头轻晃 */
+      body.talk-mode .companion.is-speaking .cat-wrap { animation: catBreathe 3.4s ease-in-out infinite, catNod 0.9s ease-in-out infinite; }
+      @keyframes catNod { 0%,100% { rotate: -2deg; } 50% { rotate: 2deg; } }
+      .companion.is-speaking .mouth { animation: catTalk .26s ease-in-out infinite alternate; }
+      @keyframes catTalk { from { transform: scaleY(0.35); } to { transform: scaleY(1.15); } }
+
+      /* 夸你地道：眼睛弯成月牙 + 脸颊变亮 + 蹦一下 */
+      .companion.is-happy .eyes-open { opacity: 0; }
+      .companion.is-happy .eyes-happy { opacity: 1; }
+      .companion.is-happy .cheek { opacity: 1; }
+      .companion.is-happy .cat-wrap { animation: catHop .5s ease; }
+      @keyframes catHop { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-12px) scale(1.05); } }
+
+      /* 温柔纠错：歪头 + 关切眉 + 抿嘴（非负面） */
+      .companion.is-concerned .cat-wrap { transform: rotate(-9deg); }
+      .companion.is-concerned .brows { opacity: 1; }
+      .companion.is-concerned .mouth { transform: scaleY(0.5); }
     </style>
   </head>
   <body>
@@ -175,12 +228,59 @@
         <span class="spacer"></span>
         <a href="/" class="pill" title="返回首页">‹ 首页</a>
         <button id="swapBtn" class="pill" type="button">🔄 互换角色</button>
+        <button id="endBtn" class="pill hidden" type="button">✅ 结束并复盘</button>
         <button id="restartBtn" class="pill" type="button">↻ 重练</button>
       </div>
 
       <!-- 上：对话窗口 -->
       <section class="panel">
         <div class="section-title"><span class="dot"></span>对话</div>
+        <!-- 陪伴角色：仅日常对练(talk-mode)显示，随对话状态变表情 -->
+        <div id="companion" class="companion">
+          <div class="cat-wrap">
+            <svg class="cat" viewBox="0 0 128 128" aria-hidden="true">
+              <!-- 耳朵 -->
+              <path d="M28 44 L36 14 L58 34 Z" fill="#f6b93b"/>
+              <path d="M100 44 L92 14 L70 34 Z" fill="#f6b93b"/>
+              <path d="M34 38 L38 22 L50 34 Z" fill="#ffd089"/>
+              <path d="M94 38 L90 22 L78 34 Z" fill="#ffd089"/>
+              <!-- 脸 -->
+              <ellipse cx="64" cy="70" rx="42" ry="38" fill="#ffce73"/>
+              <ellipse cx="64" cy="82" rx="30" ry="24" fill="#fff3d6"/>
+              <!-- 腮红 -->
+              <circle class="cheek" cx="36" cy="80" r="7" fill="#ff9d9d"/>
+              <circle class="cheek" cx="92" cy="80" r="7" fill="#ff9d9d"/>
+              <!-- 关切眉（默认隐藏） -->
+              <g class="brows" stroke="#8a5a1e" stroke-width="3" stroke-linecap="round">
+                <line x1="40" y1="52" x2="54" y2="49"/>
+                <line x1="88" y1="52" x2="74" y2="49"/>
+              </g>
+              <!-- 睁眼（默认） -->
+              <g class="eyes-open">
+                <circle cx="48" cy="64" r="6.5" fill="#3a2a12"/>
+                <circle cx="80" cy="64" r="6.5" fill="#3a2a12"/>
+                <circle cx="50" cy="62" r="2" fill="#fff"/>
+                <circle cx="82" cy="62" r="2" fill="#fff"/>
+              </g>
+              <!-- 开心月牙眼（默认隐藏） -->
+              <g class="eyes-happy" stroke="#3a2a12" stroke-width="4" stroke-linecap="round" fill="none">
+                <path d="M41 65 Q48 57 55 65"/>
+                <path d="M73 65 Q80 57 87 65"/>
+              </g>
+              <!-- 鼻子 + 嘴 -->
+              <path d="M60 76 L68 76 L64 81 Z" fill="#e8845b"/>
+              <path class="mouth" d="M52 86 Q64 98 76 86" stroke="#8a5a1e" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <!-- 胡须 -->
+              <g stroke="#e0b060" stroke-width="2" stroke-linecap="round">
+                <line x1="20" y1="74" x2="38" y2="76"/>
+                <line x1="20" y1="84" x2="38" y2="83"/>
+                <line x1="108" y1="74" x2="90" y2="76"/>
+                <line x1="108" y1="84" x2="90" y2="83"/>
+              </g>
+            </svg>
+          </div>
+          <span class="cat-name">Coco · 你的对练伙伴</span>
+        </div>
         <div id="chatThread" class="chat-thread"></div>
         <div id="chatHint" class="chat-hint hidden"></div>
         <div class="composer">

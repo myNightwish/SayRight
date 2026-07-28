@@ -298,9 +298,10 @@ listEl.addEventListener("click", async (event) => {
 clearAllBtn.addEventListener("click", async () => {
   if (!allItems.length) return;
   if (!confirm("确定清空全部润色收藏吗？此操作不可撤销。")) return;
+  const keys = allItems.map((it) => it.key);
+  await setCorrections({});          // 先落地清空，避免随后 syncNow 又把旧数据传上去
   // 每个 key 记墓碑，确保清空能同步到其他设备，而不是被别端旧数据复活。
-  if (window.NuanceSync) allItems.forEach((it) => window.NuanceSync.recordDelete(it.key));
-  await setCorrections({});
+  if (window.NuanceSync) await window.NuanceSync.recordDeleteMany(keys);
   await load();
 });
 
@@ -454,6 +455,7 @@ function renderScenes(items) {
           </div>
           <span class="spacer" style="flex:1"></span>
           <a class="sc-rehearse" href="chat.html?scene=${encodeURIComponent(scene)}" target="_blank" title="进入这个场景的对练">▶ 进入对练</a>
+          <button class="sc-scene-del" data-scene-del="${escapeHtml(scene)}" title="删除整个场景（含全部卡片）">🗑 删除场景</button>
         </div>
         <div class="sc-cards">${shown.map(sceneCardHtml).join("")}</div>
       </div>`;
@@ -492,6 +494,22 @@ sceneListEl.addEventListener("click", async (event) => {
     speak(speakBtn.getAttribute("data-text") || "");
     return;
   }
+  // 删除整个场景：一次性删掉该场景下所有卡片（含各自墓碑，保证多端同步删除）。
+  const sceneDelBtn = event.target.closest(".sc-scene-del");
+  if (sceneDelBtn) {
+    const scene = sceneDelBtn.getAttribute("data-scene-del");
+    const victims = sceneItems.filter((it) => (it.scene || "未命名场景") === scene);
+    if (!victims.length) return;
+    if (!confirm(`确定删除「${scene}」整个场景吗？将移除其下全部 ${victims.length} 张卡片，此操作不可撤销。`)) return;
+    const map = await getScenes();
+    victims.forEach((it) => delete map[it.key]);
+    await setScenes(map);            // 先落地删除，避免随后的 syncNow 把旧数据又传上去
+    delete sceneFilters[scene];
+    // 一次性记全部墓碑再上行：确保多端同步删除，且不被别端旧数据复活。
+    if (window.NuanceSync) await window.NuanceSync.recordDeleteMany(victims.map((it) => it.key));
+    await loadScenes();
+    return;
+  }
   const delBtn = event.target.closest(".sc-del");
   if (!delBtn) return;
   const key = delBtn.getAttribute("data-remove");
@@ -505,8 +523,9 @@ sceneListEl.addEventListener("click", async (event) => {
 clearScenesBtn.addEventListener("click", async () => {
   if (!sceneItems.length) return;
   if (!confirm("确定清空全部场景收藏吗？此操作不可撤销。")) return;
-  if (window.NuanceSync) sceneItems.forEach((it) => window.NuanceSync.recordDelete(it.key));
-  await setScenes({});
+  const keys = sceneItems.map((it) => it.key);
+  await setScenes({});               // 先落地清空，避免随后 syncNow 又把旧数据传上去
+  if (window.NuanceSync) await window.NuanceSync.recordDeleteMany(keys);
   await loadScenes();
 });
 

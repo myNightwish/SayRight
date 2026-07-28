@@ -18,15 +18,39 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
+const STATIC_DIR = path.dirname(fileURLToPath(import.meta.url));
+
+// 先加载同目录 .env，让本机启动无需在命令行手动带 --env-file，也无需在代码里写死任何口令/密钥。
+// Node 20.19 起提供 process.loadEnvFile。已在真实环境（Render）设好的变量优先——
+// loadEnvFile 只写 process.env 里尚不存在的键，不覆盖平台注入的值。.env 已在 .gitignore，不进仓库。
+function loadDotEnv() {
+  const envPath = path.join(STATIC_DIR, ".env");
+  try {
+    if (typeof process.loadEnvFile === "function") {
+      process.loadEnvFile(envPath);
+    } else {
+      // 老版本 Node 的极简兜底解析：KEY=VALUE，忽略注释与空行，去掉成对引号。
+      for (const line of fs.readFileSync(envPath, "utf8").split("\n")) {
+        const m = line.match(/^\s*([\w.]+)\s*=\s*(.*)\s*$/);
+        if (!m || line.trim().startsWith("#")) continue;
+        const key = m[1];
+        let val = m[2].replace(/^["']|["']$/g, "");
+        if (process.env[key] == null) process.env[key] = val;
+      }
+    }
+    console.log("已加载 .env");
+  } catch (error) {
+    console.warn("未加载 .env（不存在或读取失败，可忽略）:", error.message);
+  }
+}
+loadDotEnv();
+
 // 端口跟随环境变量：Render/Fly 等平台会通过 PORT 注入分配的端口，必须监听它；
 // 本机自用时没有该变量，回退 8770。
 const PORT = Number(process.env.PORT) || 8770;
 // 监听地址：默认 0.0.0.0，让同一 WiFi 下的 iPhone 等设备也能访问（方案 A）。
 // 只想本机访问时可设 TUTOR_HOST=127.0.0.1。
 const HOST = process.env.TUTOR_HOST || "0.0.0.0";
-// 静态页目录：server 顺带把 scene.html / chat.html / 各自的 .js 当静态文件发出去，
-// 手机用 Safari 访问 http://电脑IP:8770/scene.html 即可，无需把文件拷到手机。
-const STATIC_DIR = path.dirname(fileURLToPath(import.meta.url));
 
 // baidu-cc 的鉴权（ANTHROPIC_AUTH_TOKEN / BASE_URL / MODEL）只在交互式终端会话里注入，
 // 开机自启（launchd）的极简环境拿不到。这里启动时从 baidu-cc 的 settings.json 读取 env 并补进 process.env，
@@ -136,7 +160,7 @@ function bucketOf(provided) {
   // 口令可能含特殊字符，hash 成安全的 redis key。
   return "nuance:sync:" + crypto.createHash("sha256").update(raw).digest("hex").slice(0, 24);
 }
-const EMPTY_STATE = () => ({ corrections: {}, sceneSaves: {}, sceneScripts: {}, tombstones: {} });
+const EMPTY_STATE = () => ({ corrections: {}, sceneSaves: {}, sceneScripts: {}, drillState: {}, tombstones: {} });
 
 async function loadState(bucket) {
   if (!SYNC_PERSISTENT) return memStore.get(bucket) || EMPTY_STATE();
@@ -199,6 +223,9 @@ function mergeStates(server, client) {
     corrections: mergeMap(server.corrections, client.corrections),
     sceneSaves: mergeMap(server.sceneSaves, client.sceneSaves),
     sceneScripts: mergeMap(server.sceneScripts, client.sceneScripts),
+    // drillState：按 drillId 索引的掌握度调度态，条目带 savedAt，直接复用 savedAt-wins 合并（最近复习者胜）。
+    // 不进墓碑逻辑——进度可重建，孤儿条目无害（前端按现存收藏过滤）。
+    drillState: mergeMap(server.drillState, client.drillState),
     tombstones,
   };
   applyTombstones(merged.corrections, tombstones);
@@ -466,6 +493,54 @@ const CHAT_SYSTEM_PROMPT = [
   "- Do NOT add other keys. Treat the provided script + history as the full context each time.",
 ].join("\n");
 
+// 日常对练（Daily Talk）的 system prompt：没有剧本、没有固定场景，就是一个「好奇的朋友 + 温柔的教练」，
+// 不断就学员的真实生活追问，逼出持续表达；同时对学员上一句给地道升级反馈。
+// 复用 parseChatJson 的返回结构（reply / reply_zh / feedback / hint / done）。
+const TALK_SYSTEM_PROMPT = [
+  "You are a warm, genuinely curious English-speaking friend who is ALSO a gentle language coach, talking with a Chinese native speaker who wants to practice speaking English about their real life. This is a free-flowing daily chat — there is NO script and NO fixed scene.",
+  "",
+  "Each user message is a JSON object: { \"topic\": string, \"history\": array, \"materials\": array }.",
+  "  topic — an optional Simplified Chinese hint of what the learner wants to talk about today (e.g. '今天去了香港'); may be empty.",
+  "  history — the conversation so far: array of { \"role\": \"them\" | \"me\", \"text\": string }. 'me' = the LEARNER. 'them' = YOU. Last item is the learner's most recent line unless history is empty.",
+  "  materials — an optional array of expressions the learner has recently SAVED and is due to review, each { \"intent\": string (Simplified Chinese, when it's used), \"expression\": string (the idiomatic English), \"construct\": string (its reusable skeleton, may be empty) }. These are the phrases you want to help them ACTIVATE in real conversation. May be empty.",
+  "",
+  "YOUR PERSONA:",
+  "- A real friend who is genuinely interested in the learner's day, feelings, work, and small stories. React like a person, not an interviewer: show emotion ('Oh no, really?', 'That sounds amazing!'), relate briefly, THEN ask.",
+  "- Keep the learner TALKING. The whole point is to pull more expression out of them. Every turn ends with ONE concrete, easy-to-answer follow-up question that digs into what they just said (what happened next / how they felt / why). Prefer specific over generic — never a flat 'Interesting, tell me more.'",
+  "- Speak simply and naturally (1-3 short sentences). Match the learner's level; do not lecture.",
+  "",
+  "USING MATERIALS (the learner's due-for-review saved phrases):",
+  "- Your quiet goal is to give the learner a NATURAL chance to REUSE these phrases in real conversation — that is how a saved phrase turns into one they can actually produce.",
+  "- Do this GENTLY and INVISIBLY. Prefer to steer the topic toward a moment where the learner would naturally want to say one of these (ask a question whose honest answer invites that expression). If steering is awkward, you may MODEL the phrase yourself inside your own reply so they hear it used in context.",
+  "- Weave in AT MOST ONE material per turn, and only when it genuinely fits. Never force it, never list them, never say 'try using this phrase' or otherwise turn the chat into a drill. If nothing fits this turn, just chat naturally.",
+  "- Materials are a nudge, not a script — the learner's real story always comes first.",
+  "",
+  "WHO SPEAKS FIRST:",
+  "- If history is empty, OPEN the conversation. If topic is given, ask a warm, specific opener about it (e.g. topic='今天去了香港' → 'Hey! I heard you went to Hong Kong today — how was it? What did you get up to?'). If topic is empty, ask a friendly, open opener about their day (e.g. 'Hey, good to see you! How's your day been so far?'). In this opening turn feedback.ok=true with empty better/tip.",
+  "",
+  "GENTLE COACHING (feedback on the learner's most recent line):",
+  "- Judge how a natural English speaker would say what the learner MEANT. If it's already natural, feedback.ok=true.",
+  "- If it's understandable but not idiomatic (Chinglish, awkward wording, wrong collocation), set ok=false, put the SINGLE most useful more-idiomatic version in 'better', and a short Simplified Chinese reason in 'tip'. Fix ONE thing at a time — do not overwhelm; small grammar slips can be let go if the meaning is clear and there's a bigger fish.",
+  "- Coaching lives ONLY in feedback. Your 'reply' must stay fully in character as a friend and must NOT correct them inline.",
+  "",
+  "Your job each turn:",
+  "1) reply — react as a friend to what they said, then ask ONE follow-up question. English, 1-3 sentences.",
+  "2) feedback — gentle coaching on their last line (see above). If history empty, ok=true / empty.",
+  "3) hint — a Simplified Chinese hint of what they could talk about / try to say next (a nudge, not the English). Empty if done.",
+  "4) done — true only if the learner clearly says goodbye / wants to stop. Otherwise keep the chat going; never end it yourself.",
+  "",
+  "OUTPUT FORMAT — follow EXACTLY, no deviation:",
+  "- Output ONLY a single minified JSON object. No markdown, no code fences, no extra prose.",
+  "- CRITICAL: inside any string value, do NOT use raw double-quotes (\"). Use single quotes (') or 「」. Raw double quotes break the JSON.",
+  "- Keys in this order:",
+  '  "reply": string — your next line in English, in character as the friend.',
+  '  "reply_zh": string — Simplified Chinese translation of reply.',
+  '  "feedback": object — { "ok": boolean, "better": string (more idiomatic way to say what they meant; empty if ok or no learner line yet), "tip": string (Simplified Chinese reason; empty if ok), "scores": object with integer keys 0-100: "idiomatic", "fitness" }.',
+  '  "hint": string — Simplified Chinese nudge for what to say next (empty string if done).',
+  '  "done": boolean — true only if the learner is clearly ending the conversation.',
+  "- Do NOT add other keys.",
+].join("\n");
+
 // 场景预演的 system prompt：用户给一个未来要面对的真实场景（中文/英文描述），
 // 模型生成 ①一段沉浸式双人对话剧本（预演真实对话） ②从剧本抽出的可收藏卡片（句卡+词卡平级）。
 // 同样死锁输出为严格 JSON，不在代码里写死任何具体表达。
@@ -515,6 +590,10 @@ function callExtractClaude(userText) {
 
 function callChatClaude(userText) {
   return callModel(CHAT_SYSTEM_PROMPT, userText, { timeoutMs: 60000, maxTokens: 1024 });
+}
+
+function callTalkClaude(userText) {
+  return callModel(TALK_SYSTEM_PROMPT, userText, { timeoutMs: 60000, maxTokens: 1024 });
 }
 
 function callJudgeClaude(userText) {
@@ -821,6 +900,7 @@ async function handleSync(req, res, bucket) {
     corrections: (client && client.corrections) || {},
     sceneSaves: (client && client.sceneSaves) || {},
     sceneScripts: (client && client.sceneScripts) || {},
+    drillState: (client && client.drillState) || {},
     tombstones: (client && client.tombstones) || {},
   };
   const server = await loadState(bucket);
@@ -952,6 +1032,43 @@ async function handleChat(req, res) {
   sendJson(res, 200, parsed);
 }
 
+// 日常对练：无剧本、无场景，好奇朋友 + 温柔教练，就学员真实生活追问并给地道反馈。
+// 复用 parseChatJson 的返回结构。请求带一个可选中文话题 topic + history。
+async function handleTalk(req, res) {
+  const { topic, history, materials } = await readBody(req);
+  const hist = Array.isArray(history)
+    ? history
+        .filter((h) => h && typeof h.text === "string" && (h.role === "me" || h.role === "them"))
+        .map((h) => ({ role: h.role, text: h.text }))
+    : [];
+  // 到期复习物料：前端从 drillState 挑出到期的收藏句，最多带 5 条，供教练在对话里自然激活。
+  const mats = Array.isArray(materials)
+    ? materials
+        .filter((m) => m && typeof m.expression === "string" && m.expression.trim())
+        .slice(0, 5)
+        .map((m) => ({
+          intent: typeof m.intent === "string" ? m.intent : "",
+          expression: m.expression,
+          construct: typeof m.construct === "string" ? m.construct : "",
+        }))
+    : [];
+  const payload = JSON.stringify({
+    topic: (topic || "").trim(),
+    history: hist,
+    materials: mats,
+  });
+  const parsed = await callAndParse(
+    () => callTalkClaude(payload),
+    parseChatJson,
+    "talk"
+  );
+  if (!parsed) {
+    sendJson(res, 502, { error: "模型返回格式异常" });
+    return;
+  }
+  sendJson(res, 200, parsed);
+}
+
 // 复习判定：判断学员回答是否命中目标意图（复述/泛化两模式）。
 async function handleJudge(req, res) {
   const { intent, accepted, yours, mode } = await readBody(req);
@@ -1019,6 +1136,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && url === "/scene") return await handleScene(req, res);
     if (req.method === "POST" && url === "/extract") return await handleExtract(req, res);
     if (req.method === "POST" && url === "/chat") return await handleChat(req, res);
+    if (req.method === "POST" && url === "/talk") return await handleTalk(req, res);
     if (req.method === "POST" && url === "/judge") return await handleJudge(req, res);
     sendJson(res, 404, { error: "not found" });
   } catch (error) {

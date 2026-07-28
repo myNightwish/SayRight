@@ -10,7 +10,7 @@
 //   3) 合并遵循：同 key 取 savedAt 新者；删除靠墓碑传播（删掉的不会被别端旧数据复活）。
 //   写回本地后派发 window 事件 "nuance:synced"，收藏页据此重渲染。
 (function () {
-  const KEYS = ["corrections", "sceneSaves", "sceneScripts"];
+  const KEYS = ["corrections", "sceneSaves", "sceneScripts", "drillState"];
   const TOMB_KEY = "syncTombstones";
   const LS_ACCESS = "tutorAccessKey";
 
@@ -46,11 +46,11 @@
   }
 
   async function readAll() {
-    const [corrections, sceneSaves, sceneScripts, tombstones] = await Promise.all([
+    const [corrections, sceneSaves, sceneScripts, drillState, tombstones] = await Promise.all([
       getLocal("corrections"), getLocal("sceneSaves"),
-      getLocal("sceneScripts"), getLocal(TOMB_KEY),
+      getLocal("sceneScripts"), getLocal("drillState"), getLocal(TOMB_KEY),
     ]);
-    return { corrections, sceneSaves, sceneScripts, tombstones };
+    return { corrections, sceneSaves, sceneScripts, drillState, tombstones };
   }
 
   // 用返回的墓碑清掉本地被别端删除的项（墓碑时间 >= 本地 savedAt 才删）。
@@ -62,9 +62,12 @@
   }
 
   let inFlight = null;
-  // 上行本地态 → 取回合并态 → 写回本地。并发调用会复用同一次请求，避免重复打接口。
+  let rerunPending = false; // 飞行途中又来同步请求：标记它，等这趟结束后补跑一趟，避免刚写的墓碑/删除被漏掉。
+  // 上行本地态 → 取回合并态 → 写回本地。
+  // 注意：并发调用不能简单复用同一次请求——正在飞的那趟其 readAll() 快照早于新的删除，
+  // 直接复用会把「删除之前」的态传上去、合并回来又复活。故：飞行中再调只置 rerunPending，结束后自动补跑一趟。
   async function syncNow() {
-    if (inFlight) return inFlight;
+    if (inFlight) { rerunPending = true; return inFlight; }
     inFlight = (async () => {
       const local = await readAll();
       const headers = { "Content-Type": "application/json" };
@@ -85,6 +88,7 @@
       const corrections = merged.corrections || {};
       const sceneSaves = merged.sceneSaves || {};
       const sceneScripts = merged.sceneScripts || {};
+      const drillState = merged.drillState || {};
       const tombstones = merged.tombstones || {};
       // 服务端已并集+抹除，这里再保险地本地也应用一次墓碑。
       applyTombstones(corrections, tombstones);
@@ -94,12 +98,19 @@
         setLocal("corrections", corrections),
         setLocal("sceneSaves", sceneSaves),
         setLocal("sceneScripts", sceneScripts),
+        setLocal("drillState", drillState),
         setLocal(TOMB_KEY, tombstones),
       ]);
       try { window.dispatchEvent(new CustomEvent("nuance:synced")); } catch (_) {}
       return true;
     })();
-    try { return await inFlight; } finally { inFlight = null; }
+    try {
+      return await inFlight;
+    } finally {
+      inFlight = null;
+      // 飞行期间有新的删除/收藏进来，重新读最新本地态再跑一趟，确保它们不被漏传。
+      if (rerunPending) { rerunPending = false; syncNow(); }
+    }
   }
 
   // 记一条删除墓碑（各页删除收藏时调用），随后触发上行。
@@ -111,8 +122,19 @@
     syncNow();
   }
 
+  // 批量记墓碑：一次读-改-写，避免多次并发 recordDelete 互相覆盖导致漏记（漏记的会被别端旧数据复活）。
+  async function recordDeleteMany(mapKeys) {
+    const list = (mapKeys || []).filter(Boolean);
+    if (!list.length) return;
+    const tomb = await getLocal(TOMB_KEY);
+    const now = Date.now();
+    for (const k of list) tomb[k] = now;
+    await setLocal(TOMB_KEY, tomb);
+    return syncNow();
+  }
+
   // 暴露给各页脚本。
-  window.NuanceSync = { syncNow, recordDelete };
+  window.NuanceSync = { syncNow, recordDelete, recordDeleteMany };
 
   // 打开即拉一次。
   syncNow();

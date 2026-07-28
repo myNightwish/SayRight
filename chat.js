@@ -8,6 +8,7 @@ const SERVER_ORIGIN = location.protocol.startsWith("http")
   ? location.origin
   : (window.NUANCE_REMOTE_ORIGIN || "http://127.0.0.1:8770");
 const CHAT_API = `${SERVER_ORIGIN}/chat`;
+const TALK_API = `${SERVER_ORIGIN}/talk`;
 const EXTRACT_API = `${SERVER_ORIGIN}/extract`;
 // 访问口令：与 scene.js 一致，?key=xxx 记到 localStorage 后自动带上。
 const TUTOR_KEY = (() => {
@@ -25,6 +26,10 @@ function apiHeaders() {
 const STORAGE_KEY = "sceneSaves";
 const SCRIPT_KEY = "sceneScripts"; // 场景完整剧本（收藏时由预演页落库）
 const HANDOFF_KEY = "chatHandoff";
+// 日常对练调取物料：读润色收藏(corrections) + 掌握度(drillState)，挑到期句让教练自然激活。
+const CORR_KEY = "corrections";
+const DRILL_KEY = "drillState";
+const TALK_MATERIALS_MAX = 5;
 
 // ---- 朗读（与 scene.js 一致的高质量美音）----
 const PREFERRED_VOICES = [
@@ -85,6 +90,43 @@ function getScripts() {
   });
 }
 
+// 日常对练：调取「到期复习」物料。
+// 从 corrections（润色收藏）+ drillState（Leitner 掌握度）里挑出到期的句子，
+// 交给 /talk，让教练在自然对话里给你复用机会。到期优先，其次没练过的新句，最多 5 条。
+function getLocalMap(key) {
+  return new Promise((resolve) => {
+    if (hasChromeStorage) chrome.storage.local.get(key, (res) => resolve(res[key] || {}));
+    else { try { resolve(JSON.parse(localStorage.getItem(key) || "{}")); } catch (_) { resolve({}); } }
+  });
+}
+async function pickDueMaterials() {
+  const [corr, drill] = await Promise.all([getLocalMap(CORR_KEY), getLocalMap(DRILL_KEY)]);
+  const items = Object.values(corr).filter((it) => it && it.better && String(it.better).trim());
+  if (!items.length) return [];
+  const now = Date.now();
+  // drillState 的 key 是 `${item.key}::${mode}`，同一句可能有复述/泛化两条记录，取最早到期的那条。
+  const dueOf = (item) => {
+    let earliest = Infinity, hasState = false;
+    for (const [id, st] of Object.entries(drill)) {
+      if (id.startsWith(`${item.key}::`)) { hasState = true; earliest = Math.min(earliest, st.due || 0); }
+    }
+    return { hasState, due: hasState ? earliest : 0 };
+  };
+  const due = [], fresh = [];
+  for (const it of items) {
+    const d = dueOf(it);
+    if (!d.hasState) fresh.push(it);
+    else if (d.due <= now) due.push({ it, due: d.due });
+  }
+  due.sort((a, b) => a.due - b.due); // 到期最久的先激活
+  const chosen = due.map((x) => x.it).concat(fresh).slice(0, TALK_MATERIALS_MAX);
+  return chosen.map((it) => ({
+    intent: it.intent || it.situation || "",
+    expression: it.better,
+    construct: it.construct || "",
+  }));
+}
+
 function escapeHtml(s) {
   return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
@@ -98,11 +140,33 @@ const chatSpotlight = document.getElementById("chatSpotlight");
 const chatHint = document.getElementById("chatHint");
 const restartBtn = document.getElementById("restartBtn");
 const swapBtn = document.getElementById("swapBtn");
+const endBtn = document.getElementById("endBtn");
 const weakPanel = document.getElementById("weakPanel");
 const weakList = document.getElementById("weakList");
 const scriptPanel = document.getElementById("scriptPanel");
 const scriptList = document.getElementById("scriptList");
 const toastEl = document.getElementById("toast");
+const companionEl = document.getElementById("companion");
+
+// 陪伴角色（Coco）表情状态：speaking(说话) / happy(夸你地道) / concerned(温柔纠错) / 待命。
+// 只在日常对练(talkMode)显示；剧本对练不受影响。
+let companionMoodTimer = null;
+let companionTalking = false;
+function setCompanion(mood) {
+  if (!companionEl) return;
+  companionEl.classList.remove("is-speaking", "is-happy", "is-concerned");
+  if (mood) companionEl.classList.add(`is-${mood}`);
+}
+// 短暂表情（开心/关切）：亮一下自动回到待命；说话态由 typeOut 起止显式控制，不走这里。
+function flashCompanion(mood, ms) {
+  if (!companionEl) return;
+  clearTimeout(companionMoodTimer);
+  setCompanion(mood);
+  companionMoodTimer = setTimeout(() => {
+    // 若此刻正在说话，回到说话态而非待命。
+    setCompanion(companionTalking ? "speaking" : "");
+  }, ms || 1900);
+}
 
 let toastTimer = null;
 function toast(msg) {
@@ -119,6 +183,10 @@ let history = [];          // [{ role:'them'|'me', text }]
 let weakLines = [];        // 过程中收集的不够地道句 { said, better, tip }
 let busy = false;
 let ended = false;
+// 日常对练模式（Daily Talk）：无剧本、无场景，好奇朋友 + 温柔教练就真实生活追问。
+// 由 chat.html?talk=1 进入；此时不读场景/剧本，走 /talk。
+let talkMode = false;
+let talkTopic = "";       // 可选中文话题（?topic=...）
 // 角色分配：默认学员演「你」、AI 演剧本里的对方角色。互换后对调。
 let swapped = false;
 function learnerRoleLabel() {
@@ -173,11 +241,15 @@ function showTyping() {
 }
 
 // 对方台词逐字浮现 + 头像声波。
-function typeOut(enEl, text, avatarEl) {
+// skipSpeakBtn：日常对练「先听后看」下，复听按钮已在气泡角标（msg-ctrls），不再往行内塞 🔊。
+function typeOut(enEl, text, avatarEl, skipSpeakBtn) {
   return new Promise((resolve) => {
     const words = text.split(/(\s+)/);
     let i = 0;
     if (avatarEl) avatarEl.classList.add("speaking");
+    // 陪伴角色进入「说话」态（嘴一张一合 + 头轻晃），逐字结束后回待命。
+    companionTalking = true;
+    setCompanion("speaking");
     speak(text);
     const timer = setInterval(() => {
       enEl.textContent += words[i] || "";
@@ -186,16 +258,45 @@ function typeOut(enEl, text, avatarEl) {
       if (i >= words.length) {
         clearInterval(timer);
         setTimeout(() => avatarEl && avatarEl.classList.remove("speaking"), 600);
-        const btn = document.createElement("button");
-        btn.className = "speak";
-        btn.textContent = "🔊";
-        btn.title = "朗读";
-        btn.addEventListener("click", () => speak(text));
-        enEl.appendChild(btn);
+        companionTalking = false;
+        setCompanion("");
+        if (!skipSpeakBtn) {
+          const btn = document.createElement("button");
+          btn.className = "speak";
+          btn.textContent = "🔊";
+          btn.title = "朗读";
+          btn.addEventListener("click", () => speak(text));
+          enEl.appendChild(btn);
+        }
         resolve();
       }
     }, 55);
   });
+}
+
+// 先听后看：日常对练里对方的气泡默认遮盖文字（模糊），你先听声音；
+// 角标 👁 切换显示/隐藏，🔊 随时复听。逼你先用耳朵而不是眼睛。
+function setupListenFirst(wrap, text) {
+  wrap.classList.add("masked");
+  const body = wrap.querySelector(".msg-body");
+  const ctrls = document.createElement("div");
+  ctrls.className = "msg-ctrls";
+  const eye = document.createElement("button");
+  eye.type = "button";
+  eye.title = "显示/隐藏文字";
+  eye.textContent = "👁";
+  eye.addEventListener("click", () => {
+    const masked = wrap.classList.toggle("masked");
+    eye.textContent = masked ? "👁" : "🙈";
+  });
+  const spk = document.createElement("button");
+  spk.type = "button";
+  spk.title = "复听";
+  spk.textContent = "🔊";
+  spk.addEventListener("click", () => speak(text));
+  ctrls.appendChild(eye);
+  ctrls.appendChild(spk);
+  body.appendChild(ctrls);
 }
 
 function setComposer(state) {
@@ -217,6 +318,7 @@ function renderFeedback(fb) {
   if (!fb) return;
   if (fb.ok) {
     if (history.some((h) => h.role === "me")) {
+      flashCompanion("happy"); // Coco 开心：眼睛弯成月牙、蹦一下
       const flash = document.createElement("div");
       flash.className = "ok-flash";
       flash.textContent = "✓ 地道";
@@ -226,6 +328,7 @@ function renderFeedback(fb) {
     return;
   }
   if (!fb.better && !fb.tip) return;
+  flashCompanion("concerned", 2600); // Coco 关切：歪头帮你调一下（非负面）
   // 记录这条不够地道（对应你刚说的那句）。
   const lastMe = [...history].reverse().find((h) => h.role === "me");
   weakLines.push({ said: lastMe ? lastMe.text : "", better: fb.better, tip: fb.tip });
@@ -247,17 +350,30 @@ async function advance() {
   setHint("");
   const typing = showTyping();
   try {
-    const resp = await fetch(CHAT_API, {
+    let body;
+    if (talkMode) {
+      const materials = await pickDueMaterials();
+      body = { topic: talkTopic, history, materials };
+    } else {
+      body = { scene, script, history, learnerRole: learnerRoleLabel(), aiRole: aiRoleLabel() };
+    }
+    const resp = await fetch(talkMode ? TALK_API : CHAT_API, {
       method: "POST",
       headers: apiHeaders(),
-      body: JSON.stringify({ scene, script, history, learnerRole: learnerRoleLabel(), aiRole: aiRoleLabel() }),
+      body: JSON.stringify(body),
     });
     const data = await resp.json();
     typing.remove();
     if (!resp.ok) { toast(data.error || "对练出错了，请重试"); setComposer("active"); return; }
     renderFeedback(data.feedback);
     const { enEl, wrap } = appendMsg("them", "", data.reply_zh);
-    await typeOut(enEl, data.reply, wrap.querySelector(".avatar"));
+    // 日常对练「先听后看」：气泡默认遮盖文字 + 角标（👁 显隐 / 🔊 复听），逼你先听声音。
+    if (talkMode) setupListenFirst(wrap, data.reply);
+    // 让 Coco 的即时反应（开心/关切）先亮一下，再开口说下一句。
+    if (talkMode && data.feedback && (data.feedback.ok ? history.some((h) => h.role === "me") : (data.feedback.better || data.feedback.tip))) {
+      await new Promise((r) => setTimeout(r, 750));
+    }
+    await typeOut(enEl, data.reply, wrap.querySelector(".avatar"), talkMode);
     history.push({ role: "them", text: data.reply });
     if (data.done) { ended = true; finish(); }
     else { setComposer("active"); setHint(data.hint || ""); }
@@ -384,6 +500,11 @@ function resetChat() {
   weakPanel.classList.add("hidden");
   chatInput.value = "";
   setHint("");
+  if (talkMode) {
+    // 日常对练：无角色概念，直接让「朋友」先开口起话头。
+    advance();
+    return;
+  }
   // 顶部显示当前你演的角色（互换后会变）。
   if (roleTag) roleTag.textContent = `你演：${learnerRoleLabel()}`;
   // 不论谁先说，都让对方先发一条：
@@ -409,6 +530,22 @@ function swapRoles() {
 //   3) 兜底：该场景已收藏的散句按时间拼（旧数据，可能乱序）
 async function boot() {
   const params = new URLSearchParams(location.search);
+
+  // 日常对练模式：chat.html?talk=1 → 无剧本、无场景，好奇朋友 + 温柔教练。
+  if (params.get("talk") === "1" || params.get("talk") === "true") {
+    talkMode = true;
+    talkTopic = (params.get("topic") || "").trim();
+    scene = "日常对练"; // 收藏「更地道说法」时归入这个空间
+    document.body.classList.add("talk-mode");
+    chatScene.textContent = "日常对练";
+    if (roleTag) roleTag.classList.add("hidden");
+    if (swapBtn) swapBtn.classList.add("hidden");
+    if (endBtn) endBtn.classList.remove("hidden");
+    chatInput.placeholder = "用英文聊聊你的一天……";
+    resetChat();
+    return;
+  }
+
   const urlScene = params.get("scene");
 
   // 读并清掉 handoff（用完即焚，防止残留影响之后的对练）。
@@ -461,5 +598,11 @@ chatSend.addEventListener("click", send);
 chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
 restartBtn.addEventListener("click", resetChat);
 swapBtn.addEventListener("click", swapRoles);
+// 日常对练没有剧本终点，用户手动「结束并复盘」→ 收尾展示不够地道的句子。
+if (endBtn) endBtn.addEventListener("click", () => {
+  if (ended) return;
+  ended = true;
+  finish();
+});
 
 boot();

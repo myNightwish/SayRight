@@ -23,11 +23,17 @@ function apiHeaders() {
   return h;
 }
 const PASS_THRESHOLD = 0.85; // 本地兜底比对的过关命中率
+const DRILL_KEY = "drillState"; // 跨会话按条掌握度（Leitner 盒子），跟随云同步
+const NEW_PER_SESSION = 15;     // 「今日复习」一轮最多带入的新条，避免一次淹没
+const DAY = 86400000;
+// Leitner 间隔（天），按 box 索引：box1..5。box0 = 全新未练。答对推后一格，答错回 box1。
+const BOX_DAYS = [0, 1, 2, 4, 7, 15];
 
 const stageEl = document.querySelector("#stage");
 const progressEl = document.querySelector("#progress");
 
 let mode = "replay";  // 'replay' 复述 / 'transfer' 泛化
+let drillMap = {};   // drillId -> { box, due, reps, lapses, savedAt }；drillId = `${item.key}::${mode}`
 let queue = [];      // 待过关队列（元素是收藏条目，答错会重新入队尾）
 let current = null;  // 当前题 { ...item, prompt, askSituation }
 let passed = 0;      // 已过关条数
@@ -51,6 +57,42 @@ function getCorrections() {
       catch (_) { resolve({}); }
     }
   });
+}
+
+// ---- 掌握度调度态（drillState）读写：与 corrections 同款兜底 ----
+function getDrillState() {
+  return new Promise((resolve) => {
+    if (hasChromeStorage) {
+      chrome.storage.local.get(DRILL_KEY, (res) => resolve(res[DRILL_KEY] || {}));
+    } else {
+      try { resolve(JSON.parse(localStorage.getItem(DRILL_KEY) || "{}")); }
+      catch (_) { resolve({}); }
+    }
+  });
+}
+function setDrillState(map) {
+  if (hasChromeStorage) return new Promise((r) => chrome.storage.local.set({ [DRILL_KEY]: map }, r));
+  try { localStorage.setItem(DRILL_KEY, JSON.stringify(map)); } catch (_) {}
+  return Promise.resolve();
+}
+
+// 一条收藏在某个模式下的调度 id。复述/泛化各自独立记忆（同一句在两种练法下掌握度不同）。
+function drillIdOf(item, m) { return `${item.key}::${m || mode}`; }
+
+// Leitner 更新：答对推后一格、答错拉回 box1。立即落地 drillState 并触发上行同步，中途退出不丢进度。
+async function scheduleUpdate(item, m, isPass) {
+  const id = drillIdOf(item, m);
+  const now = Date.now();
+  const prev = drillMap[id] || { box: 0, due: 0, reps: 0, lapses: 0 };
+  let box = prev.box || 0;
+  let lapses = prev.lapses || 0;
+  const reps = (prev.reps || 0) + 1;
+  if (isPass) box = Math.min(5, box + 1);
+  else { box = 1; lapses += 1; }
+  const interval = BOX_DAYS[box] || 0;
+  drillMap[id] = { box, due: now + interval * DAY, reps, lapses, savedAt: now };
+  await setDrillState(drillMap);
+  try { window.NuanceSync && window.NuanceSync.syncNow(); } catch (_) {}
 }
 
 // 把英文 better 翻成中文，作为句子题题面。失败时返回空。
@@ -205,7 +247,8 @@ function renderModePicker() {
   });
 }
 
-// 范围选择页：按时间线分组列出，每组带条数 + 一个「全部」。
+// 范围选择页：改为「调度驱动」。顶部两个主选项：今日复习（到期+新条）/ 全部练一遍；
+// 下方保留按时间线分组，想定向补练某天仍可点。
 function renderRangePicker() {
   // 泛化模式只能练「有泛化情境」的收藏；复述模式全部可练。
   const pool = mode === "transfer"
@@ -222,6 +265,20 @@ function renderRangePicker() {
     progressEl.textContent = "";
     return;
   }
+
+  // 到期/新条统计（按当前模式的 drillId）。
+  const now = Date.now();
+  let due = 0, fresh = 0;
+  for (const it of pool) {
+    const st = drillMap[drillIdOf(it, mode)];
+    if (!st) fresh++;
+    else if ((st.due || 0) <= now) due++;
+  }
+  const todayN = due + Math.min(fresh, NEW_PER_SESSION);
+  const todayDesc = todayN
+    ? `到期 ${due} 条 · 新 ${Math.min(fresh, NEW_PER_SESSION)} 条`
+    : "今天没有到期的，可直接全部练一遍";
+
   const groups = new Map(); // label -> count
   for (const it of pool) {
     const label = dayLabel(it.savedAt);
@@ -237,32 +294,52 @@ function renderRangePicker() {
 
   stageEl.innerHTML = `
     <div class="card">
-      <div class="kind-label">${mode === "transfer" ? "泛化练习 · 选择范围" : "复述练习 · 选择范围"}</div>
-      <div class="prompt" style="font-size:18px;margin-bottom:14px">练到全部过关为止</div>
+      <div class="kind-label">${mode === "transfer" ? "泛化练习" : "复述练习"}</div>
       <div class="range-grid">
-        <button class="range-btn range-all" data-range="__all__" type="button">
-          <span class="range-name">全部</span>
+        <button class="range-btn range-all" data-range="__due__" type="button" ${todayN ? "" : "disabled"}>
+          <span class="range-name">今日复习${todayN ? ` · ${todayN} 条` : ""}</span>
+          <span class="range-count">${todayDesc}</span>
+        </button>
+        <button class="range-btn range-cram" data-range="__all__" type="button">
+          <span class="range-name">全部练一遍</span>
           <span class="range-count">${pool.length} 条</span>
         </button>
+      </div>
+      <div class="range-sub">或挑某天定向补练</div>
+      <div class="range-grid">
         ${groupBtns}
       </div>
       <div class="actions"><button class="btn-ghost" id="backMode" type="button">‹ 换模式</button></div>
     </div>`;
   progressEl.textContent = "";
   stageEl.querySelectorAll(".range-btn").forEach((btn) => {
-    btn.addEventListener("click", () => startRound(btn.dataset.range));
+    btn.addEventListener("click", () => { if (!btn.disabled) startRound(btn.dataset.range); });
   });
   stageEl.querySelector("#backMode").addEventListener("click", renderModePicker);
 }
 
 // 进入一轮复习：按范围筛出条目，洗牌入队。
+//   __due__ = 到期条（due<=now）+ 新条（无 drillState，上限 NEW_PER_SESSION）——按遗忘曲线收敛薄弱项。
+//   __all__ = 全部（考前突击）。其它 = 某天分组。
 function startRound(range) {
   const pool = mode === "transfer"
     ? allItems.filter((it) => Array.isArray(it.situations) && it.situations.length)
     : allItems;
-  const items = range === "__all__"
-    ? pool.slice()
-    : pool.filter((it) => dayLabel(it.savedAt) === range);
+  let items;
+  if (range === "__due__") {
+    const now = Date.now();
+    const dueItems = [], newItems = [];
+    for (const it of pool) {
+      const st = drillMap[drillIdOf(it, mode)];
+      if (!st) newItems.push(it);
+      else if ((st.due || 0) <= now) dueItems.push(it);
+    }
+    items = dueItems.concat(newItems.slice(0, NEW_PER_SESSION));
+  } else if (range === "__all__") {
+    items = pool.slice();
+  } else {
+    items = pool.filter((it) => dayLabel(it.savedAt) === range);
+  }
   if (!items.length) { renderRangePicker(); return; }
   // 洗牌
   for (let i = items.length - 1; i > 0; i--) {
@@ -315,8 +392,9 @@ async function nextQuestion() {
 }
 
 // 过关：计入 passed，进入下一题。未过：重新排队尾，misses+1。
-function markPass() { passed++; updateProgress(); nextQuestion(); }
-function markFail() { misses++; queue.push(stripExtra(current)); updateProgress(); nextQuestion(); }
+// 两者都按当前模式记一次 Leitner 调度（答对推后、答错拉近），立即落地并上行同步。
+function markPass() { scheduleUpdate(current, mode, true); passed++; updateProgress(); nextQuestion(); }
+function markFail() { scheduleUpdate(current, mode, false); misses++; queue.push(stripExtra(current)); updateProgress(); nextQuestion(); }
 function stripExtra(item) { const { prompt, ...rest } = item; return rest; }
 
 function renderQuestion() {
@@ -467,7 +545,8 @@ function renderEmpty() {
 }
 
 async function init() {
-  const map = await getCorrections();
+  const [map, dstate] = await Promise.all([getCorrections(), getDrillState()]);
+  drillMap = dstate || {};
   allItems = Object.entries(map)
     .map(([key, value]) => ({ key, ...value }))
     .filter((it) => it && it.better && it.better.trim())
@@ -475,6 +554,16 @@ async function init() {
   if (!allItems.length) { renderEmpty(); return; }
   renderModePicker();
 }
+
+// 云同步写回后（别端更新了收藏或掌握度）刷新本地态；练习途中不打断，仅更新数据。
+window.addEventListener("nuance:synced", async () => {
+  const [map, dstate] = await Promise.all([getCorrections(), getDrillState()]);
+  drillMap = dstate || {};
+  allItems = Object.entries(map)
+    .map(([key, value]) => ({ key, ...value }))
+    .filter((it) => it && it.better && it.better.trim())
+    .sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+});
 
 init();
 

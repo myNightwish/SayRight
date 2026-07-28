@@ -78,10 +78,21 @@
       .btn-ghost:hover:not(:disabled) { background: rgba(124,92,255,0.2); }
 
       .result { margin-top: 20px; }
-      .verdict { font-size: 15px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+      /* 判定标记：圆形徽标里放符号——对=✓、差一点=!、没过=✕，颜色沿用原语义色。
+         纯文字不够显眼，一个带底色的圆徽一眼可辨；后面文字（如命中百分比）降为小字保留信息。 */
+      .verdict { font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+      .verdict::before {
+        content: ""; flex: none;
+        width: 26px; height: 26px; border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 15px; font-weight: 900; line-height: 1;
+      }
       .verdict.ok { color: var(--success); }
+      .verdict.ok::before { content: "✓"; background: var(--success); }
       .verdict.near { color: #b54708; }
+      .verdict.near::before { content: "!"; background: #e8920a; }
       .verdict.miss { color: var(--error); }
+      .verdict.miss::before { content: "✕"; background: var(--error); }
       .answer-block { margin: 10px 0; }
       .answer-label { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
       .answer-text { font-size: 16px; line-height: 1.6; }
@@ -104,7 +115,10 @@
         color: var(--ink); cursor: pointer; transition: background .14s ease, box-shadow .16s ease;
       }
       .range-btn:hover { background: rgba(124,92,255,0.12); box-shadow: 0 6px 16px rgba(91,63,214,0.16); }
-      .range-btn.range-all { grid-column: 1 / -1; background: linear-gradient(120deg, var(--accent), var(--violet)); color: #fff; border-color: transparent; }
+      .range-btn:disabled { opacity: .5; cursor: not-allowed; }
+      .range-btn.range-all { flex-direction: column; align-items: flex-start; gap: 4px; background: linear-gradient(120deg, var(--accent), var(--violet)); color: #fff; border-color: transparent; }
+      .range-btn.range-cram { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .range-sub { color: var(--muted); font-size: 12px; font-weight: 700; margin: 16px 0 6px; }
       .range-name { font-size: 15px; font-weight: 800; }
       .range-count { font-size: 12px; opacity: 0.85; font-weight: 700; }
       /* 模式选择：复述 / 泛化 */
