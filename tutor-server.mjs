@@ -87,6 +87,11 @@ const AUTH_TOKEN =
 // 模型名不写死——网关渠道会变更（如 'Claude Sonnet 4.5' 已下线）。默认跟随 ANTHROPIC_MODEL，
 // 都没有时退回官方 Opus 4.8 的 id。可用 TUTOR_MODEL 覆盖。
 const TUTOR_MODEL = process.env.TUTOR_MODEL || process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
+// 判定/命中这类轻量分类任务不需要 Opus——用快模型(Haiku)能快数倍且够用。可用 JUDGE_MODEL 覆盖。
+const JUDGE_MODEL = process.env.JUDGE_MODEL || "claude-haiku-4-5-20251001";
+// polish 是核心教练功能、输出又长(situations+chunks+note+scores)，Opus 逐 token 吐这一大坨很慢。
+// Sonnet 对「改写润色」质量基本无损却快得多，作默认；想要极致质量可用 POLISH_MODEL=claude-opus-4-8 切回。
+const POLISH_MODEL = process.env.POLISH_MODEL || "claude-sonnet-5";
 // API 格式：'anthropic'（/v1/messages，百度网关/官方 Claude）或 'openai'（/chat/completions，OpenRouter/OpenAI/Gemini兼容层）。
 // 部署到 Render 用 OpenRouter 时设 API_STYLE=openai。默认 anthropic，兼容本机现状。
 const API_STYLE = (process.env.API_STYLE || "anthropic").toLowerCase() === "openai" ? "openai" : "anthropic";
@@ -239,7 +244,7 @@ function mergeStates(server, client) {
 // 支持两种 API 格式，由 API_STYLE 决定：
 //   anthropic —— POST /v1/messages，x-api-key 鉴权，system 数组 + prompt caching（重复长 system 按 10% 计费）。
 //   openai    —— POST /chat/completions，Bearer 鉴权，system 作为 messages 首条。OpenRouter/OpenAI/Gemini 兼容层通用。
-async function callModel(systemPrompt, userText, { timeoutMs = 60000, maxTokens = 2048 } = {}) {
+async function callModel(systemPrompt, userText, { timeoutMs = 60000, maxTokens = 2048, model = TUTOR_MODEL } = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -251,7 +256,7 @@ async function callModel(systemPrompt, userText, { timeoutMs = 60000, maxTokens 
         Authorization: `Bearer ${AUTH_TOKEN}`,
       };
       body = {
-        model: TUTOR_MODEL,
+        model,
         max_tokens: maxTokens,
         messages: [
           { role: "system", content: systemPrompt },
@@ -268,7 +273,7 @@ async function callModel(systemPrompt, userText, { timeoutMs = 60000, maxTokens 
         "anthropic-beta": "prompt-caching-2024-07-31",
       };
       body = {
-        model: TUTOR_MODEL,
+        model,
         max_tokens: maxTokens,
         system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
         messages: [{ role: "user", content: userText }],
@@ -359,6 +364,13 @@ function buildSystemPrompt() {
     "- HARD-BAN these in 'better': translationese (literal word-for-word from Chinese), AI/textbook stiffness, needless formality, redundant words, and phrases natives technically accept but rarely use.",
     "- Default to natural American English unless the scene implies otherwise. If a usage differs by region, pick the common American form and note it briefly.",
     "- Prefer the SIMPLER natural phrasing over a fancier one. Natives usually say less, not more.",
+    "",
+    "MEANING FIDELITY — this OUTRANKS idiomaticity. NEVER change WHAT the learner is saying, only HOW they say it:",
+    "- 'better' MUST preserve the learner's literal meaning and every specific referent. You may re-word, re-order, and re-phrase for naturalness, but you may NOT swap a content word for a different thing, drop a detail, or add one the learner didn't intend.",
+    "- Concrete nouns/objects are SACRED. 'pizza crust' (披萨饼边/饼皮) is NOT 'a slice of pizza' (一片披萨) — they are different things. 'bring X to her' is NOT 'bring her Y'. If the learner names a specific object, keep that exact object even if it seems unusual. An unusual-but-clear choice is intentional; assume they mean what they wrote.",
+    "- The original sentence being grammatical and clear is the COMMON case, not a defect to fix. If it is already natural and correct, KEEP IT unchanged (natural=true) — do NOT rewrite it into a different but 'more common' sentence.",
+    "- If you genuinely suspect the learner meant something different from what they wrote (a possible word confusion), DO NOT silently substitute. Keep their stated meaning in 'better', and raise the possible confusion in 'note' as a question (e.g. '如果你想说的是 X 而不是 Y，可以说 ...'). Let them decide.",
+    "- A 'better' that changes the meaning is a FAILURE — worse than no edit at all — because it teaches the learner to say something they did not mean.",
     "",
     "TWO RUBRICS — apply the one named by this message's strictness:",
     "[strictness = 'strict'] " + rubricStrict,
@@ -541,6 +553,74 @@ const TALK_SYSTEM_PROMPT = [
   "- Do NOT add other keys.",
 ].join("\n");
 
+// 情景对练·出剧本（Rehearse-Plan）：不给固定场景，而是「读学员积累的素材，反过来为他造一场对练」。
+// 输入是学员到期/待复用的一批表达；输出一个能自然带出这批表达的情景设定 + 一份「这场要用上的清单」+ 开场白。
+// 关键：不写死每句台词（那是 handleRehearse 即兴演的事），只定情景骨架 + 目标清单。
+const REHEARSE_PLAN_SYSTEM_PROMPT = [
+  "You are an English REHEARSAL DIRECTOR for a Chinese native speaker. You are given a batch of expressions the learner has SAVED and needs to REACTIVATE, and you must design ONE coherent real-life scene in which the learner would naturally end up saying most of them. You are building a rehearsal, not a lesson.",
+  "",
+  "Each user message is a JSON object: { \"materials\": array }.",
+  "  materials — array of the learner's saved expressions, each { \"intent\": string (Simplified Chinese, when it's used), \"expression\": string (the idiomatic English), \"construct\": string (reusable skeleton, may be empty) }.",
+  "",
+  "YOUR JOB — design a scene that makes these expressions come out NATURALLY:",
+  "- Pick a single, concrete, everyday situation (a conversation between the learner and ONE other person) where a real person would plausibly want to say as many of these expressions as possible. The expressions should feel like they belong together in this scene, not be forced.",
+  "- If a few materials truly don't fit one natural scene, LEAVE THEM OUT of the checklist — a coherent scene beats cramming everything. Aim to include most of them.",
+  "- Decide the two roles: who the LEARNER plays and who YOU (the AI) will play. Choose roles such that the OTHER party's questions/reactions will naturally PULL these expressions out of the learner.",
+  "- Write a CHECKLIST: the subset of materials this scene will cover, each as a communication goal the learner should hit during the rehearsal (keep the original English expression so the client can track it).",
+  "- Write an OPENER: the AI (in character as the other party) speaks first to kick off the scene, in a way that immediately invites the learner into it. Do NOT reveal the checklist or coach in the opener — just start the scene like a real person.",
+  "",
+  "OUTPUT FORMAT — follow EXACTLY, no deviation:",
+  "- Output ONLY a single minified JSON object. No markdown, no code fences, no extra prose.",
+  "- CRITICAL: inside any string value, do NOT use raw double-quotes (\"). Use single quotes (') or 「」. Raw double quotes break the JSON.",
+  "- Keys in this order:",
+  '  "scene": string — a short Simplified Chinese label for the scene, e.g. "跟同事聊上周的项目复盘".',
+  '  "learnerRole": string — Simplified Chinese label of who the LEARNER plays, e.g. "你（团队成员）".',
+  '  "aiRole": string — Simplified Chinese label of who YOU play, e.g. "你的组长 Mia".',
+  '  "goal": string — Simplified Chinese, one sentence on what the learner is trying to accomplish in this scene.',
+  '  "checklist": array of objects, the materials this scene covers, each { "intent": string (Simplified Chinese goal, e.g. "委婉说明延期原因"), "expression": string (the idiomatic English, kept verbatim from materials), "construct": string (its skeleton, may be empty) }. Order them by when they would naturally come up in the scene.',
+  '  "opener": string — the AI\'s first line in English, in character as aiRole, starting the scene.',
+  '  "opener_zh": string — Simplified Chinese translation of opener.',
+  "- Do NOT add other keys.",
+].join("\n");
+
+// 情景对练·演（Rehearse）：即兴演出上面定好的角色，盯着清单逐个把学员该说的表达逼出来。
+// 复用 parseChatJson 结构，额外返回 used（本轮学员自然用出/命中了清单里的哪些表达）。
+const REHEARSE_SYSTEM_PROMPT = [
+  "You are role-playing as a specific character in a rehearsal scene with a Chinese native speaker who is practicing English. You improvise as the OTHER party while quietly steering the learner to naturally USE a checklist of target expressions. You are a scene partner AND a gentle coach.",
+  "",
+  "Each user message is a JSON object: { \"scene\": string, \"learnerRole\": string, \"aiRole\": string, \"goal\": string, \"checklist\": array, \"history\": array }.",
+  "  scene / learnerRole / aiRole / goal — the scene setup (Simplified Chinese labels). Stay fully in character as aiRole for the whole conversation.",
+  "  checklist — the target expressions this rehearsal covers, each { \"intent\": string (Simplified Chinese goal), \"expression\": string (idiomatic English), \"construct\": string }. Your quiet mission is to create moments where the learner naturally WANTS to say each one, and to keep going until they've hit them all.",
+  "  history — the conversation so far: array of { \"role\": \"them\" | \"me\", \"text\": string }. 'me' = the LEARNER (playing learnerRole). 'them' = YOU (playing aiRole). Empty means you must open (but normally the opener was already sent by the plan step, so history won't be empty).",
+  "",
+  "HOW TO RUN THE REHEARSAL:",
+  "- Stay in character as aiRole. React and speak like that person would (1-3 short, natural sentences). Never break character in your reply, never mention the checklist, never say 'try to say...'.",
+  "- Each turn, end with something (a question, a prompt, a reaction) that pulls the learner toward the NEXT unhit checklist item — set up a moment where saying that expression is the natural response. Work through the checklist roughly in order, ONE target at a time.",
+  "- If the learner hits a target (says something that accomplishes a checklist item's intent — the exact words need not match, a natural equivalent counts), acknowledge it in character and move the scene toward the next target.",
+  "- When all checklist items have been hit, bring the scene to a natural, warm close and set done=true.",
+  "",
+  "GENTLE COACHING (feedback on the learner's most recent line):",
+  "- Judge how a natural English speaker (esp. someone using the target expression) would say what the learner MEANT. If it's already natural, feedback.ok=true.",
+  "- If understandable but not idiomatic, ok=false, put the SINGLE most useful more-idiomatic version in 'better' (prefer nudging toward the relevant checklist expression when applicable) and a short Simplified Chinese reason in 'tip'. Fix ONE thing at a time.",
+  "- Coaching lives ONLY in feedback. Your 'reply' stays fully in character and must NOT correct inline.",
+  "",
+  "TRACKING PROGRESS — 'used':",
+  "- After reading the learner's most recent line, decide which checklist expressions they have now SUCCESSFULLY used or accomplished for the FIRST time this turn (natural equivalents count, not just verbatim). Return those expressions (verbatim from the checklist) in 'used'. If none this turn, return an empty array. Only report a checklist item as used when the learner (not you) produced it.",
+  "",
+  "OUTPUT FORMAT — follow EXACTLY, no deviation:",
+  "- Output ONLY a single minified JSON object. No markdown, no code fences, no extra prose.",
+  "- CRITICAL: inside any string value, do NOT use raw double-quotes (\"). Use single quotes (') or 「」. Raw double quotes break the JSON.",
+  "- Keys in this order:",
+  '  "reply": string — your next line in English, in character as aiRole.',
+  '  "reply_zh": string — Simplified Chinese translation of reply.',
+  '  "feedback": object — { "ok": boolean, "better": string (empty if ok or no learner line yet), "tip": string (Simplified Chinese; empty if ok), "scores": object with integer keys 0-100: "idiomatic", "fitness" }.',
+  '  "used": array of strings — checklist expressions the learner successfully used/accomplished for the first time this turn (verbatim from checklist); empty array if none.',
+  '  "hint": string — Simplified Chinese nudge for what to say next (empty string if done).',
+  '  "done": boolean — true only when all checklist items are hit or the learner clearly ends the conversation.',
+  "- Do NOT add other keys.",
+].join("\n");
+
+
 // 场景预演的 system prompt：用户给一个未来要面对的真实场景（中文/英文描述），
 // 模型生成 ①一段沉浸式双人对话剧本（预演真实对话） ②从剧本抽出的可收藏卡片（句卡+词卡平级）。
 // 同样死锁输出为严格 JSON，不在代码里写死任何具体表达。
@@ -574,7 +654,7 @@ const SCENE_SYSTEM_PROMPT = [
 // 无状态直连后，并发请求彼此独立，不再需要常驻会话与串行排队。
 
 function callClaude(userText) {
-  return callModel(SYSTEM_PROMPT, userText, { timeoutMs: 60000, maxTokens: 2048 });
+  return callModel(SYSTEM_PROMPT, userText, { timeoutMs: 60000, maxTokens: 2048, model: POLISH_MODEL });
 }
 
 function callSceneClaude(userText) {
@@ -596,8 +676,18 @@ function callTalkClaude(userText) {
   return callModel(TALK_SYSTEM_PROMPT, userText, { timeoutMs: 60000, maxTokens: 1024 });
 }
 
+function callRehearsePlanClaude(userText) {
+  // 出剧本要读全部素材、造情景+清单+开场，略重，放宽到 90s / 2048。
+  return callModel(REHEARSE_PLAN_SYSTEM_PROMPT, userText, { timeoutMs: 90000, maxTokens: 2048 });
+}
+
+function callRehearseClaude(userText) {
+  return callModel(REHEARSE_SYSTEM_PROMPT, userText, { timeoutMs: 60000, maxTokens: 1024 });
+}
+
 function callJudgeClaude(userText) {
-  return callModel(JUDGE_SYSTEM_PROMPT, userText, { timeoutMs: 60000, maxTokens: 1024 });
+  // 判定是轻量分类，改用快模型(JUDGE_MODEL/Haiku)，比 Opus 快数倍，命中判断够用。
+  return callModel(JUDGE_SYSTEM_PROMPT, userText, { timeoutMs: 60000, maxTokens: 1024, model: JUDGE_MODEL });
 }
 
 function parseChatJson(raw) {
@@ -630,6 +720,54 @@ function parseChatJson(raw) {
     hint: typeof obj.hint === "string" ? obj.hint : "",
     done: obj.done === true || obj.done === "true",
   };
+}
+
+// 解析情景出剧本返回：情景设定 + 清单 + 开场白。
+function parseRehearsePlanJson(raw) {
+  if (!raw) return null;
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  let obj = null;
+  try {
+    obj = JSON.parse(match[0]);
+  } catch (_) {
+    return null;
+  }
+  if (!obj || typeof obj.opener !== "string") return null;
+  const checklist = Array.isArray(obj.checklist)
+    ? obj.checklist
+        .filter((c) => c && typeof c.expression === "string" && c.expression.trim())
+        .map((c) => ({
+          intent: typeof c.intent === "string" ? c.intent : "",
+          expression: c.expression,
+          construct: typeof c.construct === "string" ? c.construct : "",
+        }))
+    : [];
+  if (!checklist.length) return null;
+  return {
+    scene: typeof obj.scene === "string" ? obj.scene : "情景对练",
+    learnerRole: typeof obj.learnerRole === "string" ? obj.learnerRole : "你",
+    aiRole: typeof obj.aiRole === "string" ? obj.aiRole : "对方",
+    goal: typeof obj.goal === "string" ? obj.goal : "",
+    checklist,
+    opener: obj.opener,
+    opener_zh: typeof obj.opener_zh === "string" ? obj.opener_zh : "",
+  };
+}
+
+// 解析情景对练每轮返回：复用 chat 结构 + used（本轮命中的清单表达）。
+function parseRehearseJson(raw) {
+  const base = parseChatJson(raw);
+  if (!base) return null;
+  let used = [];
+  try {
+    const match = raw.match(/\{[\s\S]*\}/);
+    const obj = match ? JSON.parse(match[0]) : null;
+    if (obj && Array.isArray(obj.used)) {
+      used = obj.used.filter((u) => typeof u === "string" && u.trim());
+    }
+  } catch (_) {}
+  return { ...base, used };
 }
 
 function parseJudgeJson(raw) {
@@ -1069,7 +1207,73 @@ async function handleTalk(req, res) {
   sendJson(res, 200, parsed);
 }
 
-// 复习判定：判断学员回答是否命中目标意图（复述/泛化两模式）。
+// 情景对练·出剧本：读学员积累的素材，反过来为他造一场对练（情景+角色+清单+开场白）。
+// 不写死每句台词——具体演出交给 /rehearse。素材上限放宽（不再硬卡 5 条），由模型按情景取舍。
+async function handleRehearsePlan(req, res) {
+  const { materials } = await readBody(req);
+  const mats = Array.isArray(materials)
+    ? materials
+        .filter((m) => m && typeof m.expression === "string" && m.expression.trim())
+        .slice(0, 20)
+        .map((m) => ({
+          intent: typeof m.intent === "string" ? m.intent : "",
+          expression: m.expression,
+          construct: typeof m.construct === "string" ? m.construct : "",
+        }))
+    : [];
+  if (!mats.length) {
+    sendJson(res, 400, { error: "还没有可用来对练的收藏素材" });
+    return;
+  }
+  const payload = JSON.stringify({ materials: mats });
+  const parsed = await callAndParse(
+    () => callRehearsePlanClaude(payload),
+    parseRehearsePlanJson,
+    "rehearse-plan"
+  );
+  if (!parsed) {
+    sendJson(res, 502, { error: "模型返回格式异常" });
+    return;
+  }
+  sendJson(res, 200, parsed);
+}
+
+// 情景对练·演：即兴演出定好的角色，盯着清单逐个逼出学员该说的表达，返回本轮命中的 used。
+async function handleRehearse(req, res) {
+  const { scene, learnerRole, aiRole, goal, checklist, history } = await readBody(req);
+  const list = Array.isArray(checklist)
+    ? checklist
+        .filter((c) => c && typeof c.expression === "string" && c.expression.trim())
+        .map((c) => ({
+          intent: typeof c.intent === "string" ? c.intent : "",
+          expression: c.expression,
+          construct: typeof c.construct === "string" ? c.construct : "",
+        }))
+    : [];
+  const hist = Array.isArray(history)
+    ? history
+        .filter((h) => h && typeof h.text === "string" && (h.role === "me" || h.role === "them"))
+        .map((h) => ({ role: h.role, text: h.text }))
+    : [];
+  const payload = JSON.stringify({
+    scene: (scene || "").trim(),
+    learnerRole: (learnerRole || "你").trim() || "你",
+    aiRole: (aiRole || "对方").trim() || "对方",
+    goal: (goal || "").trim(),
+    checklist: list,
+    history: hist,
+  });
+  const parsed = await callAndParse(
+    () => callRehearseClaude(payload),
+    parseRehearseJson,
+    "rehearse"
+  );
+  if (!parsed) {
+    sendJson(res, 502, { error: "模型返回格式异常" });
+    return;
+  }
+  sendJson(res, 200, parsed);
+}
 async function handleJudge(req, res) {
   const { intent, accepted, yours, mode } = await readBody(req);
   const answer = (yours || "").trim();
@@ -1137,6 +1341,8 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && url === "/extract") return await handleExtract(req, res);
     if (req.method === "POST" && url === "/chat") return await handleChat(req, res);
     if (req.method === "POST" && url === "/talk") return await handleTalk(req, res);
+    if (req.method === "POST" && url === "/rehearse-plan") return await handleRehearsePlan(req, res);
+    if (req.method === "POST" && url === "/rehearse") return await handleRehearse(req, res);
     if (req.method === "POST" && url === "/judge") return await handleJudge(req, res);
     sendJson(res, 404, { error: "not found" });
   } catch (error) {

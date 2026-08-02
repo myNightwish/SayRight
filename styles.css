@@ -387,6 +387,22 @@ body {
 .memo-input:focus { border-color: var(--violet); box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.15); }
 .memo-input::placeholder { color: #a59fc0; }
 
+/* 星级选择器：0=只进接收库；1–5=晋升产出核心，星越多越高频。点星隐含收藏。 */
+.stars-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px; padding: 2px;
+}
+.stars-label { font-size: 12px; font-weight: 800; color: var(--violet-deep); flex: none; }
+.stars-picker { display: flex; align-items: center; gap: 2px; }
+.stars-picker .star {
+  border: none; background: none; cursor: pointer; padding: 0 1px;
+  font-size: 22px; line-height: 1; color: #d9b310;
+  transition: transform .1s ease, color .14s ease;
+}
+.stars-picker .star:hover { transform: scale(1.18); }
+.stars-picker .star.on { color: #f5b301; text-shadow: 0 0 8px rgba(245, 179, 1, 0.5); }
+.stars-tip { font-size: 12px; font-weight: 700; color: var(--muted); margin-left: 6px; }
+
 .polish-note {
   color: var(--muted);
   font-size: 13px;
@@ -442,20 +458,43 @@ body {
   background: rgba(124, 92, 255, 0.07);
   border-left: 3px solid var(--violet);
   border-radius: 8px;
+  position: relative;        /* 让删除按钮定位到右上角 */
 }
 .chunk-row.upgrade {
   background: rgba(196, 75, 255, 0.1);
   border-left-color: var(--accent);
 }
 .chunk-text { font-size: 14px; font-weight: 700; color: var(--ink); line-height: 1.5; }
+/* 可编辑态：留出右侧删除按钮的位置，聚焦时给个淡框提示「这里能改」 */
+.chunk-text[contenteditable] { padding-right: 22px; border-radius: 6px; outline: none; cursor: text; }
+.chunk-text[contenteditable]:hover { background: rgba(124, 92, 255, 0.06); }
+.chunk-text[contenteditable]:focus {
+  background: #fff; box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.35);
+}
+/* 每条右上角的删除叉 */
+.chunk-del {
+  position: absolute; top: 6px; right: 8px;
+  border: none; background: none; cursor: pointer;
+  font-size: 13px; line-height: 1; color: var(--muted); opacity: .5; padding: 2px;
+}
+.chunk-del:hover { opacity: 1; color: #d92d20; }
 .chunk-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
 .chunk-type {
   font-size: 10px; font-weight: 800; border-radius: 5px; padding: 1px 7px;
+  border: none; cursor: pointer;    /* 现在是按钮：点一下循环切类型 */
 }
 .chunk-type.fixed { color: #1f7a5a; background: rgba(31, 157, 107, 0.16); }
 .chunk-type.skeleton { color: var(--violet-deep); background: rgba(124, 92, 255, 0.16); }
 .chunk-type.semi { color: #b54708; background: rgba(181, 71, 8, 0.14); }
 .chunk-label { font-size: 12px; color: var(--muted); }
+/* 自己加一条 */
+.chunk-add {
+  display: inline-flex; align-items: center; gap: 4px;
+  border: 1px dashed rgba(124, 92, 255, 0.5); background: none; cursor: pointer;
+  color: var(--violet-deep); font-size: 12px; font-weight: 700;
+  border-radius: 8px; padding: 5px 12px; margin-top: 2px;
+}
+.chunk-add:hover { background: rgba(124, 92, 255, 0.08); }
 .chunk-up {
   font-size: 11px; font-weight: 800; color: var(--accent);
   background: rgba(196, 75, 255, 0.14); border-radius: 5px; padding: 1px 7px;

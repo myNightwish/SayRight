@@ -124,6 +124,27 @@
       #chatInput { flex: 1; border: none; background: none; outline: none; padding: 10px 12px; font-size: 15px; color: var(--ink); font-family: inherit; }
       .chat-send { border: none; border-radius: 12px; padding: 0 20px; font-size: 15px; font-weight: 700; color: #fff; cursor: pointer; background: linear-gradient(120deg, var(--violet), var(--accent)); }
       .chat-send:disabled { opacity: .5; cursor: default; }
+      /* ===== 情景对练：情景卡 + 目标清单（仅 rehearse 模式）===== */
+      .rehearse-card {
+        background: var(--glass-strong); border: 1px solid rgba(124,92,255,0.24);
+        border-radius: 14px; padding: 12px 14px; margin-bottom: 12px;
+      }
+      .rehearse-card .rh-roles { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; font-weight: 700; }
+      .rehearse-card .rh-you { color: var(--violet-deep); }
+      .rehearse-card .rh-ai { color: #1f7a5a; }
+      .rehearse-card .rh-vs { color: var(--muted); }
+      .rehearse-card .rh-goal { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+      .checklist .cl-head { font-size: 13px; font-weight: 800; color: var(--ink); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+      .checklist .cl-count { font-size: 12px; font-weight: 700; color: var(--violet-deep); background: rgba(124,92,255,0.12); border-radius: 999px; padding: 2px 10px; }
+      .checklist .cl-item { display: flex; gap: 8px; padding: 8px 0; border-top: 1px solid rgba(124,92,255,0.12); transition: opacity .3s; }
+      .checklist .cl-item:first-of-type { border-top: none; }
+      .checklist .cl-mark { flex: 0 0 18px; font-size: 15px; color: var(--muted); }
+      .checklist .cl-item.hit .cl-mark { color: #1f9d6b; }
+      .checklist .cl-item.hit .cl-expr { text-decoration: line-through; color: var(--muted); }
+      .checklist .cl-intent { font-size: 12px; color: var(--muted); }
+      .checklist .cl-expr { font-size: 14px; font-weight: 700; color: var(--violet-deep); margin-top: 2px; }
+      .checklist .cl-expr .speak { border: none; background: none; cursor: pointer; color: var(--violet); opacity: .5; margin-left: 4px; font-size: 13px; }
+      .checklist .cl-expr .speak:hover { opacity: 1; }
       /* ===== 中：不够地道复盘 ===== */
       .weak-card {
         background: var(--glass-strong); border: 1px solid rgba(196,75,255,0.22); border-radius: 12px;
@@ -235,6 +256,8 @@
       <!-- 上：对话窗口 -->
       <section class="panel">
         <div class="section-title"><span class="dot"></span>对话</div>
+        <!-- 情景对练：情景卡（你演谁 / 对方谁 / 这场目标），仅 rehearse 模式显示 -->
+        <div id="rehearseCard" class="rehearse-card hidden"></div>
         <!-- 陪伴角色：仅日常对练(talk-mode)显示，随对话状态变表情 -->
         <div id="companion" class="companion">
           <div class="cat-wrap">
@@ -289,6 +312,11 @@
             <button id="chatSend" class="chat-send" type="button">发送</button>
           </div>
         </div>
+      </section>
+
+      <!-- 情景对练：这场要用上的表达清单（命中打勾），仅 rehearse 模式显示 -->
+      <section id="checklistPanel" class="panel hidden">
+        <div id="checklist" class="checklist"></div>
       </section>
 
       <!-- 中：不够地道的句子（对练结束后出现） -->

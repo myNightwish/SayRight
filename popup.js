@@ -10,6 +10,7 @@ const saveButton = document.querySelector("#saveButton");
 const resultText = document.querySelector("#resultText");
 const memoInput = document.querySelector("#memoInput");
 const memoRow = document.querySelector("#memoRow");
+const starsPicker = document.querySelector("#starsPicker");
 
 const PLACEHOLDER_RESULT = "翻译或润色结果......";
 const TRANSLATE_LABEL = "翻译";
@@ -116,26 +117,107 @@ function speak(text) {
 
 // 渲染可复用表达块（chunks）。兼容老数据：construct 字符串当单个 skeleton 块。
 // 每块显示：块文本（槽位高亮）+ 类型标 + 中文用途；升级点(isUpgrade)特别高亮。
-function renderChunks(result) {
-  let chunks = Array.isArray(result.chunks) ? result.chunks : [];
-  if (!chunks.length && result.construct) {
-    chunks = [{ text: result.construct, type: "skeleton", label: "", isUpgrade: false }];
+// 收藏当下可编辑：文本就地改（contenteditable），可删、可点类型标切换、可自己加一条。
+// 编辑直接作用于 currentPolish.chunks，收藏时 toggleSave 自然带上校订后的版本。
+const CHUNK_TYPES = ["fixed", "skeleton", "semi"];
+const CHUNK_TYPE_LABEL = { fixed: "固定表达", skeleton: "句型骨架", semi: "半固定" };
+
+// 把 currentPolish.chunks 归一成一个真数组（老数据的 construct 合成单块），
+// 之后所有编辑都落在这个数组上，收藏即持久化。
+function ensureChunksArray() {
+  if (!currentPolish) return [];
+  if (!Array.isArray(currentPolish.chunks)) currentPolish.chunks = [];
+  if (!currentPolish.chunks.length && currentPolish.construct) {
+    currentPolish.chunks = [{ text: currentPolish.construct, type: "skeleton", label: "", isUpgrade: false }];
   }
-  if (!chunks.length) return "";
-  const typeLabel = { fixed: "固定表达", skeleton: "句型骨架", semi: "半固定" };
+  return currentPolish.chunks;
+}
+
+function renderChunks() {
+  const chunks = ensureChunksArray();
   const rows = chunks
-    .map((c) => {
-      const t = ["fixed", "skeleton", "semi"].includes(c.type) ? c.type : "skeleton";
+    .map((c, i) => {
+      const t = CHUNK_TYPES.includes(c.type) ? c.type : "skeleton";
       const up = c.isUpgrade ? `<span class="chunk-up">✨ 你可能想不到</span>` : "";
       const label = c.label ? `<span class="chunk-label">${escapeHtml(c.label)}</span>` : "";
       return `
-        <div class="chunk-row ${c.isUpgrade ? "upgrade" : ""}">
-          <div class="chunk-text">${highlightSlots(c.text)}</div>
-          <div class="chunk-meta"><span class="chunk-type ${t}">${typeLabel[t]}</span>${label}${up}</div>
+        <div class="chunk-row ${c.isUpgrade ? "upgrade" : ""}" data-chunk="${i}">
+          <div class="chunk-text" contenteditable="true" data-chunk-edit="${i}"
+            title="点这里改文字">${highlightSlots(c.text)}</div>
+          <button class="chunk-del" data-chunk-del="${i}" type="button" title="删掉这条">✕</button>
+          <div class="chunk-meta">
+            <button class="chunk-type ${t}" data-chunk-type="${i}" type="button" title="点一下换类型">${CHUNK_TYPE_LABEL[t]}</button>
+            ${label}${up}
+          </div>
         </div>`;
     })
     .join("");
-  return `<div class="chunks"><div class="chunks-title">可复用表达</div>${rows}</div>`;
+  return `
+    <div class="chunks" id="chunksBox">
+      <div class="chunks-title">可复用表达 · 可改可删</div>
+      ${rows}
+      <button class="chunk-add" id="chunkAdd" type="button">＋ 自己加一条</button>
+    </div>`;
+}
+
+// 绑定 chunks 的就地编辑：文本失焦存、删除、类型切换、新增。改完只重渲染 chunks 区。
+function bindChunks() {
+  const box = resultText.querySelector("#chunksBox");
+  if (!box) return;
+  const chunks = ensureChunksArray();
+
+  // 文本就地编辑：失焦时把纯文本（去掉槽位高亮 span）写回。
+  box.querySelectorAll("[data-chunk-edit]").forEach((el) => {
+    el.addEventListener("blur", () => {
+      const i = Number(el.getAttribute("data-chunk-edit"));
+      if (chunks[i]) chunks[i].text = el.textContent.trim();
+    });
+    // 回车＝结束编辑（不换行）
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); el.blur(); }
+    });
+  });
+
+  // 删除某条
+  box.querySelectorAll("[data-chunk-del]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const i = Number(btn.getAttribute("data-chunk-del"));
+      chunks.splice(i, 1);
+      rerenderChunks();
+    });
+  });
+
+  // 点类型标：fixed → skeleton → semi 循环
+  box.querySelectorAll("[data-chunk-type]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const i = Number(btn.getAttribute("data-chunk-type"));
+      if (!chunks[i]) return;
+      const cur = CHUNK_TYPES.indexOf(chunks[i].type);
+      chunks[i].type = CHUNK_TYPES[(cur + 1) % CHUNK_TYPES.length];
+      rerenderChunks();
+    });
+  });
+
+  // 自己加一条：默认固定表达，加完聚焦到新行让用户直接打字。
+  const addBtn = box.querySelector("#chunkAdd");
+  if (addBtn) {
+    addBtn.addEventListener("click", () => {
+      chunks.push({ text: "", type: "fixed", label: "", isUpgrade: false });
+      rerenderChunks();
+      const last = resultText.querySelector(`[data-chunk-edit="${chunks.length - 1}"]`);
+      if (last) last.focus();
+    });
+  }
+}
+
+// 只重画 chunks 区（编辑/删除/加条后），不动整块结果，避免闪烁与丢焦。
+function rerenderChunks() {
+  const box = resultText.querySelector("#chunksBox");
+  if (!box) return;
+  const tmp = document.createElement("div");
+  tmp.innerHTML = renderChunks();
+  box.replaceWith(tmp.firstElementChild);
+  bindChunks();
 }
 
 // 统一输出区写入入口：
@@ -279,7 +361,8 @@ function renderPolish(result) {
     ? `<div class="polish-note"><span class="note-label">为什么这么改</span>${escapeHtml(result.note)}</div>`
     : "";
   // 可复用表达块（chunks）：固定/骨架/半固定分类，升级点高亮。给迁移练习铺路。
-  const chunksHtml = renderChunks(result);
+  // 收藏当下可就地编辑（改/删/加/切类型），编辑落在 currentPolish.chunks 上。
+  const chunksHtml = renderChunks();
   // 当前场景+语气标注：用户关心的是"在这个场景、这个语气下"我的表达合不合适。
   // 场景为空时显示「通用」，语气为空时显示「自然」，始终给出上下文。
   const sceneLabel = (currentPolish && currentPolish.scene) || "通用";
@@ -311,6 +394,9 @@ function renderPolish(result) {
   // 朗读地道说法
   const betterSpeak = resultText.querySelector("#betterSpeak");
   if (betterSpeak) betterSpeak.addEventListener("click", () => speak(result.better || ""));
+
+  // 绑定 chunks 就地编辑（改/删/加/切类型）——编辑作用于 currentPolish.chunks
+  bindChunks();
 
   // 绑定语气切换
   if (Array.isArray(result.tones) && result.tones.length) {
@@ -355,38 +441,22 @@ function setCorrections(map) {
   return Promise.resolve();
 }
 
-// 根据当前润色结果是否已收藏，刷新星标外观。
-async function refreshSaveButton() {
-  if (!currentPolish) {
-    saveButton.hidden = true;
-    if (memoRow) memoRow.hidden = true;
-    return;
-  }
-  saveButton.hidden = false;
-  if (memoRow) memoRow.hidden = false;
-  const map = await getCorrections();
-  const saved = map[correctionKey(currentPolish.input)];
-  // 已收藏：把存过的记忆提示回填到输入框，方便查看/修改；未收藏时清空，用占位提示引导新填。
-  if (memoInput) memoInput.value = saved ? (saved.situation || "") : "";
-  saveButton.classList.toggle("active", Boolean(saved));
-  saveButton.textContent = saved ? "★ 已收藏" : "☆ 收藏";
-  saveButton.title = saved ? "取消收藏" : "收藏这条润色";
+// 星级：0=只进接收库（普通收藏）；1–5=晋升进产出核心，星越多＝越高频/越优先，
+// 练习与对练据此排序。兼容早期布尔 starred（视作 3 星）。
+function starLevel(it) {
+  if (!it) return 0;
+  if (typeof it.stars === "number") return it.stars;
+  return it.starred ? 3 : 0;
 }
 
-async function toggleSave() {
-  if (!currentPolish) return;
+// 把当前润色写进收藏 map（若尚未收藏则按草稿新建），返回其 key。
+// 收藏按钮与星级选择器共用它，避免两处各写一份收藏结构。
+function ensureSaved(map) {
   const key = correctionKey(currentPolish.input);
-  if (!key) return;
-  const map = await getCorrections();
-  if (map[key]) {
-    delete map[key];
-    if (memoInput) memoInput.value = "";
-  } else {
+  if (!key) return "";
+  if (!map[key]) {
     // 记忆提示：用户选填的「唤醒这句话的情境」优先；没填则回退到模型生成的 situation。
-    // 这条 situation 正是抽卡复述练习的题面——用户自己的记忆锚点比机器造的更贴合。
     const userMemo = (memoInput && memoInput.value.trim()) || "";
-    // 收藏「表达意图」：除原句/better/note 外，存场景、意图、印象、评分、语气版本，
-    // 为将来与 Trace 的「应用可视化」打通保留结构。
     map[key] = {
       input: currentPolish.input,
       scene: currentPolish.scene || "通用",
@@ -401,11 +471,90 @@ async function toggleSave() {
       scores: currentPolish.scores || null,
       tones: Array.isArray(currentPolish.tones) ? currentPolish.tones : [],
       natural: Boolean(currentPolish.natural),
+      stars: 0,          // 默认进接收库；点星级才晋升进产出核心
+      createdAt: Date.now(), // 收藏那天，固定不变——供收藏页日期分组；savedAt 只服务同步
       savedAt: Date.now(),
     };
   }
+  return key;
+}
+
+// 画出 5 颗星，点亮到 level。level=0 全空（未进核心）。
+function renderStarsPicker(level) {
+  if (!starsPicker) return;
+  let html = "";
+  for (let i = 1; i <= 5; i++) {
+    html += `<button class="star ${i <= level ? "on" : ""}" data-star="${i}" type="button"
+      title="${i} 星${i <= level ? "（点它取消到此级）" : ""}">${i <= level ? "★" : "☆"}</button>`;
+  }
+  const tip = level ? `产出核心 · ${level} 星` : "点星标记为高频核心";
+  starsPicker.innerHTML = `${html}<span class="stars-tip">${tip}</span>`;
+}
+
+// 设星级：n=点的那颗星。再点当前最高星＝降到 n-1（可一路清零，但仍保留收藏）。
+// 设星隐含「收藏」——没收藏会先建，契合「polish 时就能打星」。
+async function setStars(n) {
+  if (!currentPolish) return;
+  const map = await getCorrections();
+  const key = ensureSaved(map);
+  if (!key) return;
+  const cur = starLevel(map[key]);
+  map[key].stars = (cur === n) ? n - 1 : n;   // 点已亮的最高星＝取消这一级
+  map[key].savedAt = Date.now();
   await setCorrections(map);
+  if (window.NuanceSync) window.NuanceSync.syncNow();
   await refreshSaveButton();
+}
+
+// 根据当前润色结果是否已收藏，刷新收藏按钮 + 星级选择器外观。
+async function refreshSaveButton() {
+  if (!currentPolish) {
+    saveButton.hidden = true;
+    if (memoRow) memoRow.hidden = true;
+    if (starsPicker) starsPicker.closest(".stars-row")?.setAttribute("hidden", "");
+    return;
+  }
+  saveButton.hidden = false;
+  if (memoRow) memoRow.hidden = false;
+  const starsRow = starsPicker && starsPicker.closest(".stars-row");
+  if (starsRow) starsRow.removeAttribute("hidden");
+  const map = await getCorrections();
+  const saved = map[correctionKey(currentPolish.input)];
+  // 已收藏：把存过的记忆提示回填到输入框，方便查看/修改；未收藏时清空，用占位提示引导新填。
+  if (memoInput) memoInput.value = saved ? (saved.situation || "") : "";
+  renderStarsPicker(saved ? starLevel(saved) : 0);
+  saveButton.classList.toggle("active", Boolean(saved));
+  saveButton.textContent = saved ? "★ 已收藏" : "☆ 收藏";
+  saveButton.title = saved ? "取消收藏" : "收藏这条润色";
+}
+
+async function toggleSave() {
+  if (!currentPolish) return;
+  const key = correctionKey(currentPolish.input);
+  if (!key) return;
+  const map = await getCorrections();
+  if (map[key]) {
+    delete map[key];
+    if (memoInput) memoInput.value = "";
+    await setCorrections(map);
+    // 取消收藏要记墓碑并立即上行，否则同步会把服务端还留着的这条又并回来（「删了又复活」）。
+    if (window.NuanceSync) window.NuanceSync.recordDelete(key);
+  } else {
+    ensureSaved(map);
+    await setCorrections(map);
+    // 新收藏立即上行，别攒着——慢同步途中若被别的写回覆盖就会丢（已在 sync 侧加防丢，这里再主动推一把）。
+    if (window.NuanceSync) window.NuanceSync.syncNow();
+  }
+  await refreshSaveButton();
+}
+
+// 星级选择器点击：设星（隐含收藏）。
+if (starsPicker) {
+  starsPicker.addEventListener("click", (e) => {
+    const btn = e.target.closest(".star");
+    if (!btn) return;
+    setStars(Number(btn.getAttribute("data-star")));
+  });
 }
 // __APPEND_HANDLERS__
 

@@ -9,6 +9,8 @@ const SERVER_ORIGIN = location.protocol.startsWith("http")
   : (window.NUANCE_REMOTE_ORIGIN || "http://127.0.0.1:8770");
 const CHAT_API = `${SERVER_ORIGIN}/chat`;
 const TALK_API = `${SERVER_ORIGIN}/talk`;
+const REHEARSE_PLAN_API = `${SERVER_ORIGIN}/rehearse-plan`;
+const REHEARSE_API = `${SERVER_ORIGIN}/rehearse`;
 const EXTRACT_API = `${SERVER_ORIGIN}/extract`;
 // 访问口令：与 scene.js 一致，?key=xxx 记到 localStorage 后自动带上。
 const TUTOR_KEY = (() => {
@@ -92,14 +94,15 @@ function getScripts() {
 
 // 日常对练：调取「到期复习」物料。
 // 从 corrections（润色收藏）+ drillState（Leitner 掌握度）里挑出到期的句子，
-// 交给 /talk，让教练在自然对话里给你复用机会。到期优先，其次没练过的新句，最多 5 条。
+// 交给 /talk 或 /rehearse-plan。到期优先、其次没练过的新句。
+// limit 控制上限：日常对练每轮至多 5 条（轻激活）；情景对练传更大值（凑一整场剧本）。
 function getLocalMap(key) {
   return new Promise((resolve) => {
     if (hasChromeStorage) chrome.storage.local.get(key, (res) => resolve(res[key] || {}));
     else { try { resolve(JSON.parse(localStorage.getItem(key) || "{}")); } catch (_) { resolve({}); } }
   });
 }
-async function pickDueMaterials() {
+async function pickDueMaterials(limit = TALK_MATERIALS_MAX) {
   const [corr, drill] = await Promise.all([getLocalMap(CORR_KEY), getLocalMap(DRILL_KEY)]);
   const items = Object.values(corr).filter((it) => it && it.better && String(it.better).trim());
   if (!items.length) return [];
@@ -119,7 +122,13 @@ async function pickDueMaterials() {
     else if (d.due <= now) due.push({ it, due: d.due });
   }
   due.sort((a, b) => a.due - b.due); // 到期最久的先激活
-  const chosen = due.map((x) => x.it).concat(fresh).slice(0, TALK_MATERIALS_MAX);
+  // 产出核心优先：练习/对练服务的是用户认领的高频核心，星级越高越靠前。
+  // 兼容早期布尔 starred（视作 3 星）。
+  const starLevelOf = (it) =>
+    it && typeof it.stars === "number" ? it.stars : (it && it.starred ? 3 : 0);
+  const ordered = due.map((x) => x.it).concat(fresh);
+  ordered.sort((a, b) => starLevelOf(b) - starLevelOf(a)); // 稳定排序：星级高的提前，其余保持到期/新序
+  const chosen = ordered.slice(0, limit);
   return chosen.map((it) => ({
     intent: it.intent || it.situation || "",
     expression: it.better,
@@ -147,6 +156,9 @@ const scriptPanel = document.getElementById("scriptPanel");
 const scriptList = document.getElementById("scriptList");
 const toastEl = document.getElementById("toast");
 const companionEl = document.getElementById("companion");
+const rehearseCard = document.getElementById("rehearseCard");
+const checklistPanel = document.getElementById("checklistPanel");
+const checklistEl = document.getElementById("checklist");
 
 // 陪伴角色（Coco）表情状态：speaking(说话) / happy(夸你地道) / concerned(温柔纠错) / 待命。
 // 只在日常对练(talkMode)显示；剧本对练不受影响。
@@ -187,6 +199,36 @@ let ended = false;
 // 由 chat.html?talk=1 进入；此时不读场景/剧本，走 /talk。
 let talkMode = false;
 let talkTopic = "";       // 可选中文话题（?topic=...）
+// 情景对练模式（Rehearse）：读你积累的收藏素材，反过来为你造一场剧本对练。
+// 由 chat.html?rehearse=1 进入；开场先 /rehearse-plan 定情景+清单，之后每轮走 /rehearse。
+let rehearseMode = false;
+let rehearsePlan = null;  // { scene, learnerRole, aiRole, goal, checklist:[{intent,expression,construct}], opener, opener_zh }
+let checklistHit = [];    // 与 rehearsePlan.checklist 等长的布尔数组，标记哪些已命中
+// 情景对练命中一条清单 → 把对应收藏句在 Leitner 里推后（答对＝box+1），落地 + 触发同步。
+const REHEARSE_BOX_DAYS = [0, 1, 2, 4, 7, 15];
+function setDrillMap(map) {
+  if (hasChromeStorage) return chrome.storage.local.set({ [DRILL_KEY]: map });
+  try { localStorage.setItem(DRILL_KEY, JSON.stringify(map)); } catch (_) {}
+  return Promise.resolve();
+}
+// 由 expression 反查收藏 item 的 key，命中即把其 replay 档 Leitner 前进一格。
+async function bumpMasteryByExpression(expression) {
+  const expr = String(expression || "").trim();
+  if (!expr) return;
+  const [corr, drill] = await Promise.all([getLocalMap(CORR_KEY), getLocalMap(DRILL_KEY)]);
+  const item = Object.values(corr).find((it) => it && it.better && String(it.better).trim() === expr);
+  if (!item || !item.key) return;
+  const id = `${item.key}::replay`;
+  const now = Date.now();
+  const st = drill[id] || { box: 0, due: 0, reps: 0, lapses: 0 };
+  st.box = Math.min(5, (st.box || 0) + 1);
+  st.reps = (st.reps || 0) + 1;
+  st.due = now + REHEARSE_BOX_DAYS[st.box] * 86400000;
+  st.savedAt = now;
+  drill[id] = st;
+  await setDrillMap(drill);
+  if (window.NuanceSync && typeof window.NuanceSync.syncSoon === "function") window.NuanceSync.syncSoon();
+}
 // 角色分配：默认学员演「你」、AI 演剧本里的对方角色。互换后对调。
 let swapped = false;
 function learnerRoleLabel() {
@@ -299,6 +341,63 @@ function setupListenFirst(wrap, text) {
   body.appendChild(ctrls);
 }
 
+// 情景对练：渲染顶部情景卡 + 目标清单（这场要用上的表达）。命中的打勾。
+function renderRehearsePlan() {
+  if (!rehearsePlan) return;
+  if (rehearseCard) {
+    rehearseCard.innerHTML = `
+      <div class="rh-roles"><span class="rh-you">🙋 你演：${escapeHtml(rehearsePlan.learnerRole)}</span><span class="rh-vs">↔</span><span class="rh-ai">🧑‍💼 对方：${escapeHtml(rehearsePlan.aiRole)}</span></div>
+      ${rehearsePlan.goal ? `<div class="rh-goal">🎯 ${escapeHtml(rehearsePlan.goal)}</div>` : ""}`;
+    rehearseCard.classList.remove("hidden");
+  }
+  renderChecklist();
+  if (checklistPanel) checklistPanel.classList.remove("hidden");
+}
+
+function renderChecklist() {
+  if (!checklistEl || !rehearsePlan) return;
+  const total = rehearsePlan.checklist.length;
+  const done = checklistHit.filter(Boolean).length;
+  checklistEl.innerHTML =
+    `<div class="cl-head">这场要用上的表达 <span class="cl-count">${done}/${total}</span></div>` +
+    rehearsePlan.checklist
+      .map((c, i) => `
+        <div class="cl-item ${checklistHit[i] ? "hit" : ""}">
+          <span class="cl-mark">${checklistHit[i] ? "✓" : "○"}</span>
+          <div class="cl-body">
+            ${c.intent ? `<div class="cl-intent">${escapeHtml(c.intent)}</div>` : ""}
+            <div class="cl-expr">${escapeHtml(c.expression)}<button class="speak" data-i="${i}" title="朗读">🔊</button></div>
+          </div>
+        </div>`)
+      .join("");
+  checklistEl.querySelectorAll(".speak").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const it = rehearsePlan.checklist[Number(btn.getAttribute("data-i"))];
+      if (it) speak(it.expression);
+    });
+  });
+}
+
+// 处理本轮命中的清单表达：打勾、bump 掌握度、刷新清单。
+async function applyUsed(used) {
+  if (!rehearsePlan || !Array.isArray(used) || !used.length) return;
+  let changed = false;
+  for (const expr of used) {
+    const idx = rehearsePlan.checklist.findIndex(
+      (c) => c.expression.trim().toLowerCase() === String(expr).trim().toLowerCase()
+    );
+    if (idx >= 0 && !checklistHit[idx]) {
+      checklistHit[idx] = true;
+      changed = true;
+      bumpMasteryByExpression(rehearsePlan.checklist[idx].expression);
+    }
+  }
+  if (changed) {
+    renderChecklist();
+    flashCompanion("happy");
+  }
+}
+
 function setComposer(state) {
   chatSpotlight.classList.toggle("active", state === "active");
   chatSpotlight.classList.toggle("waiting", state === "waiting");
@@ -350,14 +449,26 @@ async function advance() {
   setHint("");
   const typing = showTyping();
   try {
-    let body;
-    if (talkMode) {
+    let body, api;
+    if (rehearseMode) {
+      body = {
+        scene: rehearsePlan.scene,
+        learnerRole: rehearsePlan.learnerRole,
+        aiRole: rehearsePlan.aiRole,
+        goal: rehearsePlan.goal,
+        checklist: rehearsePlan.checklist,
+        history,
+      };
+      api = REHEARSE_API;
+    } else if (talkMode) {
       const materials = await pickDueMaterials();
       body = { topic: talkTopic, history, materials };
+      api = TALK_API;
     } else {
       body = { scene, script, history, learnerRole: learnerRoleLabel(), aiRole: aiRoleLabel() };
+      api = CHAT_API;
     }
-    const resp = await fetch(talkMode ? TALK_API : CHAT_API, {
+    const resp = await fetch(api, {
       method: "POST",
       headers: apiHeaders(),
       body: JSON.stringify(body),
@@ -366,14 +477,16 @@ async function advance() {
     typing.remove();
     if (!resp.ok) { toast(data.error || "对练出错了，请重试"); setComposer("active"); return; }
     renderFeedback(data.feedback);
+    // 情景对练：先把本轮命中的清单表达打勾（含 Coco 开心 + bump 掌握度）。
+    if (rehearseMode && data.used) await applyUsed(data.used);
     const { enEl, wrap } = appendMsg("them", "", data.reply_zh);
-    // 日常对练「先听后看」：气泡默认遮盖文字 + 角标（👁 显隐 / 🔊 复听），逼你先听声音。
-    if (talkMode) setupListenFirst(wrap, data.reply);
+    // 「先听后看」：日常/情景对练都遮盖对方文字（角标 👁 显隐 / 🔊 复听），逼你先听声音。
+    if (talkMode || rehearseMode) setupListenFirst(wrap, data.reply);
     // 让 Coco 的即时反应（开心/关切）先亮一下，再开口说下一句。
-    if (talkMode && data.feedback && (data.feedback.ok ? history.some((h) => h.role === "me") : (data.feedback.better || data.feedback.tip))) {
+    if ((talkMode || rehearseMode) && data.feedback && (data.feedback.ok ? history.some((h) => h.role === "me") : (data.feedback.better || data.feedback.tip))) {
       await new Promise((r) => setTimeout(r, 750));
     }
-    await typeOut(enEl, data.reply, wrap.querySelector(".avatar"), talkMode);
+    await typeOut(enEl, data.reply, wrap.querySelector(".avatar"), talkMode || rehearseMode);
     history.push({ role: "them", text: data.reply });
     if (data.done) { ended = true; finish(); }
     else { setComposer("active"); setHint(data.hint || ""); }
@@ -500,6 +613,13 @@ function resetChat() {
   weakPanel.classList.add("hidden");
   chatInput.value = "";
   setHint("");
+  if (rehearseMode) {
+    // 情景对练：清单命中标记清零，用 plan 里的开场白让对方先开口起这场戏。
+    checklistHit = rehearsePlan ? rehearsePlan.checklist.map(() => false) : [];
+    renderChecklist();
+    openRehearse();
+    return;
+  }
   if (talkMode) {
     // 日常对练：无角色概念，直接让「朋友」先开口起话头。
     advance();
@@ -521,6 +641,50 @@ function swapRoles() {
   resetChat();
 }
 
+// 情景对练开场：直接用 /rehearse-plan 给的 opener 让对方先开口（省一次请求），再把话交给你。
+async function openRehearse() {
+  if (!rehearsePlan) return;
+  const { enEl, wrap } = appendMsg("them", "", rehearsePlan.opener_zh);
+  setupListenFirst(wrap, rehearsePlan.opener);
+  await typeOut(enEl, rehearsePlan.opener, wrap.querySelector(".avatar"), true);
+  history.push({ role: "them", text: rehearsePlan.opener });
+  setComposer("active");
+  setHint("试着把清单里第一条自然地说出来");
+}
+
+// 情景对练启动：读你积累的收藏素材（到期优先、不够补新），调 /rehearse-plan 造这场剧本。
+async function loadRehearsePlan() {
+  const loading = appendMsg("them", "正在根据你的收藏素材，为你安排一场对练……", "");
+  const materials = await pickDueMaterials(20); // 不再硬卡 5 条，交给模型按情景取舍
+  if (!materials.length) {
+    loading.enEl.textContent = "你还没有可以用来对练的收藏素材。先去润色/场景里收藏一些地道说法吧～";
+    setComposer("waiting");
+    return;
+  }
+  try {
+    const resp = await fetch(REHEARSE_PLAN_API, {
+      method: "POST",
+      headers: apiHeaders(),
+      body: JSON.stringify({ materials }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      loading.enEl.textContent = data.error || "没能安排出对练，请重试。";
+      setComposer("waiting");
+      return;
+    }
+    rehearsePlan = data;
+    scene = data.scene || "情景对练";
+    chatScene.textContent = scene;
+    loading.wrap.remove();
+    renderRehearsePlan();
+    resetChat();
+  } catch (_) {
+    loading.enEl.textContent = "连不上本地服务，请确认 tutor-server.mjs 已启动。";
+    setComposer("waiting");
+  }
+}
+
 // ---- 启动：拿场景 + 剧本 ----
 // 剧本来源优先级：
 //   1) 预演页交接的 handoff（刚从预演点进来，最新最准）
@@ -530,6 +694,20 @@ function swapRoles() {
 //   3) 兜底：该场景已收藏的散句按时间拼（旧数据，可能乱序）
 async function boot() {
   const params = new URLSearchParams(location.search);
+
+  // 情景对练模式：chat.html?rehearse=1 → 读你积累的收藏素材，反过来为你造一场剧本对练。
+  if (params.get("rehearse") === "1" || params.get("rehearse") === "true") {
+    rehearseMode = true;
+    document.body.classList.add("talk-mode"); // 复用 Coco 陪伴角色
+    chatScene.textContent = "情景对练";
+    if (roleTag) roleTag.classList.add("hidden");
+    if (swapBtn) swapBtn.classList.add("hidden");
+    if (endBtn) endBtn.classList.remove("hidden");
+    chatInput.placeholder = "轮到你了，用英文回应……";
+    setComposer("waiting");
+    loadRehearsePlan();
+    return;
+  }
 
   // 日常对练模式：chat.html?talk=1 → 无剧本、无场景，好奇朋友 + 温柔教练。
   if (params.get("talk") === "1" || params.get("talk") === "true") {

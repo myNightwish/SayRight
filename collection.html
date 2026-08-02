@@ -74,6 +74,28 @@
         background: rgba(214,51,108,0.1); color: var(--danger); border: 1px solid rgba(214,51,108,0.28);
       }
       .pill-danger:hover { background: rgba(214,51,108,0.16); }
+      /* 只看核心：未激活是描边金，激活后实心金——一眼看出正在筛核心 */
+      .pill-star {
+        background: rgba(240,180,20,0.12); color: #b8860b; border: 1px solid rgba(240,180,20,0.4);
+      }
+      .pill-star:hover { background: rgba(240,180,20,0.2); }
+      .pill-star.active {
+        background: linear-gradient(120deg, #f5b301, #ffce54); color: #5a4300; border-color: transparent;
+        box-shadow: 0 8px 18px rgba(240,180,20,0.36);
+      }
+      /* 卡片头右侧：星级 + 时间 */
+      .head-right { display: flex; align-items: center; gap: 8px; flex: none; }
+      /* 5 星选择器：0=只在接收库；1–5=产出核心，星越多越优先练习 */
+      .star-picker { display: inline-flex; align-items: center; gap: 1px; }
+      .star-picker .star {
+        border: none; background: none; cursor: pointer; font-size: 14px; line-height: 1;
+        color: #d9b310; padding: 0 1px; transition: transform .12s ease, color .14s ease;
+      }
+      .star-picker .star:hover { transform: scale(1.25); }
+      .star-picker .star.on { color: #f5b301; text-shadow: 0 0 8px rgba(245,179,1,0.5); }
+      /* 已进核心的卡片：左描一条金边，和普通收藏区分开 */
+      .card.starred { border-color: rgba(245,179,1,0.5); box-shadow: 0 16px 40px rgba(200,150,10,0.2); }
+      .card.starred .card-summary { border-left: 3px solid #f5b301; padding-left: 13px; }
       /* 润色卡片：宽容器下用两列网格，避免单卡过宽。每个日期分组各一组网格。 */
       .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; margin-bottom: 4px; }
       @media (max-width: 720px) { .cards-grid { grid-template-columns: 1fr; } }
@@ -371,6 +393,7 @@
       <div id="paneCorrections">
         <div class="toolbar">
           <input type="search" id="search" placeholder="搜索意图、场景、原句或地道说法…" />
+          <button class="pill pill-star" id="filterStar" type="button" title="只看已晋升进产出核心的高频表达">☆ 只看核心</button>
           <a class="pill pill-quiz" href="quiz.html">🎲 随机练习</a>
           <button class="pill pill-danger" id="clearAll">清空全部</button>
         </div>

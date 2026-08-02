@@ -61,6 +61,21 @@
     }
   }
 
+  // 客户端侧并集合并（与服务端 mergeMap 同款 savedAt-wins）。
+  // 写回时用它把「服务端合并结果」再和「当前最新本地态」并一次——
+  // 关键：同步是异步的，一趟慢同步飞行期间用户可能又收藏了新条目（写进本地）。
+  // 若直接 setLocal(服务端结果) 就会把这些新条目盲覆盖掉（就是「收藏丢失」的根因）。
+  // 重新读一次本地、按 savedAt-wins 合并，飞行期间的新增/新改一定保住。
+  function mergeMapLocal(base, incoming) {
+    const out = { ...(base || {}) };
+    for (const [k, v] of Object.entries(incoming || {})) {
+      if (!v || typeof v !== "object") continue;
+      const cur = out[k];
+      if (!cur || (v.savedAt || 0) >= (cur.savedAt || 0)) out[k] = v;
+    }
+    return out;
+  }
+
   let inFlight = null;
   let rerunPending = false; // 飞行途中又来同步请求：标记它，等这趟结束后补跑一趟，避免刚写的墓碑/删除被漏掉。
   // 上行本地态 → 取回合并态 → 写回本地。
@@ -85,11 +100,30 @@
       }
       if (!merged || typeof merged !== "object") return false;
 
-      const corrections = merged.corrections || {};
-      const sceneSaves = merged.sceneSaves || {};
-      const sceneScripts = merged.sceneScripts || {};
-      const drillState = merged.drillState || {};
-      const tombstones = merged.tombstones || {};
+      // 关键防丢：同步是异步的，这趟请求飞行期间用户可能又收藏/改了新条目（已落本地）。
+      // 服务端只见到我们上行时的旧快照，回传里没有这些新条目。若直接写回服务端结果就把它们冲掉了。
+      // 所以：写回前重新读一次「当前最新本地态」，再与服务端结果按 savedAt-wins 并一次——
+      // 新收藏（savedAt 更新）胜出得以保留，别端的更新也照常合并进来。
+      const fresh = await readAll();
+
+      const corrections = mergeMapLocal(merged.corrections || {}, fresh.corrections);
+      const sceneSaves = mergeMapLocal(merged.sceneSaves || {}, fresh.sceneSaves);
+      // 老服务端可能不认 drillState / sceneScripts（部署早于这两个字段）。
+      // 这时 merged 里没有它们，绝不能写成 {} 把本地进度/剧本冲掉——
+      // 缺字段就保留刚上行的本地值（跨设备合并需服务端支持，但至少不丢本地）。
+      const sceneScripts = mergeMapLocal(
+        merged.sceneScripts && typeof merged.sceneScripts === "object" ? merged.sceneScripts : {},
+        fresh.sceneScripts
+      );
+      const drillState = mergeMapLocal(
+        merged.drillState && typeof merged.drillState === "object" ? merged.drillState : {},
+        fresh.drillState
+      );
+      // 墓碑同理：本地飞行期间新记的删除也要并进来，别被服务端旧墓碑覆盖。
+      const tombstones = { ...(merged.tombstones || {}) };
+      for (const [k, at] of Object.entries(fresh.tombstones || {})) {
+        if (!tombstones[k] || at > tombstones[k]) tombstones[k] = at;
+      }
       // 服务端已并集+抹除，这里再保险地本地也应用一次墓碑。
       applyTombstones(corrections, tombstones);
       applyTombstones(sceneSaves, tombstones);
@@ -133,14 +167,29 @@
     return syncNow();
   }
 
-  // 暴露给各页脚本。
-  window.NuanceSync = { syncNow, recordDelete, recordDeleteMany };
+  // 去抖上行：高频本地小改动（打星、抽卡进度、下一题、对练命中）不必每次都立刻打网络，
+  // 攒到安静 DEBOUNCE_MS 再合并成一趟。改动已先落地本地，晚几秒上行不丢；
+  // 关页/切后台会 flushSync 立即补传，所以不存在「攒着还没传就离开」的风险。
+  const DEBOUNCE_MS = 1500;
+  let debounceTimer = null;
+  function syncSoon() {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => { debounceTimer = null; syncNow(); }, DEBOUNCE_MS);
+  }
+  // 取消挂起的去抖并立刻上行——关页/切后台等「必须保住」的时刻用。
+  function flushSync() {
+    if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; }
+    return syncNow();
+  }
+
+  // 暴露给各页脚本。syncNow=立即；syncSoon=去抖合并（高频小改动首选）。
+  window.NuanceSync = { syncNow, syncSoon, recordDelete, recordDeleteMany };
 
   // 打开即拉一次。
   syncNow();
-  // 切后台 / 关页时补一次上行，尽量不丢刚产生的改动。
-  window.addEventListener("pagehide", () => { syncNow(); });
+  // 切后台 / 关页时补一次上行（flush 掉去抖里攒着的改动），尽量不丢刚产生的改动。
+  window.addEventListener("pagehide", () => { flushSync(); });
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") syncNow();
+    if (document.visibilityState === "hidden") flushSync();
   });
 })();

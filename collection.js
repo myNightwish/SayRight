@@ -8,6 +8,14 @@ const searchEl = document.querySelector("#search");
 const clearAllBtn = document.querySelector("#clearAll");
 
 let allItems = [];
+let showStarredOnly = false;   // 「只看核心」筛选：只显示晋升进产出核心（星级≥1）的收藏
+
+// 星级：0=只在接收库；1–5=产出核心。兼容早期布尔 starred（视作 3 星）。
+function starLevelOf(it) {
+  if (!it) return 0;
+  if (typeof it.stars === "number") return it.stars;
+  return it.starred ? 3 : 0;
+}
 
 const hasChromeStorage = typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
 
@@ -107,17 +115,29 @@ function scorePill(label, val) {
 }
 
 function cardHtml(item) {
-  const time = new Date(item.savedAt || 0);
+  // 卡片时间戳跟日期分组一致，看 createdAt（收藏那天）；老数据回退 savedAt。
+  const ts = item.createdAt || item.savedAt || 0;
+  const time = new Date(ts);
   const pad = (n) => String(n).padStart(2, "0");
   // 卡片时间：几月几日 几时几分（日期+时刻都给全，便于回看具体哪条）
-  const stamp = item.savedAt
+  const stamp = ts
     ? `${time.getMonth() + 1}月${time.getDate()}日 ${pad(time.getHours())}:${pad(time.getMinutes())}`
     : "";
 
-  // 标题优先用「表达意图」，没有则回退到原句——收藏的是"我以后想怎么表达"。
-  const title = item.intent || item.input || item.better || "";
+  // 标题＝用户手写的「记忆提示」(situation)：它对这句话的唤醒能力最强，
+  // 既是找回的入口线索、也是复习题面。没填才回退到原句/地道说法。
+  // 机器造的 intent 暂不展示（实践表明它唤不动表达）。
+  const title = item.situation || item.input || item.better || "";
   const sceneTag = item.scene ? `<span class="scene-tag">${escapeHtml(item.scene)}</span>` : "";
   const toneTag = item.tone ? `<span class="tone-tag">${escapeHtml(item.tone)}语气</span>` : "";
+  // 星级：0=只在接收库；1–5=产出核心（星越多越高频，练习/对练优先）。这里可改，收藏当下在 polish 页也能标。
+  const level = starLevelOf(item);
+  let starHtml = "";
+  for (let i = 1; i <= 5; i++) {
+    starHtml += `<button class="star ${i <= level ? "on" : ""}" data-star-key="${escapeHtml(item.key)}" data-star-n="${i}"
+      type="button" title="${i} 星">${i <= level ? "★" : "☆"}</button>`;
+  }
+  const starBox = `<div class="star-picker" title="核心度：星越多越优先练习">${starHtml}</div>`;
   const inputLine = item.input
     ? `<div class="input-line">原句：${escapeHtml(item.input)}</div>`
     : "";
@@ -176,7 +196,7 @@ function cardHtml(item) {
   // 整张卡片折叠：<details> 默认收起，只显示摘要（场景标签 + 意图 + 地道说法）。
   // 点标题展开才显示构式/评分/语气/笔记等，一屏能扫更多条、按需深入。
   return `
-    <details class="card" data-key="${escapeHtml(item.key)}">
+    <details class="card ${level ? "starred" : ""}" data-key="${escapeHtml(item.key)}">
       <summary class="card-summary">
         <div class="card-head">
           <div class="title-wrap">
@@ -184,7 +204,10 @@ function cardHtml(item) {
             ${toneTag}
             <span class="intent-title">${escapeHtml(title)}</span>
           </div>
-          <span class="meta">${stamp}</span>
+          <div class="head-right">
+            ${starBox}
+            <span class="meta">${stamp}</span>
+          </div>
         </div>
         <div class="better">
           ${escapeHtml(item.better || "")}
@@ -211,7 +234,8 @@ function cardHtml(item) {
 }
 
 function render(items) {
-  countEl.textContent = `共 ${allItems.length} 条润色收藏`;
+  const starN = allItems.filter((it) => starLevelOf(it) >= 1).length;
+  countEl.textContent = `共 ${allItems.length} 条润色收藏 · 产出核心 ${starN}`;
 
   if (!items.length) {
     listNavEl.innerHTML = "";
@@ -222,7 +246,9 @@ function render(items) {
   // 先按日期聚合，给每个日期一个锚点 id，供左侧目录跳转。
   const dayGroups = [];
   for (const item of items) {
-    const label = dayLabel(item.savedAt);
+    // 日期分组按 createdAt（收藏那天）；老数据/未改过的没有它，回退 savedAt。
+    // 这样「换情境」等就地改动 bump 了 savedAt，也不会把卡片挪到今天。
+    const label = dayLabel(item.createdAt || item.savedAt);
     let g = dayGroups.find((d) => d.label === label);
     if (!g) { g = { label, items: [], anchor: `day-anchor-${dayGroups.length}` }; dayGroups.push(g); }
     g.items.push(item);
@@ -252,15 +278,16 @@ function render(items) {
 
 function applyFilter() {
   const q = searchEl.value.trim().toLowerCase();
-  if (!q) {
-    render(allItems);
-    return;
+  let items = allItems;
+  // 「只看核心」：只留星级≥1（已晋升进产出核心）的。
+  if (showStarredOnly) items = items.filter((it) => starLevelOf(it) >= 1);
+  if (q) {
+    items = items.filter((item) => {
+      const hay = `${item.situation || ""} ${item.intent || ""} ${item.scene || ""} ${item.input || ""} ${item.better || ""} ${item.note || ""}`;
+      return hay.toLowerCase().includes(q);
+    });
   }
-  const filtered = allItems.filter((item) => {
-    const hay = `${item.intent || ""} ${item.scene || ""} ${item.input || ""} ${item.better || ""} ${item.note || ""}`;
-    return hay.toLowerCase().includes(q);
-  });
-  render(filtered);
+  render(items);
 }
 
 async function load() {
@@ -272,6 +299,27 @@ async function load() {
 }
 
 listEl.addEventListener("click", async (event) => {
+  // 星级：点第 n 颗星＝设为 n 星（产出核心，星越多越优先）；再点当前最高星＝降到 n-1，可清零回接收库。
+  // 改 item.stars + 刷新 savedAt（让同步 savedAt-wins 生效），落地并上行。
+  const starBtn = event.target.closest(".star");
+  if (starBtn) {
+    event.preventDefault();          // 别触发 <summary> 的展开
+    event.stopPropagation();
+    const key = starBtn.getAttribute("data-star-key");
+    const n = Number(starBtn.getAttribute("data-star-n"));
+    const map = await getCorrections();
+    if (map[key]) {
+      const cur = starLevelOf(map[key]);
+      map[key].stars = (cur === n) ? n - 1 : n;
+      delete map[key].starred;       // 迁移掉早期布尔字段，统一到 stars
+      map[key].savedAt = Date.now(); // 让「最近改动者胜」的同步把这次星级传出去
+      await setCorrections(map);
+      if (window.NuanceSync) window.NuanceSync.syncSoon();
+      await load();
+    }
+    return;
+  }
+
   // 语气行的朗读按钮：读该语气版本自己的文本。
   const toneSpeak = event.target.closest(".tone-speak");
   if (toneSpeak) {
@@ -306,6 +354,17 @@ clearAllBtn.addEventListener("click", async () => {
 });
 
 searchEl.addEventListener("input", applyFilter);
+
+// 「只看核心」：切换只显示星标（产出核心）条目。
+const filterStarBtn = document.querySelector("#filterStar");
+if (filterStarBtn) {
+  filterStarBtn.addEventListener("click", () => {
+    showStarredOnly = !showStarredOnly;
+    filterStarBtn.classList.toggle("active", showStarredOnly);
+    filterStarBtn.textContent = showStarredOnly ? "★ 只看核心" : "☆ 只看核心";
+    applyFilter();
+  });
+}
 
 // 润色 tab 左侧日期目录：点击跳转 + 高亮。
 listNavEl.addEventListener("click", (event) => {
