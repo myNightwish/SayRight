@@ -11,6 +11,45 @@ const resultText = document.querySelector("#resultText");
 const memoInput = document.querySelector("#memoInput");
 const memoRow = document.querySelector("#memoRow");
 const starsPicker = document.querySelector("#starsPicker");
+const polishAssistantImage = document.querySelector("#polishAssistantImage");
+const polishAssistantTitle = document.querySelector("#polishAssistantTitle");
+const polishAssistantStatus = document.querySelector("#polishAssistantStatus");
+
+const POLISH_ASSISTANT_STATES = {
+  idle: {
+    src: "images/mascot-study-v2.png",
+    title: "把想说的直接写下来",
+    status: "中英文都可以，我会结合场景处理。",
+    alt: "Coco 正在陪你练习表达",
+  },
+  thinking: {
+    src: "images/mascot-thinking-v1.gif",
+    title: "正在理解你的语境",
+    status: "会同时检查自然度、语气和使用场景。",
+    alt: "Coco 正在思考更自然的表达",
+  },
+  success: {
+    src: "images/mascot-success-v1.gif",
+    title: "表达已经整理好了",
+    status: "重点看更自然的版本，再听一遍发音。",
+    alt: "Coco 正在庆祝表达完成",
+  },
+  error: {
+    src: "images/mascot-comfort-v1.gif",
+    title: "这次没有处理成功",
+    status: "内容还保留着，稍后可以直接重试。",
+    alt: "Coco 正在提醒你稍后重试",
+  },
+};
+
+function setPolishAssistant(stateName) {
+  if (!polishAssistantImage) return;
+  const state = POLISH_ASSISTANT_STATES[stateName] || POLISH_ASSISTANT_STATES.idle;
+  polishAssistantImage.src = state.src;
+  polishAssistantImage.alt = state.alt;
+  polishAssistantTitle.textContent = state.title;
+  polishAssistantStatus.textContent = state.status;
+}
 
 const PLACEHOLDER_RESULT = "翻译或润色结果......";
 const TRANSLATE_LABEL = "翻译";
@@ -579,14 +618,17 @@ async function handleTranslate() {
   currentPolish = null;        // 翻译结果不可收藏
   refreshSaveButton();
   setLoading("翻译中…");
+  setPolishAssistant("thinking");
 
   try {
     const translatedText = await translateText(text, direction);
     setResult(translatedText);
+    setPolishAssistant("success");
   } catch (error) {
     console.error(error);
     setResult("");
     setCopyButtonState("error");
+    setPolishAssistant("error");
   } finally {
     setBusy(false);
   }
@@ -607,6 +649,7 @@ async function handleTutor() {
   currentPolish = null;
   refreshSaveButton();
   setLoading("正在分析地道表达…");
+  setPolishAssistant("thinking");
 
   try {
     const result = await polishExpression(text, sceneSelect.value, toneSelect.value, strictnessSelect.value);
@@ -614,6 +657,7 @@ async function handleTutor() {
     currentPolish = { input: text, scene: sceneSelect.value, tone: toneSelect.value, ...result };
     renderPolish(result);
     refreshSaveButton();
+    setPolishAssistant("success");
   } catch (error) {
     console.error(error);
     const msg =
@@ -622,6 +666,7 @@ async function handleTutor() {
         : `润色失败：${error.message}`;
     setResult("", `<div class="polish-hint">${escapeHtml(msg)}</div>`);
     setCopyButtonState("error");
+    setPolishAssistant("error");
   } finally {
     setBusy(false);
   }
@@ -645,6 +690,7 @@ async function handleCopy() {
 sourceText.addEventListener("input", () => {
   updateInputMeta();
   setCopyButtonState("idle");
+  setPolishAssistant("idle");
 });
 sourceText.addEventListener("focus", () => sourceText.select());
 sourceText.addEventListener("click", () => sourceText.select());
@@ -677,6 +723,74 @@ try {
 strictnessSelect.addEventListener("change", () => {
   try { localStorage.setItem("tutorStrictness", strictnessSelect.value); } catch (_) {}
 });
+
+// --- H5 移动端表达设置：场景 / 语气 / 严格度放到底部 Sheet ---
+(function initExpressionSettings() {
+  const openBtn = document.querySelector("#openExpressionSettings");
+  const panel = document.querySelector("#expressionSettings");
+  const sheet = panel?.querySelector(".expression-settings-sheet");
+  const closeBtn = document.querySelector("#closeExpressionSettings");
+  const summary = document.querySelector("#expressionSettingsSummary");
+  if (!openBtn || !panel || !sheet || !closeBtn || !summary) return;
+
+  const mobileMedia = window.matchMedia?.("(max-width: 768px)");
+  const isMobile = () => Boolean(mobileMedia?.matches);
+  const selectedText = (select, fallback) => select.selectedOptions?.[0]?.textContent?.trim() || fallback;
+
+  function updateSummary() {
+    const scene = selectedText(sceneSelect, "通用");
+    const tone = selectedText(toneSelect, "自然");
+    const strictness = strictnessSelect.value === "easy" ? "鼓励" : "严格";
+    summary.textContent = `${scene} · ${tone} · ${strictness}`;
+  }
+
+  function open() {
+    if (!isMobile()) return;
+    panel.classList.add("is-open");
+    panel.setAttribute("aria-hidden", "false");
+    sheet.setAttribute("role", "dialog");
+    sheet.setAttribute("aria-modal", "true");
+    openBtn.setAttribute("aria-expanded", "true");
+    setTimeout(() => sceneSelect.focus(), 0);
+  }
+
+  function close({ restoreFocus = true } = {}) {
+    panel.classList.remove("is-open");
+    panel.setAttribute("aria-hidden", "true");
+    sheet.removeAttribute("role");
+    sheet.removeAttribute("aria-modal");
+    openBtn.setAttribute("aria-expanded", "false");
+    if (restoreFocus) openBtn.focus();
+  }
+
+  function syncViewportMode() {
+    if (isMobile()) {
+      if (!panel.classList.contains("is-open")) panel.setAttribute("aria-hidden", "true");
+      return;
+    }
+    panel.classList.remove("is-open");
+    panel.removeAttribute("aria-hidden");
+    sheet.removeAttribute("role");
+    sheet.removeAttribute("aria-modal");
+    openBtn.setAttribute("aria-expanded", "false");
+  }
+
+  openBtn.setAttribute("aria-expanded", "false");
+  syncViewportMode();
+  mobileMedia?.addEventListener?.("change", syncViewportMode);
+  openBtn.addEventListener("click", open);
+  closeBtn.addEventListener("click", () => close());
+  panel.addEventListener("pointerdown", (event) => {
+    if (event.target === panel) close();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && panel.classList.contains("is-open")) close();
+  });
+  [sceneSelect, toneSelect, strictnessSelect].forEach((select) => {
+    select.addEventListener("change", updateSummary);
+  });
+  updateSummary();
+})();
 
 // --- 设置：访问口令输入 ---
 // 口令存 localStorage（auth.js 的 fetch 拦截器在请求时实时读它，改完立即生效，无需重载弹窗）。

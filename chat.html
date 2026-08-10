@@ -195,48 +195,176 @@
       /* ===== 陪伴角色（仅日常对练 talk-mode 显示）===== */
       .companion { display: none; }
       body.talk-mode .companion {
-        display: flex; flex-direction: column; align-items: center; gap: 6px;
-        margin: 2px auto 14px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto 10px;
+        padding: 5px 11px 5px 6px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.5);
+        border: 1px solid rgba(124,92,255,0.12);
       }
-      .companion .cat-wrap {
-        width: 128px; height: 128px; position: relative;
-        filter: drop-shadow(0 10px 20px rgba(124,92,255,0.22));
-        animation: catBreathe 3.4s ease-in-out infinite;
+      .companion-media {
+        flex: 0 0 54px;
+        width: 54px;
+        height: 54px;
         transition: transform .35s cubic-bezier(.2,.8,.2,1);
       }
-      @keyframes catBreathe { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-3px) scale(1.015); } }
-      .companion .cat { width: 100%; height: 100%; overflow: visible; }
-      .companion .cat-name {
-        font-size: 12px; font-weight: 700; color: var(--violet-deep);
-        background: rgba(124,92,255,0.12); border-radius: 999px; padding: 3px 12px;
+      .companion-gif {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 6px 10px rgba(124,92,255,0.18));
       }
-      /* 眨眼：平时睁眼，定时快速闭合一下 */
-      .companion .eyes-open { animation: catBlink 4.2s infinite; transform-origin: center; }
-      @keyframes catBlink {
-        0%, 92%, 100% { transform: scaleY(1); }
-        95%, 97% { transform: scaleY(0.12); }
+      .companion-copy { min-width: 0; }
+      .companion-name {
+        display: block;
+        color: var(--violet-deep);
+        font-size: 12px;
+        font-weight: 800;
       }
-      .companion .eyes-happy, .companion .brows { opacity: 0; transition: opacity .2s; }
-      .companion .mouth { transform-origin: 64px 90px; transition: transform .2s; }
-      .companion .cheek { opacity: .5; transition: opacity .3s; }
+      .companion-status {
+        display: block;
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.35;
+      }
+      body.talk-mode .companion.is-speaking .companion-media { animation: companionNod .9s ease-in-out infinite; }
+      @keyframes companionNod { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+      .companion.is-happy .companion-media { animation: companionHop .5s ease; }
+      @keyframes companionHop { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-7px) scale(1.04); } }
+      .companion.is-concerned .companion-media { transform: rotate(-7deg); }
+      .top-action { display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+      .top-action.hidden { display: none; }
 
-      /* 说话：嘴一张一合 + 头轻晃 */
-      body.talk-mode .companion.is-speaking .cat-wrap { animation: catBreathe 3.4s ease-in-out infinite, catNod 0.9s ease-in-out infinite; }
-      @keyframes catNod { 0%,100% { rotate: -2deg; } 50% { rotate: 2deg; } }
-      .companion.is-speaking .mouth { animation: catTalk .26s ease-in-out infinite alternate; }
-      @keyframes catTalk { from { transform: scaleY(0.35); } to { transform: scaleY(1.15); } }
-
-      /* 夸你地道：眼睛弯成月牙 + 脸颊变亮 + 蹦一下 */
-      .companion.is-happy .eyes-open { opacity: 0; }
-      .companion.is-happy .eyes-happy { opacity: 1; }
-      .companion.is-happy .cheek { opacity: 1; }
-      .companion.is-happy .cat-wrap { animation: catHop .5s ease; }
-      @keyframes catHop { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-12px) scale(1.05); } }
-
-      /* 温柔纠错：歪头 + 关切眉 + 抿嘴（非负面） */
-      .companion.is-concerned .cat-wrap { transform: rotate(-9deg); }
-      .companion.is-concerned .brows { opacity: 1; }
-      .companion.is-concerned .mouth { transform: scaleY(0.5); }
+      @media (max-width: 768px) {
+        .wrap {
+          min-height: 100dvh;
+          display: flex;
+          flex-direction: column;
+          padding: max(12px, env(safe-area-inset-top)) 14px calc(94px + env(safe-area-inset-bottom));
+        }
+        .topbar {
+          flex: 0 0 auto;
+          display: grid;
+          grid-template-columns: auto minmax(0, 1fr) auto auto;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 10px;
+        }
+        .brand-name {
+          font-size: 20px;
+          white-space: nowrap;
+        }
+        .scene-label {
+          min-width: 0;
+          overflow: hidden;
+          padding: 6px 9px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .role-tag,
+        .spacer,
+        .topbar-home { display: none; }
+        .top-action {
+          position: relative;
+          width: 38px;
+          height: 38px;
+          padding: 0;
+          border-radius: 12px;
+          font-size: 18px;
+        }
+        .top-action.hidden { display: none; }
+        .top-action .action-label {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          overflow: hidden;
+          clip: rect(0 0 0 0);
+          white-space: nowrap;
+        }
+        .chat-panel {
+          flex: 1 0 auto;
+          min-height: calc(100dvh - 174px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+          display: flex;
+          flex-direction: column;
+          padding: 4px 0 0;
+          margin-bottom: 0;
+          border: 0;
+          border-radius: 0;
+          background: transparent;
+          box-shadow: none;
+          backdrop-filter: none;
+        }
+        .chat-panel > .section-title {
+          flex: 0 0 auto;
+          margin-bottom: 8px;
+          padding: 0 4px;
+        }
+        .rehearse-card { flex: 0 0 auto; }
+        body.talk-mode .companion {
+          flex: 0 0 auto;
+          margin-bottom: 6px;
+          padding: 4px 9px 4px 5px;
+        }
+        .companion-media {
+          flex-basis: 44px;
+          width: 44px;
+          height: 44px;
+        }
+        .chat-thread {
+          flex: 1 1 auto;
+          min-height: 0;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          padding: 3px 2px 10px;
+          scroll-padding-bottom: 12px;
+        }
+        .msg,
+        .feedback { max-width: 94%; }
+        .composer {
+          position: sticky;
+          bottom: 0;
+          flex: 0 0 auto;
+          margin-top: 6px;
+          padding-top: 5px;
+          background: transparent;
+        }
+        .spotlight {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 6px;
+          padding: 4px;
+          border: 1px solid rgba(255,255,255,0.84);
+          border-radius: 16px;
+          background: rgba(255,255,255,0.9);
+          box-shadow: 0 12px 28px rgba(70,40,160,0.16);
+          backdrop-filter: blur(16px) saturate(150%);
+        }
+        #chatInput {
+          min-width: 0;
+          padding: 10px 9px;
+          font-size: 16px;
+        }
+        .chat-send {
+          width: 48px;
+          min-width: 48px;
+          height: 44px;
+          padding: 0;
+          border-radius: 11px;
+          font-size: 0;
+        }
+        .chat-send::before {
+          content: "↑";
+          font-size: 21px;
+          line-height: 1;
+        }
+        .toast { bottom: calc(92px + env(safe-area-inset-bottom)); }
+      }
     </style>
   </head>
   <body>
@@ -247,62 +375,26 @@
         <span id="chatScene" class="scene-label"></span>
         <span id="roleTag" class="role-tag"></span>
         <span class="spacer"></span>
-        <a href="/" class="pill" title="返回首页">‹ 首页</a>
-        <button id="swapBtn" class="pill" type="button">🔄 互换角色</button>
-        <button id="endBtn" class="pill hidden" type="button">✅ 结束并复盘</button>
-        <button id="restartBtn" class="pill" type="button">↻ 重练</button>
+        <a href="polish.html" class="pill topbar-home" title="返回表达页">‹ 表达</a>
+        <button id="swapBtn" class="pill top-action" type="button" title="互换角色"><span aria-hidden="true">↔</span><span class="action-label">互换角色</span></button>
+        <button id="endBtn" class="pill top-action hidden" type="button" title="结束并复盘"><span aria-hidden="true">✓</span><span class="action-label">结束并复盘</span></button>
+        <button id="restartBtn" class="pill top-action" type="button" title="重新开始"><span aria-hidden="true">↻</span><span class="action-label">重练</span></button>
       </div>
 
       <!-- 上：对话窗口 -->
-      <section class="panel">
+      <section class="panel chat-panel">
         <div class="section-title"><span class="dot"></span>对话</div>
         <!-- 情景对练：情景卡（你演谁 / 对方谁 / 这场目标），仅 rehearse 模式显示 -->
         <div id="rehearseCard" class="rehearse-card hidden"></div>
         <!-- 陪伴角色：仅日常对练(talk-mode)显示，随对话状态变表情 -->
         <div id="companion" class="companion">
-          <div class="cat-wrap">
-            <svg class="cat" viewBox="0 0 128 128" aria-hidden="true">
-              <!-- 耳朵 -->
-              <path d="M28 44 L36 14 L58 34 Z" fill="#f6b93b"/>
-              <path d="M100 44 L92 14 L70 34 Z" fill="#f6b93b"/>
-              <path d="M34 38 L38 22 L50 34 Z" fill="#ffd089"/>
-              <path d="M94 38 L90 22 L78 34 Z" fill="#ffd089"/>
-              <!-- 脸 -->
-              <ellipse cx="64" cy="70" rx="42" ry="38" fill="#ffce73"/>
-              <ellipse cx="64" cy="82" rx="30" ry="24" fill="#fff3d6"/>
-              <!-- 腮红 -->
-              <circle class="cheek" cx="36" cy="80" r="7" fill="#ff9d9d"/>
-              <circle class="cheek" cx="92" cy="80" r="7" fill="#ff9d9d"/>
-              <!-- 关切眉（默认隐藏） -->
-              <g class="brows" stroke="#8a5a1e" stroke-width="3" stroke-linecap="round">
-                <line x1="40" y1="52" x2="54" y2="49"/>
-                <line x1="88" y1="52" x2="74" y2="49"/>
-              </g>
-              <!-- 睁眼（默认） -->
-              <g class="eyes-open">
-                <circle cx="48" cy="64" r="6.5" fill="#3a2a12"/>
-                <circle cx="80" cy="64" r="6.5" fill="#3a2a12"/>
-                <circle cx="50" cy="62" r="2" fill="#fff"/>
-                <circle cx="82" cy="62" r="2" fill="#fff"/>
-              </g>
-              <!-- 开心月牙眼（默认隐藏） -->
-              <g class="eyes-happy" stroke="#3a2a12" stroke-width="4" stroke-linecap="round" fill="none">
-                <path d="M41 65 Q48 57 55 65"/>
-                <path d="M73 65 Q80 57 87 65"/>
-              </g>
-              <!-- 鼻子 + 嘴 -->
-              <path d="M60 76 L68 76 L64 81 Z" fill="#e8845b"/>
-              <path class="mouth" d="M52 86 Q64 98 76 86" stroke="#8a5a1e" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <!-- 胡须 -->
-              <g stroke="#e0b060" stroke-width="2" stroke-linecap="round">
-                <line x1="20" y1="74" x2="38" y2="76"/>
-                <line x1="20" y1="84" x2="38" y2="83"/>
-                <line x1="108" y1="74" x2="90" y2="76"/>
-                <line x1="108" y1="84" x2="90" y2="83"/>
-              </g>
-            </svg>
+          <div class="companion-media">
+            <img class="companion-gif" src="images/mascot-waiting-v1.gif" alt="Coco 正在等待你的回应" />
           </div>
-          <span class="cat-name">Coco · 你的对练伙伴</span>
+          <div class="companion-copy">
+            <strong class="companion-name">Coco</strong>
+            <span class="companion-status">等你用英文接上</span>
+          </div>
         </div>
         <div id="chatThread" class="chat-thread"></div>
         <div id="chatHint" class="chat-hint hidden"></div>

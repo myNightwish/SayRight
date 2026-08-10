@@ -151,6 +151,9 @@ const goBtn = document.getElementById("goBtn");
 const chips = document.getElementById("chips");
 const historyEl = document.getElementById("history");
 const statusEl = document.getElementById("status");
+const sceneAssistantImage = document.getElementById("sceneAssistantImage");
+const sceneAssistantTitle = document.getElementById("sceneAssistantTitle");
+const sceneAssistantStatus = document.getElementById("sceneAssistantStatus");
 const stage = document.getElementById("stage");
 const sceneLabel = document.getElementById("sceneLabel");
 const dialogueEl = document.getElementById("dialogue");
@@ -158,6 +161,42 @@ const cardsEl = document.getElementById("cards");
 const saveAllBtn = document.getElementById("saveAllBtn");
 const startChatBtn = document.getElementById("startChatBtn");
 const toastEl = document.getElementById("toast");
+
+const SCENE_ASSISTANT_STATES = {
+  idle: {
+    src: "images/mascot-study-v2.png",
+    title: "描述一个真实场景",
+    status: "人物、地点和目的越具体，预演越贴近实际。",
+    alt: "Coco 正在陪你准备场景",
+  },
+  thinking: {
+    src: "images/mascot-thinking-v1.gif",
+    title: "正在搭建这场对话",
+    status: "会整理角色、对话顺序和可带走的表达。",
+    alt: "Coco 正在思考场景对话",
+  },
+  success: {
+    src: "images/mascot-success-v1.gif",
+    title: "场景已经准备好了",
+    status: "先走一遍对话，再收藏真正会用到的句子。",
+    alt: "Coco 正在庆祝场景生成完成",
+  },
+  error: {
+    src: "images/mascot-comfort-v1.gif",
+    title: "这次没有生成成功",
+    status: "场景还保留着，确认服务后可以直接重试。",
+    alt: "Coco 正在提醒你稍后重试",
+  },
+};
+
+function setSceneAssistant(stateName) {
+  if (!sceneAssistantImage) return;
+  const state = SCENE_ASSISTANT_STATES[stateName] || SCENE_ASSISTANT_STATES.idle;
+  sceneAssistantImage.src = state.src;
+  sceneAssistantImage.alt = state.alt;
+  sceneAssistantTitle.textContent = state.title;
+  sceneAssistantStatus.textContent = state.status;
+}
 
 let toastTimer = null;
 function toast(msg) {
@@ -418,6 +457,7 @@ async function rehearse(scene) {
   goBtn.disabled = true;
   stage.classList.add("hidden");
   setStatus("正在为你预演这场对话……（首次约 10s，之后更快）");
+  setSceneAssistant("thinking");
 
   try {
     const resp = await fetch(API, {
@@ -428,6 +468,7 @@ async function rehearse(scene) {
     const data = await resp.json();
     if (!resp.ok) {
       setStatus(data.error || "生成失败，请重试。");
+      setSceneAssistant("error");
       return;
     }
     setStatus("");
@@ -440,10 +481,12 @@ async function rehearse(scene) {
     renderDialogue(currentScene, currentTurns);
     renderCards(currentCards);
     stage.classList.remove("hidden");
+    setSceneAssistant("success");
     // 缓存这次结果到历史话题（同场景覆盖、提到最前），刷新后可直接点开。
     pushHistory(currentScene, currentTurns, currentCards);
   } catch (err) {
     setStatus("连不上本地服务，请确认 tutor-server.mjs 已启动（node tutor-server.mjs）。");
+    setSceneAssistant("error");
   } finally {
     goBtn.disabled = false;
   }
@@ -455,6 +498,7 @@ startChatBtn.addEventListener("click", openChat);
 startChatBtn.addEventListener("keydown", (e) => {
   if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openChat(); }
 });
+sceneInput.addEventListener("input", () => setSceneAssistant("idle"));
 sceneInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") rehearse(sceneInput.value);
 });

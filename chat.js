@@ -156,18 +156,50 @@ const scriptPanel = document.getElementById("scriptPanel");
 const scriptList = document.getElementById("scriptList");
 const toastEl = document.getElementById("toast");
 const companionEl = document.getElementById("companion");
+const companionGifEl = companionEl?.querySelector(".companion-gif");
+const companionStatusEl = companionEl?.querySelector(".companion-status");
 const rehearseCard = document.getElementById("rehearseCard");
 const checklistPanel = document.getElementById("checklistPanel");
 const checklistEl = document.getElementById("checklist");
 
 // 陪伴角色（Coco）表情状态：speaking(说话) / happy(夸你地道) / concerned(温柔纠错) / 待命。
 // 只在日常对练(talkMode)显示；剧本对练不受影响。
+const COMPANION_STATES = {
+  idle: {
+    src: "images/mascot-waiting-v1.gif",
+    status: "等你用英文接上",
+    alt: "Coco 正在等待你的回应",
+  },
+  speaking: {
+    src: "images/mascot-encourage-v1.gif",
+    status: "先听，再接上这一句",
+    alt: "Coco 正在鼓励你开口",
+  },
+  happy: {
+    src: "images/mascot-success-v1.gif",
+    status: "这句说得很自然",
+    alt: "Coco 正在庆祝你的自然表达",
+  },
+  concerned: {
+    src: "images/mascot-comfort-v1.gif",
+    status: "换个说法会更自然",
+    alt: "Coco 正在温柔提醒你调整表达",
+  },
+};
+
 let companionMoodTimer = null;
 let companionTalking = false;
 function setCompanion(mood) {
   if (!companionEl) return;
   companionEl.classList.remove("is-speaking", "is-happy", "is-concerned");
   if (mood) companionEl.classList.add(`is-${mood}`);
+
+  const state = COMPANION_STATES[mood || "idle"];
+  if (companionGifEl) {
+    companionGifEl.src = state.src;
+    companionGifEl.alt = state.alt;
+  }
+  if (companionStatusEl) companionStatusEl.textContent = state.status;
 }
 // 短暂表情（开心/关切）：亮一下自动回到待命；说话态由 typeOut 起止显式控制，不走这里。
 function flashCompanion(mood, ms) {

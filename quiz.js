@@ -647,8 +647,13 @@ function renderDone() {
   stageEl.innerHTML = `
     <div class="card">
       <div class="kind-label">本组完成</div>
-      <div class="prompt">这一组过完啦 🎉</div>
-      <div class="done-stat">共 ${total} 题 · 过程中没过 ${misses} 次</div>
+      <div class="quiz-state-media">
+        <img src="images/mascot-success-v1.gif" alt="Coco 正在庆祝本组练习完成" />
+        <div>
+          <div class="prompt">这一组过完啦</div>
+          <div class="done-stat">共 ${total} 题 · 过程中没过 ${misses} 次</div>
+        </div>
+      </div>
       <div class="actions">
         <button class="btn-primary" id="againBtn" type="button">再来一组</button>
       </div>
@@ -666,7 +671,10 @@ function quitRound() {
 function renderEmpty() {
   stageEl.innerHTML = `
     <div class="card">
-      <div class="empty">还没有可练习的收藏。<br/>先在插件里润色几句话并点 ☆ 收藏，再回来练习。</div>
+      <div class="empty quiz-state-media">
+        <img src="images/mascot-comfort-v2.png" alt="Coco 正在等你添加练习内容" />
+        <span>还没有可练习的收藏。<br/>先润色并收藏几句话，再回来练习。</span>
+      </div>
     </div>`;
   progressEl.textContent = "";
 }

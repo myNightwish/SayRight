@@ -195,7 +195,25 @@
       .mode-name { font-size: 16px; font-weight: 800; color: var(--violet-deep); }
       .mode-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
 
-      .done-stat { color: var(--muted); font-size: 14px; margin: 10px 0 4px; }
+      .done-stat { color: var(--muted); font-size: 14px; margin: 6px 0 4px; }
+      .quiz-state-media {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+      .quiz-state-media img {
+        flex: 0 0 66px;
+        width: 66px;
+        height: 66px;
+        object-fit: contain;
+        border-radius: 16px;
+      }
+      .quiz-state-media .prompt { margin-top: 0; }
+      .empty.quiz-state-media {
+        justify-content: center;
+        padding: 44px 10px;
+        text-align: left;
+      }
     </style>
   </head>
   <body>

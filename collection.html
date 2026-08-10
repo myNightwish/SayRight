@@ -225,7 +225,23 @@
         transition: background .16s ease;
       }
       .btn-del:hover { background: rgba(214,51,108,0.18); }
-      .empty { text-align: center; color: var(--muted); padding: 80px 0; }
+      .empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        color: var(--muted);
+        padding: 56px 12px;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+      .empty img {
+        flex: 0 0 58px;
+        width: 58px;
+        height: 58px;
+        object-fit: contain;
+        border-radius: 15px;
+      }
       .day-divider {
         display: flex; align-items: center; gap: 10px;
         margin: 24px 2px 12px; padding-bottom: 6px;
@@ -379,7 +395,7 @@
     <div class="aurora"></div>
     <div class="wrap">
       <header>
-        <a class="home-link" href="/" title="返回首页">‹ 首页</a>
+        <a class="home-link" href="polish.html" title="返回表达页">‹ 表达</a>
         <h1 id="pageTitle">我的收藏</h1>
         <span class="count" id="count"></span>
       </header>

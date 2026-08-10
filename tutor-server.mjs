@@ -974,6 +974,7 @@ function sendJson(res, status, payload) {
 // 避免暴露 .env、tutor-server.mjs 等敏感文件。
 const STATIC_FILES = {
   "/": "text/html; charset=utf-8", // 根路径 → polish 主功能页（手机首页）
+  "/index.html": "text/html; charset=utf-8",
   "/polish.html": "text/html; charset=utf-8",
   "/privacy.html": "text/html; charset=utf-8",
   "/config.js": "application/javascript; charset=utf-8",
@@ -990,6 +991,17 @@ const STATIC_FILES = {
   "/quiz.js": "application/javascript; charset=utf-8",
   "/styles.css": "text/css; charset=utf-8",
   "/manifest.webmanifest": "application/manifest+json; charset=utf-8",
+  "/images/mascot-waiting-v1.gif": "image/gif",
+  "/images/mascot-encourage-v1.gif": "image/gif",
+  "/images/mascot-thinking-v1.gif": "image/gif",
+  "/images/mascot-success-v1.gif": "image/gif",
+  "/images/mascot-comfort-v1.gif": "image/gif",
+  "/images/mascot-study-v2.png": "image/png",
+  "/images/mascot-success-v2.png": "image/png",
+  "/images/mascot-encourage-v2.png": "image/png",
+  "/images/mascot-waiting-v2.png": "image/png",
+  "/images/mascot-thinking-v2.png": "image/png",
+  "/images/mascot-comfort-v2.png": "image/png",
   "/icons/icon16.png": "image/png",
   "/icons/icon32.png": "image/png",
   "/icons/icon48.png": "image/png",

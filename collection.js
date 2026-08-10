@@ -239,7 +239,10 @@ function render(items) {
 
   if (!items.length) {
     listNavEl.innerHTML = "";
-    listEl.innerHTML = `<div class="empty">${allItems.length ? "没有匹配的收藏。" : "还没有润色收藏。在插件里润色一句话后，点结果区的 ☆ 即可收藏。"}</div>`;
+    const message = allItems.length
+      ? "没有匹配的收藏。"
+      : "还没有润色收藏。完成一次润色后，点结果区的 ☆ 即可收藏。";
+    listEl.innerHTML = `<div class="empty"><img src="images/mascot-comfort-v2.png" alt="Coco 正在等待你的收藏" /><span>${message}</span></div>`;
     return;
   }
 
@@ -464,9 +467,10 @@ function renderScenes(items) {
   countEl.textContent = `共 ${sceneItems.length} 条场景收藏`;
   if (!items.length) {
     sceneNavEl.innerHTML = "";
-    sceneListEl.innerHTML = `<div class="empty">${
-      sceneItems.length ? "没有匹配的收藏。" : "还没有场景收藏。在「场景预演」里点卡片的 ☆ 即可收藏。"
-    }</div>`;
+    const message = sceneItems.length
+      ? "没有匹配的收藏。"
+      : "还没有场景收藏。在「场景预演」里点卡片的 ☆ 即可收藏。";
+    sceneListEl.innerHTML = `<div class="empty"><img src="images/mascot-comfort-v2.png" alt="Coco 正在等待你的场景收藏" /><span>${message}</span></div>`;
     return;
   }
   // 按场景空间分组：同一场景下的句卡/词卡聚在一起。

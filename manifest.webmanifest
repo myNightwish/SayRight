@@ -2,7 +2,7 @@
   "name": "Nuance 语差 · 表达练习",
   "short_name": "语差",
   "description": "把你想说的话，变成地道的英语表达。场景预演、对练、复习。",
-  "start_url": "/?source=pwa",
+  "start_url": "polish.html?source=pwa",
   "display": "standalone",
   "background_color": "#0d0b1a",
   "theme_color": "#0d0b1a",
