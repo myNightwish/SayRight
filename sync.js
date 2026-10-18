@@ -17,11 +17,8 @@
   const hasChromeStorage =
     typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
 
-  // 同步端点：H5 跟随 location.origin；插件(chrome-extension://)打到 config.js 的线上域名。
-  const ORIGIN =
-    typeof location !== "undefined" && location.protocol.startsWith("http")
-      ? location.origin
-      : (typeof window !== "undefined" && window.NUANCE_REMOTE_ORIGIN) || "http://127.0.0.1:8770";
+  // 所有客户端共用线上同步环境；模型请求仍可使用本地服务。
+  const ORIGIN = window.NUANCE_REMOTE_ORIGIN || location.origin;
   const SYNC_ENDPOINT = `${ORIGIN}/sync`;
 
   function getKey() {
@@ -30,18 +27,24 @@
 
   // ---- 本地存储读写（chrome.storage 优先，localStorage 兜底）----
   function getLocal(key) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       if (hasChromeStorage) {
-        chrome.storage.local.get(key, (res) => resolve(res[key] || {}));
+        chrome.storage.local.get(key, (res) => {
+          if (chrome.runtime?.lastError) reject(new Error(chrome.runtime.lastError.message));
+          else resolve(res[key] || {});
+        });
       } else {
         try { resolve(JSON.parse(localStorage.getItem(key) || "{}")); }
-        catch (_) { resolve({}); }
+        catch (error) { reject(error); }
       }
     });
   }
   function setLocal(key, val) {
-    if (hasChromeStorage) return new Promise((r) => chrome.storage.local.set({ [key]: val }, r));
-    try { localStorage.setItem(key, JSON.stringify(val)); } catch (_) {}
+    if (hasChromeStorage) return new Promise((resolve, reject) => chrome.storage.local.set({ [key]: val }, () => {
+      if (chrome.runtime?.lastError) reject(new Error(chrome.runtime.lastError.message));
+      else resolve();
+    }));
+    localStorage.setItem(key, JSON.stringify(val));
     return Promise.resolve();
   }
 
@@ -77,29 +80,44 @@
   }
 
   let inFlight = null;
-  let rerunPending = false; // 飞行途中又来同步请求：标记它，等这趟结束后补跑一趟，避免刚写的墓碑/删除被漏掉。
-  // 上行本地态 → 取回合并态 → 写回本地。
-  // 注意：并发调用不能简单复用同一次请求——正在飞的那趟其 readAll() 快照早于新的删除，
-  // 直接复用会把「删除之前」的态传上去、合并回来又复活。故：飞行中再调只置 rerunPending，结束后自动补跑一趟。
-  async function syncNow() {
-    if (inFlight) { rerunPending = true; return inFlight; }
-    inFlight = (async () => {
+  let lastSynced = null;
+  let debounceTimer = null;
+  const fingerprint = (value) => JSON.stringify(value);
+
+  // 每次先比较完整本地快照。并发调用共享同一轮；只有新改动才补传。
+  function syncNow() {
+    if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; }
+    if (inFlight) return inFlight;
+    inFlight = runSync().catch((error) => {
+      console.warn("[sync] 同步失败，本地数据保留:", error.message);
+      try { window.dispatchEvent(new CustomEvent("nuance:sync-error", { detail: error.message })); } catch (_) {}
+      return false;
+    }).finally(() => { inFlight = null; });
+    return inFlight;
+  }
+
+  async function runSync() {
+    while (true) {
       const local = await readAll();
+      if (fingerprint(local) === lastSynced) return true;
+      // 保留迁移前原始版本，包括被较新删除记录遮盖的收藏。
+      const backupKey = "nuanceSyncBackup:" + SYNC_ENDPOINT;
+      if (!localStorage.getItem(backupKey)) {
+        localStorage.setItem(backupKey, JSON.stringify({ at: Date.now(), state: local }));
+      }
       const headers = { "Content-Type": "application/json" };
       const key = getKey();
       if (key) headers["x-tutor-key"] = key;
-      let merged;
-      try {
-        const res = await fetch(SYNC_ENDPOINT, {
-          method: "POST", headers, body: JSON.stringify(local),
-        });
-        if (!res.ok) return false; // 401/网络问题：静默跳过，纯本地照常用
-        merged = await res.json();
-      } catch (_) {
-        return false;
+      const res = await fetch(SYNC_ENDPOINT, {
+        method: "POST", headers, body: JSON.stringify(local),
+        signal: AbortSignal.timeout(45000),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const merged = await res.json();
+      if (!merged || KEYS.some((key) => !merged[key] || typeof merged[key] !== "object") ||
+          !merged.tombstones || typeof merged.tombstones !== "object") {
+        throw new Error("同步响应不完整，已停止写回");
       }
-      if (!merged || typeof merged !== "object") return false;
-
       // 关键防丢：同步是异步的，这趟请求飞行期间用户可能又收藏/改了新条目（已落本地）。
       // 服务端只见到我们上行时的旧快照，回传里没有这些新条目。若直接写回服务端结果就把它们冲掉了。
       // 所以：写回前重新读一次「当前最新本地态」，再与服务端结果按 savedAt-wins 并一次——
@@ -108,9 +126,7 @@
 
       const corrections = mergeMapLocal(merged.corrections || {}, fresh.corrections);
       const sceneSaves = mergeMapLocal(merged.sceneSaves || {}, fresh.sceneSaves);
-      // 老服务端可能不认 drillState / sceneScripts（部署早于这两个字段）。
-      // 这时 merged 里没有它们，绝不能写成 {} 把本地进度/剧本冲掉——
-      // 缺字段就保留刚上行的本地值（跨设备合并需服务端支持，但至少不丢本地）。
+      // 远端与最新本地的剧本、复习进度也按版本合并。
       const sceneScripts = mergeMapLocal(
         merged.sceneScripts && typeof merged.sceneScripts === "object" ? merged.sceneScripts : {},
         fresh.sceneScripts
@@ -135,15 +151,12 @@
         setLocal("drillState", drillState),
         setLocal(TOMB_KEY, tombstones),
       ]);
+      const combined = { corrections, sceneSaves, sceneScripts, drillState, tombstones };
+      // fresh 和上行快照不同，说明飞行期间产生了新改动，必须再传一轮。
+      const changedDuringRequest = fingerprint(fresh) !== fingerprint(local);
+      lastSynced = changedDuringRequest ? null : fingerprint(combined);
       try { window.dispatchEvent(new CustomEvent("nuance:synced")); } catch (_) {}
-      return true;
-    })();
-    try {
-      return await inFlight;
-    } finally {
-      inFlight = null;
-      // 飞行期间有新的删除/收藏进来，重新读最新本地态再跑一趟，确保它们不被漏传。
-      if (rerunPending) { rerunPending = false; syncNow(); }
+      if (!changedDuringRequest) return true;
     }
   }
 
@@ -169,9 +182,8 @@
 
   // 去抖上行：高频本地小改动（打星、抽卡进度、下一题、对练命中）不必每次都立刻打网络，
   // 攒到安静 DEBOUNCE_MS 再合并成一趟。改动已先落地本地，晚几秒上行不丢；
-  // 关页/切后台会 flushSync 立即补传，所以不存在「攒着还没传就离开」的风险。
+  // 关页/切后台尽力补传；浏览器中止请求时，下次打开重试。
   const DEBOUNCE_MS = 1500;
-  let debounceTimer = null;
   function syncSoon() {
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => { debounceTimer = null; syncNow(); }, DEBOUNCE_MS);

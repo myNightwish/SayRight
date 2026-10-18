@@ -87,10 +87,10 @@ function getSaves() {
     }
   });
 }
-function setSaves(map) {
-  if (hasChromeStorage) return chrome.storage.local.set({ [STORAGE_KEY]: map });
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(map)); } catch (_) {}
-  return Promise.resolve();
+async function setSaves(map) {
+  if (hasChromeStorage) await chrome.storage.local.set({ [STORAGE_KEY]: map });
+  else try { localStorage.setItem(STORAGE_KEY, JSON.stringify(map)); } catch (_) {}
+  window.NuanceSync?.syncSoon();
 }
 const canPersist = hasChromeStorage || typeof localStorage !== "undefined";
 // 收藏键：场景 + better 唯一定位一张卡，避免重复收藏。
@@ -109,10 +109,10 @@ function getScripts() {
     }
   });
 }
-function setScripts(map) {
-  if (hasChromeStorage) return chrome.storage.local.set({ [SCRIPT_KEY]: map });
-  try { localStorage.setItem(SCRIPT_KEY, JSON.stringify(map)); } catch (_) {}
-  return Promise.resolve();
+async function setScripts(map) {
+  if (hasChromeStorage) await chrome.storage.local.set({ [SCRIPT_KEY]: map });
+  else try { localStorage.setItem(SCRIPT_KEY, JSON.stringify(map)); } catch (_) {}
+  window.NuanceSync?.syncSoon();
 }
 // 收藏某场景任意一句时调用：把当前完整剧本落库（供对练当主线）。
 // 用「新剧本更长就覆盖」而非「存过就跳过」——避免早先存了残缺剧本后再也更新不了。

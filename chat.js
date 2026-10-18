@@ -77,10 +77,10 @@ function getSaves() {
     else { try { resolve(JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")); } catch (_) { resolve({}); } }
   });
 }
-function setSaves(map) {
-  if (hasChromeStorage) return chrome.storage.local.set({ [STORAGE_KEY]: map });
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(map)); } catch (_) {}
-  return Promise.resolve();
+async function setSaves(map) {
+  if (hasChromeStorage) await chrome.storage.local.set({ [STORAGE_KEY]: map });
+  else try { localStorage.setItem(STORAGE_KEY, JSON.stringify(map)); } catch (_) {}
+  window.NuanceSync?.syncSoon();
 }
 const canPersist = hasChromeStorage || typeof localStorage !== "undefined";
 

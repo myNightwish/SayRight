@@ -4,3 +4,8 @@ library.json
 .env
 .env.*
 .DS_Store
+# Personal sync exports and migration backups
+/local.json
+/online.json
+/backups/sync-migration-*/
+/backups/sync-live-*/

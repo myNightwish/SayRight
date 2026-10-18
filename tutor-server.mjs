@@ -167,31 +167,37 @@ function bucketOf(provided) {
 }
 const EMPTY_STATE = () => ({ corrections: {}, sceneSaves: {}, sceneScripts: {}, drillState: {}, tombstones: {} });
 
-async function loadState(bucket) {
-  if (!SYNC_PERSISTENT) return memStore.get(bucket) || EMPTY_STATE();
-  try {
-    const r = await fetch(`${UPSTASH_URL}/get/${encodeURIComponent(bucket)}`, {
-      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` },
-    });
-    const j = await r.json();
-    if (j && j.result) return JSON.parse(j.result);
-  } catch (e) {
-    console.warn("[sync] 读取失败，暂用空态:", e?.message || e);
-  }
-  return EMPTY_STATE();
+async function redisCommand(command) {
+  const response = await fetch(UPSTASH_URL, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${UPSTASH_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify(command),
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error(`同步存储 HTTP ${response.status}`);
+  const data = await response.json();
+  if (data.error) throw new Error(`同步存储失败: ${data.error}`);
+  return data.result;
 }
-async function saveState(bucket, state) {
-  if (!SYNC_PERSISTENT) { memStore.set(bucket, state); return; }
-  try {
-    // Upstash REST: POST body 作为 SET 的值，避免超长 URL。
-    await fetch(`${UPSTASH_URL}/set/${encodeURIComponent(bucket)}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}`, "Content-Type": "application/json" },
-      body: JSON.stringify(state),
-    });
-  } catch (e) {
-    console.warn("[sync] 写入失败:", e?.message || e);
+
+// Redis 原子比较并写入，防止两个设备读到同一旧版本后相互覆盖。
+async function mergeStoredState(bucket, client) {
+  if (!SYNC_PERSISTENT) {
+    const merged = mergeStates(memStore.get(bucket) || EMPTY_STATE(), client);
+    memStore.set(bucket, merged);
+    return merged;
   }
+  const script = `local current = redis.call('GET', KEYS[1])
+    if (current or '') ~= ARGV[1] then return 0 end
+    redis.call('SET', KEYS[1], ARGV[2])
+    return 1`;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const raw = await redisCommand(["GET", bucket]);
+    const merged = mergeStates(raw ? JSON.parse(raw) : EMPTY_STATE(), client);
+    const saved = await redisCommand(["EVAL", script, 1, bucket, raw || "", JSON.stringify(merged)]);
+    if (saved === 1) return merged;
+  }
+  throw new Error("同步冲突，请稍后重试；本地数据已保留");
 }
 
 // 合并两个「key→item」的 map：并集；同 key 保留 savedAt 更大的。
@@ -1053,9 +1059,7 @@ async function handleSync(req, res, bucket) {
     drillState: (client && client.drillState) || {},
     tombstones: (client && client.tombstones) || {},
   };
-  const server = await loadState(bucket);
-  const merged = mergeStates(server, clientState);
-  await saveState(bucket, merged);
+  const merged = await mergeStoredState(bucket, clientState);
   sendJson(res, 200, merged);
 }
 
