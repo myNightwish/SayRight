@@ -18,6 +18,7 @@ zip -r "$OUT" \
   quiz.html quiz.js \
   privacy.html \
   styles.css \
+  images/*.png images/*.gif \
   icons/icon16.png icons/icon32.png icons/icon48.png icons/icon128.png \
   >/dev/null
 

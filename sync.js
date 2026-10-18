@@ -143,6 +143,10 @@
       // 服务端已并集+抹除，这里再保险地本地也应用一次墓碑。
       applyTombstones(corrections, tombstones);
       applyTombstones(sceneSaves, tombstones);
+      const scriptCutoff = tombstones["__sceneScriptsClearedBefore"] || 0;
+      if (scriptCutoff) for (const [key, item] of Object.entries(sceneScripts)) {
+        if ((item.savedAt || 0) <= scriptCutoff) delete sceneScripts[key];
+      }
 
       await Promise.all([
         setLocal("corrections", corrections),

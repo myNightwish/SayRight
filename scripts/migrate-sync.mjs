@@ -2,7 +2,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import readline from 'node:readline';
-const origin = 'https://say-50s9.onrender.com';
+const origin = 'https://sayright-x4a0.onrender.com';
 const fields = ['corrections','sceneSaves','sceneScripts','drillState'];
 function merge(a,b) {
  const out={tombstones:{...a.tombstones}};

@@ -16,3 +16,13 @@
 验证：`npm test`。
 
 注意：浏览器关闭时普通 fetch 不保证完成。改动先保存在本地，下次打开会重试；不要在确认云端同步成功前清理浏览器数据。删除墓碑不能直接清空，防止离线设备将旧收藏复活。
+
+## 本机后台模型服务
+
+扩展模型功能访问 `http://127.0.0.1:48773`，同步仍访问线上。端口冲突检查已完成；本机服务默认只监听 loopback。线上 Render 仍使用平台注入的 PORT 并监听 0.0.0.0。
+
+运行 `python3 scripts/install-background-service.py` 安装或更新后台服务。安装器会把运行文件和本地 `.env` 复制到 `~/Library/Application Support/SayRight/runtime/`（目录仅本人可访问，`.env` 权限 600），并注册 `com.maomao.sayright.tutor` 用户 LaunchAgent。登录后自动启动，进程退出后自动重启。仓库更新或 `.env` 变化后重新运行安装器以更新运行副本。
+
+健康检查：`curl http://127.0.0.1:48773/health`。日志：`~/Library/Logs/SayRight/`。停止服务：`launchctl bootout gui/$(id -u)/com.maomao.sayright.tutor`。重新登录仍会启动；如需永久禁用，应移除对应 LaunchAgent plist。
+
+扩展修改后需在 `chrome://extensions` 重新加载（商店版本需更新安装）。电脑必须开机、未休眠，且能访问内网模型网关。本机服务不使手机或其他电脑自动获得内网模型能力；公网网页仍按其自身后端调用模型。

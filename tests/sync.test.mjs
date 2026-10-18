@@ -9,7 +9,7 @@ function setup(fetcher) {
   let timer;
   const context = { location: { protocol: 'http:', origin: 'http://localhost:8770' },
     localStorage: { getItem: k => data.get(k) ?? null, setItem: (k,v) => data.set(k,v) },
-    window: { NUANCE_REMOTE_ORIGIN: 'https://say-50s9.onrender.com', addEventListener: (k,f) => events[k]=f, dispatchEvent() {} },
+    window: { NUANCE_REMOTE_ORIGIN: 'https://sayright-x4a0.onrender.com', addEventListener: (k,f) => events[k]=f, dispatchEvent() {} },
     document: { visibilityState:'hidden', addEventListener:(k,f)=>events[k]=f },
     CustomEvent: class {}, console, AbortSignal,
     setTimeout: f => { timer=f; return 1; }, clearTimeout:()=>{timer=null;},
@@ -20,7 +20,7 @@ function setup(fetcher) {
 }
 test('local web shares remote environment; unchanged lifecycle events do not upload',async()=>{
  const s=setup(); await s.api.syncNow();
- assert.equal(s.calls[0].url,'https://say-50s9.onrender.com/sync');
+ assert.equal(s.calls[0].url,'https://sayright-x4a0.onrender.com/sync');
  s.events.visibilitychange(); s.events.pagehide(); await tick();
  assert.equal(s.calls.length,1);
 });
@@ -47,4 +47,12 @@ test('incomplete response never overwrites local storage',async()=>{
  const s=setup(async()=>({ok:true,json:async()=>({})}));
  s.data.set('corrections',JSON.stringify({a:{savedAt:1}}));
  await s.api.syncNow();assert.ok(JSON.parse(s.data.get('corrections')).a);
+});
+test('extension model routing uses loopback independently of cloud sync',()=>{
+ const context={window:{},location:{protocol:'chrome-extension:',origin:'chrome-extension://test'}};
+ vm.runInNewContext(fs.readFileSync('config.js','utf8'),context);
+ assert.equal(context.window.NUANCE_MODEL_ORIGIN,'http://127.0.0.1:48773');
+ assert.equal(context.window.NUANCE_REMOTE_ORIGIN,'https://sayright-x4a0.onrender.com');
+ const manifest=JSON.parse(fs.readFileSync('manifest.json','utf8'));
+ assert.ok(manifest.host_permissions.includes('http://127.0.0.1:48773/*'));
 });

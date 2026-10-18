@@ -4,9 +4,7 @@
 
 // 接口地址：H5 网页版由本服务托管，跟随 location.origin（手机/电脑共用、无需填 IP）；
 // 插件（chrome-extension:// 协议）没有自己的后端，打到 config.js 里配置的线上域名。
-const SERVER_ORIGIN = location.protocol.startsWith("http")
-  ? location.origin
-  : (window.NUANCE_REMOTE_ORIGIN || "http://127.0.0.1:8770");
+const SERVER_ORIGIN = window.NUANCE_MODEL_ORIGIN || location.origin;
 const API = `${SERVER_ORIGIN}/scene`;
 const EXTRACT_API = `${SERVER_ORIGIN}/extract`;
 // 访问口令：公网部署后后端要求请求头 x-tutor-key。首次用 ?key=xxx 打开会记到 localStorage，

@@ -4,9 +4,7 @@
 // 三段式：上=对话窗口（沉浸动效），中=对练结束后「不够地道」复盘（可收藏），下=原始剧本对照。
 
 // 接口地址：H5 跟随 location.origin；插件（chrome-extension://）打到 config.js 的线上域名。
-const SERVER_ORIGIN = location.protocol.startsWith("http")
-  ? location.origin
-  : (window.NUANCE_REMOTE_ORIGIN || "http://127.0.0.1:8770");
+const SERVER_ORIGIN = window.NUANCE_MODEL_ORIGIN || location.origin;
 const CHAT_API = `${SERVER_ORIGIN}/chat`;
 const TALK_API = `${SERVER_ORIGIN}/talk`;
 const REHEARSE_PLAN_API = `${SERVER_ORIGIN}/rehearse-plan`;

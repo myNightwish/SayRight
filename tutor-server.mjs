@@ -46,11 +46,11 @@ function loadDotEnv() {
 loadDotEnv();
 
 // 端口跟随环境变量：Render/Fly 等平台会通过 PORT 注入分配的端口，必须监听它；
-// 本机自用时没有该变量，回退 8770。
-const PORT = Number(process.env.PORT) || 8770;
+// 本机自用时没有该变量，回退 48773。
+const PORT = Number(process.env.PORT) || 48773;
 // 监听地址：默认 0.0.0.0，让同一 WiFi 下的 iPhone 等设备也能访问（方案 A）。
 // 只想本机访问时可设 TUTOR_HOST=127.0.0.1。
-const HOST = process.env.TUTOR_HOST || "0.0.0.0";
+const HOST = process.env.TUTOR_HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 
 // baidu-cc 的鉴权（ANTHROPIC_AUTH_TOKEN / BASE_URL / MODEL）只在交互式终端会话里注入，
 // 开机自启（launchd）的极简环境拿不到。这里启动时从 baidu-cc 的 settings.json 读取 env 并补进 process.env，
@@ -241,7 +241,11 @@ function mergeStates(server, client) {
   };
   applyTombstones(merged.corrections, tombstones);
   applyTombstones(merged.sceneSaves, tombstones);
-  // sceneScripts 用场景名做 key，与 sceneSaves 的删除不强绑定，这里不按同一批墓碑抹除。
+  // 清理旧剧本的时间水位：旧设备重新上线时也不能复活旧内容。
+  const scriptCutoff = tombstones["__sceneScriptsClearedBefore"] || 0;
+  if (scriptCutoff) for (const [key, item] of Object.entries(merged.sceneScripts)) {
+    if ((item.savedAt || 0) <= scriptCutoff) delete merged.sceneScripts[key];
+  }
   return merged;
 }
 
@@ -1059,6 +1063,9 @@ async function handleSync(req, res, bucket) {
     drillState: (client && client.drillState) || {},
     tombstones: (client && client.tombstones) || {},
   };
+  if (client?.clearSceneScripts === true) {
+    clientState.tombstones = { ...clientState.tombstones, __sceneScriptsClearedBefore: Date.now() };
+  }
   const merged = await mergeStoredState(bucket, clientState);
   sendJson(res, 200, merged);
 }
@@ -1325,6 +1332,9 @@ const server = http.createServer(async (req, res) => {
   }
   const url = (req.url || "").split("?")[0];
   try {
+    if (req.method === "GET" && url === "/health") {
+      return sendJson(res, 200, { ok: true, service: "sayright", port: PORT });
+    }
     // GET 静态页：手机 Safari 直接访问的各页面（scene/chat/polish 等）
     if (req.method === "GET" && serveStatic(res, url)) return;
     // 收藏同步：单独处理。要求口令有效（防陌生人写你的桶），但不计入每日模型配额

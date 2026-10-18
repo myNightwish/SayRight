@@ -12,7 +12,7 @@ bash package.sh   # 生成 nuance-语差-v0.1.0.zip
    `TUTOR_DAILY_QUOTA=200`（每口令每日上限）。谁把口令转给别人，配额会被一起刷爆、
    从日志能看出异常，直接从变量里删掉那个口令即可单独吊销。
 2. **隐私政策要有公网 URL**：`privacy.html` 已随服务托管，地址为
-   `https://say-50s9.onrender.com/privacy.html`，填进上架表单的隐私政策栏。
+   `https://sayright-x4a0.onrender.com/privacy.html`，填进上架表单的隐私政策栏。
 3. （可选）manifest 里的 `http://127.0.0.1:8770/*` 是本地调试用，上架版可留（无害），
    介意的话打包前删掉这一条 host_permission。
 
@@ -38,7 +38,7 @@ bash package.sh   # 生成 nuance-语差-v0.1.0.zip
 
 ## 四、隐私 / 权限（审核必填）
 
-**隐私政策 URL**：`https://say-50s9.onrender.com/privacy.html`
+**隐私政策 URL**：`https://sayright-x4a0.onrender.com/privacy.html`
 
 **单一用途说明**：
 > 帮助用户练习地道英文表达：润色点评、场景预演、对话演练与复习。
@@ -48,7 +48,7 @@ bash package.sh   # 生成 nuance-语差-v0.1.0.zip
 |---|---|
 | `storage` | 在本机保存用户的收藏与偏好设置，不上传。 |
 | `clipboardWrite` | 让用户一键复制润色结果。 |
-| `host: say-50s9.onrender.com` | 本扩展服务端，发送用户主动输入的练习文本并取回 AI 结果。 |
+| `host: sayright-x4a0.onrender.com` | 本扩展服务端，发送用户主动输入的练习文本并取回 AI 结果。 |
 | `host: translate.googleapis.com / mymemory` | 基础中英互译。 |
 
 **数据用途声明**：不收集个人身份信息、不出售、不追踪；用户主动操作时发送的文本仅用于生成当次结果，服务端不留存。

@@ -29,3 +29,7 @@ test('newer deletion survives merging an old local collection',()=>{
  const s=setup();const state=s.mergeStates({corrections:{},tombstones:{old:20}},{corrections:{old:{savedAt:10},fresh:{savedAt:30}}});
  assert.equal(state.corrections.old,undefined);assert.ok(state.corrections.fresh);
 });
+test('cleared scripts do not revive from old devices; new scripts remain',()=>{
+ const s=setup();const state=s.mergeStates({tombstones:{__sceneScriptsClearedBefore:20}}, {sceneScripts:{old:{savedAt:10},fresh:{savedAt:30}}});
+ assert.equal(state.sceneScripts.old,undefined);assert.ok(state.sceneScripts.fresh);
+});
