@@ -507,7 +507,8 @@ function ensureSaved(map) {
       scores: currentPolish.scores || null,
       tones: Array.isArray(currentPolish.tones) ? currentPolish.tones : [],
       natural: Boolean(currentPolish.natural),
-      stars: 0,          // 默认进接收库；点星级才晋升进产出核心
+      studyState: "inbox",
+      stars: 0,          // 默认暂存，不自动增加复习任务
       createdAt: Date.now(), // 收藏那天，固定不变——供收藏页日期分组；savedAt 只服务同步
       savedAt: Date.now(),
     };
@@ -517,14 +518,7 @@ function ensureSaved(map) {
 
 // 画出 5 颗星，点亮到 level。level=0 全空（未进核心）。
 function renderStarsPicker(level) {
-  if (!starsPicker) return;
-  let html = "";
-  for (let i = 1; i <= 5; i++) {
-    html += `<button class="star ${i <= level ? "on" : ""}" data-star="${i}" type="button"
-      title="${i} 星${i <= level ? "（点它取消到此级）" : ""}">${i <= level ? "★" : "☆"}</button>`;
-  }
-  const tip = level ? `产出核心 · ${level} 星` : "点星标记为高频核心";
-  starsPicker.innerHTML = `${html}<span class="stars-tip">${tip}</span>`;
+  starsPicker.innerHTML = '<a href="collection.html" target="_blank" rel="noopener">到表达库选择近期要练的表达 →</a>';
 }
 
 // 设星级：n=点的那颗星。再点当前最高星＝降到 n-1（可一路清零，但仍保留收藏）。
@@ -560,7 +554,7 @@ async function refreshSaveButton() {
   if (memoInput) memoInput.value = saved ? (saved.situation || "") : "";
   renderStarsPicker(saved ? starLevel(saved) : 0);
   saveButton.classList.toggle("active", Boolean(saved));
-  saveButton.textContent = saved ? "★ 已收藏" : "☆ 收藏";
+  saveButton.textContent = saved ? "★ 已保存" : "☆ 暂存表达";
   saveButton.title = saved ? "取消收藏" : "收藏这条润色";
 }
 

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#0d0b1a" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <title>练习 · 语差 Nuance</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --violet: #7c5cff;
+        --violet-deep: #5b3fd6;
+        --accent: #c44bff;
+        --ink: #1b1733;
+        --muted: #6f6a8a;
+        --glass: rgba(255, 255, 255, 0.62);
+        --glass-border: rgba(255, 255, 255, 0.7);
+        --success: #1f9d6b;
+        --error: #d6336c;
+        --shadow: 0 18px 44px rgba(70, 40, 160, 0.18);
+      }
+      * { box-sizing: border-box; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+        margin: 0; color: var(--ink); min-height: 100vh; position: relative; overscroll-behavior-y: none;
+        background: radial-gradient(120% 70% at 12% 0%, #efe6ff 0%, #e7ecff 45%, #f3edff 100%);
+      }
+      .aurora {
+        position: fixed; inset: -30% -10% auto -10%; height: 440px; z-index: 0; pointer-events: none;
+        background:
+          radial-gradient(40% 60% at 25% 30%, rgba(124,92,255,0.42), transparent 70%),
+          radial-gradient(35% 55% at 78% 18%, rgba(196,75,255,0.36), transparent 70%),
+          radial-gradient(45% 60% at 55% 70%, rgba(92,140,255,0.32), transparent 70%);
+        filter: blur(52px);
+      }
+      .wrap { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; padding: 40px 20px 70px; }
+      header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 22px; }
+      h1 {
+        font-size: 24px; margin: 0; font-weight: 800;
+        background: linear-gradient(120deg, var(--violet), var(--accent));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      }
+      .back { color: var(--violet-deep); font-size: 13px; font-weight: 700; text-decoration: none; }
+      .back:hover { text-decoration: underline; }
+
+      .card {
+        background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px;
+        padding: 26px; box-shadow: var(--shadow); backdrop-filter: blur(20px) saturate(160%);
+      }
+      .prompt-label { color: var(--violet-deep); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+      .prompt { font-size: 21px; line-height: 1.5; margin: 10px 0 4px; font-weight: 700; }
+      .prompt-hint { color: #a59fc0; font-size: 12px; }
+      /* 换个情境提示：低调的描边小按钮，放在题面下方。早期收藏情境不贴切时可重生成。 */
+      .refresh-situation {
+        display: inline-flex; align-items: center; gap: 4px; margin-top: 10px;
+        border: 1px solid rgba(124,92,255,0.28); background: rgba(255,255,255,0.5);
+        color: var(--violet-deep); border-radius: 999px; padding: 5px 12px;
+        font-size: 12px; font-weight: 700; cursor: pointer;
+        transition: background .14s ease, box-shadow .16s ease;
+      }
+      .refresh-situation:hover:not(:disabled) { background: rgba(124,92,255,0.14); }
+      .refresh-situation:disabled { opacity: .55; cursor: not-allowed; }
+
+      textarea {
+        width: 100%; min-height: 100px; margin-top: 18px; padding: 13px;
+        border: 1px solid rgba(124,92,255,0.24); border-radius: 14px; font: inherit; line-height: 1.5;
+        outline: none; resize: vertical; background: rgba(255,255,255,0.6);
+        transition: border-color .16s ease, box-shadow .16s ease;
+      }
+      textarea:focus { border-color: var(--violet); box-shadow: 0 0 0 4px rgba(124,92,255,.16); background: rgba(255,255,255,0.85); }
+
+      .actions { display: flex; gap: 10px; margin-top: 16px; }
+      button {
+        border: 0; border-radius: 12px; cursor: pointer; font: inherit; font-size: 14px;
+        font-weight: 700; padding: 11px 18px; transition: transform .14s ease, box-shadow .16s ease, opacity .16s ease;
+      }
+      button:active:not(:disabled) { transform: translateY(1px); }
+      button:disabled { opacity: .45; cursor: not-allowed; }
+      .btn-primary {
+        background: linear-gradient(120deg, var(--violet), var(--violet-deep)); color: #fff; flex: 1;
+        box-shadow: 0 8px 18px rgba(91,63,214,0.32);
+      }
+      .btn-primary:hover:not(:disabled) { box-shadow: 0 10px 22px rgba(91,63,214,0.42); }
+      .btn-ghost { background: rgba(124,92,255,0.12); color: var(--violet-deep); border: 1px solid rgba(124,92,255,0.22); }
+      .btn-ghost:hover:not(:disabled) { background: rgba(124,92,255,0.2); }
+
+      .result { margin-top: 20px; }
+      /* 判定标记：圆形徽标里放符号——对=✓、差一点=!、没过=✕，颜色沿用原语义色。
+         纯文字不够显眼，一个带底色的圆徽一眼可辨；后面文字（如命中百分比）降为小字保留信息。 */
+      .verdict { font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+      .verdict::before {
+        content: ""; flex: none;
+        width: 26px; height: 26px; border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 15px; font-weight: 900; line-height: 1;
+      }
+      .verdict.ok { color: var(--success); }
+      .verdict.ok::before { content: "✓"; background: var(--success); }
+      .verdict.near { color: #b54708; }
+      .verdict.near::before { content: "!"; background: #e8920a; }
+      .verdict.miss { color: var(--error); }
+      .verdict.miss::before { content: "✕"; background: var(--error); }
+      .answer-block { margin: 10px 0; }
+      .answer-label { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+      .answer-text { font-size: 16px; line-height: 1.6; }
+      .speak { border: none; background: none; cursor: pointer; font-size: 15px; color: var(--violet); padding: 0; margin-left: 6px; }
+      .w-ok { color: var(--ink); }
+      .w-bad { color: var(--error); text-decoration: line-through; }
+      .w-miss { color: var(--success); background: rgba(31,157,107,0.14); border-radius: 4px; padding: 0 3px; }
+      .note { color: var(--muted); font-size: 13px; line-height: 1.6; margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(124,92,255,0.28); }
+
+      /* 判定修正：机器判得不准时用户自己拍板。推荐项高亮(btn-primary)、另一项描边(btn-ghost)，都可点。 */
+      .verdict-hint { color: var(--muted); font-size: 12px; margin-top: 16px; text-align: center; }
+      .verdict-hint + .actions { margin-top: 8px; }
+
+      /* 复习中删除这条收藏：结果页底部一条低调的红色描边小按钮 + 题面右上角一个小垃圾桶图标。 */
+      .quiz-del {
+        display: block; width: 100%; margin-top: 12px;
+        border: 1px solid rgba(214,51,108,0.3); background: rgba(214,51,108,0.06);
+        color: var(--error); border-radius: 12px; padding: 9px 14px;
+        font-size: 13px; font-weight: 700; cursor: pointer;
+        transition: background .14s ease;
+      }
+      .quiz-del:hover { background: rgba(214,51,108,0.14); }
+      .card { position: relative; }
+      .quiz-del-icon {
+        position: absolute; top: 14px; right: 14px; z-index: 2;
+        border: none; background: none; cursor: pointer; padding: 4px;
+        font-size: 16px; line-height: 1; opacity: .45; border-radius: 8px;
+        transition: opacity .14s ease, background .14s ease;
+      }
+      .quiz-del-icon:hover { opacity: 1; background: rgba(214,51,108,0.12); }
+
+      /* 掌握度总览：进度条 + 四色图例，让用户一眼看到练过多少、还剩多少组。 */
+      .mastery { margin: 6px 0 16px; }
+      .mastery-head { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+      .mastery-head b { color: var(--violet-deep); }
+      .mastery-bar { height: 8px; border-radius: 999px; background: rgba(124,92,255,0.14); overflow: hidden; }
+      .mastery-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--violet), var(--accent)); transition: width .3s ease; }
+      .mastery-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 9px; font-size: 12px; font-weight: 700; color: var(--muted); }
+      .lg { display: inline-flex; align-items: center; gap: 5px; }
+      .lg::before { content: ""; width: 9px; height: 9px; border-radius: 50%; flex: none; }
+      .lg-mastered::before { background: var(--success); }
+      .lg-learning::before { background: var(--violet); }
+      .lg-due::before { background: #e8920a; }
+      .lg-fresh::before { background: #c3bede; }
+      /* 某天分组：练完(全部有掌握度记录)的打勾并变淡，一眼区分「练过 / 没练过」。 */
+      .range-btn.range-done { opacity: .6; background: rgba(31,157,107,0.08); border-color: rgba(31,157,107,0.28); }
+      .range-btn.range-done .range-name { color: var(--success); }
+
+      .empty { text-align: center; color: var(--muted); padding: 80px 0; }
+      .progress { color: var(--muted); font-size: 12px; margin-top: 18px; text-align: center; font-weight: 600; }
+
+      /* 范围选择 */
+      .kind-label { color: var(--violet-deep); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+      .range-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 4px; }
+      .range-btn {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px 16px; border-radius: 14px; flex: none;
+        border: 1px solid rgba(124,92,255,0.22); background: rgba(255,255,255,0.55);
+        color: var(--ink); cursor: pointer; transition: background .14s ease, box-shadow .16s ease;
+      }
+      .range-btn:hover { background: rgba(124,92,255,0.12); box-shadow: 0 6px 16px rgba(91,63,214,0.16); }
+      .range-btn:disabled { opacity: .5; cursor: not-allowed; }
+      .range-btn.range-all { flex-direction: column; align-items: flex-start; gap: 4px; background: linear-gradient(120deg, var(--accent), var(--violet)); color: #fff; border-color: transparent; }
+      .range-btn.range-cram { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .range-sub { color: var(--muted); font-size: 12px; font-weight: 700; margin: 16px 0 6px; }
+      /* 只练核心：描边金 / 激活实心金，和收藏页「只看核心」一致的视觉语言 */
+      .star-toggle {
+        display: inline-flex; align-items: center; gap: 4px; margin: 10px 0 4px;
+        border: 1px solid rgba(240,180,20,0.42); background: rgba(240,180,20,0.12); color: #b8860b;
+        border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 800; cursor: pointer;
+        transition: background .14s ease, box-shadow .16s ease;
+      }
+      .star-toggle:hover { background: rgba(240,180,20,0.2); }
+      .star-toggle:disabled { opacity: .5; cursor: not-allowed; }
+      .star-toggle.on {
+        background: linear-gradient(120deg, #f5b301, #ffce54); color: #5a4300; border-color: transparent;
+        box-shadow: 0 8px 18px rgba(240,180,20,0.36);
+      }
+      .range-name { font-size: 15px; font-weight: 800; }
+      .range-count { font-size: 12px; opacity: 0.85; font-weight: 700; }
+      /* 模式选择：复述 / 泛化 */
+      .mode-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 8px; }
+      .mode-btn {
+        display: flex; flex-direction: column; gap: 4px; text-align: left;
+        padding: 16px 18px; border-radius: 16px; cursor: pointer;
+        border: 1px solid rgba(124,92,255,0.22); background: rgba(255,255,255,0.55);
+        color: var(--ink); transition: background .14s ease, box-shadow .16s ease;
+      }
+      .mode-btn:hover { background: rgba(124,92,255,0.1); box-shadow: 0 8px 20px rgba(91,63,214,0.16); }
+      .mode-name { font-size: 16px; font-weight: 800; color: var(--violet-deep); }
+      .mode-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+      .done-stat { color: var(--muted); font-size: 14px; margin: 6px 0 4px; }
+      .quiz-state-media {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+      .quiz-state-media img {
+        flex: 0 0 66px;
+        width: 66px;
+        height: 66px;
+        object-fit: contain;
+        border-radius: 16px;
+      }
+      .quiz-state-media .prompt { margin-top: 0; }
+      .empty.quiz-state-media {
+        justify-content: center;
+        padding: 44px 10px;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="aurora"></div>
+    <div class="wrap">
+      <header>
+        <h1>练习 · 把意思说清楚</h1>
+        <a class="back" href="capture-preview.html">← 返回体验示例</a>
+      </header>
+      <div id="stage"></div>
+      <div class="progress" id="progress"></div>
+    </div>
+    <script src="config.js"></script>
+    
+    
+    <script src="learning.js"></script>
+    <script src="capture-preview-practice.js"></script>
+    <script src="quiz.js"></script>
+  </body>
+</html>

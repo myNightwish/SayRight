@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#0d0b1a" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <title>我的润色收藏 · 语差 Nuance</title>
+    <title>我的表达 · 语差 Nuance</title>
     <style>
       :root {
         color-scheme: light;
@@ -389,6 +389,28 @@
         .scene-group-head { flex-wrap: wrap; gap: 8px; }
         .sc-rehearse { margin-left: auto; }
       }
+      .library-management { position: relative; font-size: 13px; color: var(--muted); }
+      .library-management summary { cursor: pointer; padding: 8px; }
+      .library-management[open] button { margin-top: 8px; }
+      #feedbackDetails { margin-top: 14px; }
+      .feedback-row { padding: 16px 0; border-bottom: 1px solid #e2dcf0; }
+      .feedback-row p { margin: 8px 0; overflow-wrap: anywhere; }
+      .feedback-before { color: var(--muted); }
+      .feedback-after { color: var(--violet-deep); font-weight: 650; }
+      .feedback-source { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; max-height: 280px; overflow: auto; }
+      .feedback-note { font-size: 13px; color: var(--muted); }
+      .capture-panel [hidden] { display: none !important; }
+      .capture-panel { padding: 20px; margin: 18px 0; border: 1px solid var(--glass-border); border-radius: 18px; background: var(--glass); }
+      .capture-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+      .capture-panel h2 { font-size: 20px; margin: 0; }
+      .capture-panel p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+      .capture-panel label { display: block; margin: 14px 0 6px; }
+      .capture-panel textarea,.capture-panel input[type=text] { box-sizing: border-box; width: 100%; border: 1px solid #cbc5e1; border-radius: 10px; padding: 12px; font: inherit; background: white; color: #211b3b; }
+      .capture-panel textarea { resize: vertical; }
+      .capture-panel summary { cursor: pointer; width: fit-content; }
+      .capture-row { border-bottom: 1px solid #ded9ee; padding-bottom: 10px; overflow-wrap: anywhere; }
+      .study-control { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 12px 0; }
+      select { padding: 8px; border-radius: 8px; font: inherit; max-width: 100%; }
     </style>
   </head>
   <body>
@@ -396,22 +418,44 @@
     <div class="wrap">
       <header>
         <a class="home-link" href="polish.html" title="返回表达页">‹ 表达</a>
-        <h1 id="pageTitle">我的收藏</h1>
+        <h1 id="pageTitle">我的表达</h1>
         <span class="count" id="count"></span>
       </header>
 
       <div class="tabs">
-        <button class="tab active" id="tabCorrections" data-tab="corrections">表达纠错 · 润色收藏</button>
+        <button class="tab active" id="tabCorrections" data-tab="corrections">表达库</button>
         <button class="tab" id="tabScenes" data-tab="scenes">场景预演 · 演练收藏</button>
       </div>
 
       <!-- tab 1：润色收藏（原有） -->
       <div id="paneCorrections">
+        <section class="capture-panel" aria-labelledby="captureTitle">
+          <div class="capture-heading"><div><h2 id="captureTitle">这句我想会用</h2><p>从 GPT 带回来的好表达，保留原句，直接加入。先暂存，再挑少量近期想用的表达练习。</p></div><a class="pill" href="quiz.html">练已有的表达 →</a></div>
+          <details id="captureDetails"><summary class="pill">＋ 粘贴本次学习表达</summary>
+            <label for="captureSource">来源（选填）</label><input id="captureSource" type="text" maxlength="120" placeholder="例如：每日英语 · 工作沟通" />
+            <label for="captureText">每行一句英文；可用全角 ｜ 补充中文使用情境</label>
+            <textarea id="captureText" rows="5" placeholder="I've had a lot on my plate lately.｜同事问我最近为什么没空
+That works for me.｜同意对方提出的时间"></textarea>
+            <p>仅支持逐行表达，不会自动解析整段聊天。不会改写原文，也不会自动产生复习任务。</p>
+            <button class="pill" id="previewCapture" type="button">预览并选择</button>
+            <div id="capturePreview"></div>
+            <button class="pill pill-quiz" id="saveCapture" type="button" hidden>将选中表达加入暂存</button>
+          </details>
+          <details id="feedbackDetails"><summary class="pill">＋ 记录本次 AI 反馈中的调整</summary>
+            <p>整段粘贴 AI 的纠正反馈。保留「原来怎么说 → 调整成什么 → 为什么」，不重新润色，不把所有调整变成复习任务。</p>
+            <label for="feedbackTitle">这次聊的是什么（选填）</label><input id="feedbackTitle" type="text" maxlength="120" placeholder="例如：今天聊投资时的吐槽" />
+            <label for="feedbackImage">粘贴或上传对比截图（最多 5 MB）</label><input id="feedbackImage" type="file" accept="image/png,image/jpeg,image/webp" /><p>也可直接在下方输入框按 ⌘V / Ctrl+V 粘贴截图，自动识别并记下。原图不保存，识别结果请核对。</p>
+            <label for="feedbackText">AI 反馈（包含原表达与调整后的对比）</label><textarea id="feedbackText" rows="7" maxlength="20000" placeholder="可以直接粘贴包含对比表、润色段落和解释的完整反馈。不需要手动拆成句子。"></textarea>
+            <button class="pill pill-quiz" id="saveFeedback" type="button">整理并记下这次调整</button>
+            <p id="feedbackStatus" role="status" aria-live="polite"></p>
+          </details>
+          <p id="captureStatus" role="status" aria-live="polite"></p>
+        </section>
         <div class="toolbar">
           <input type="search" id="search" placeholder="搜索意图、场景、原句或地道说法…" />
-          <button class="pill pill-star" id="filterStar" type="button" title="只看已晋升进产出核心的高频表达">☆ 只看核心</button>
-          <a class="pill pill-quiz" href="quiz.html">🎲 随机练习</a>
-          <button class="pill pill-danger" id="clearAll">清空全部</button>
+          <label>学习状态 <select id="studyFilter"><option value="all">全部</option><option value="feedback">本次调整记录</option><option value="active">正在练</option><option value="inbox">暂存</option><option value="archived">已能用 / 归档</option></select></label>
+          <a class="pill pill-quiz" href="quiz.html">开始今日练习</a>
+          <details class="library-management"><summary>更多操作</summary><button class="pill pill-danger" id="clearAll">清空表达库</button></details>
         </div>
         <div class="scene-layout">
           <nav id="listNav" class="scene-nav"></nav>
@@ -435,6 +479,8 @@
     <script src="config.js"></script>
     <script src="auth.js"></script>
     <script src="sync.js"></script>
+    <script src="learning.js"></script>
+    <script src="feedback-core.js"></script>
     <script src="collection.js"></script>
   </body>
 </html>

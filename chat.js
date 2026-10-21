@@ -102,7 +102,7 @@ function getLocalMap(key) {
 }
 async function pickDueMaterials(limit = TALK_MATERIALS_MAX) {
   const [corr, drill] = await Promise.all([getLocalMap(CORR_KEY), getLocalMap(DRILL_KEY)]);
-  const items = Object.values(corr).filter((it) => it && it.better && String(it.better).trim());
+  const items = Object.entries(corr).map(([key, value]) => ({ ...value, key })).filter((it) => it && it.better && String(it.better).trim() && NuanceLearning.stateOf(it) === "active");
   if (!items.length) return [];
   const now = Date.now();
   // drillState 的 key 是 `${item.key}::${mode}`，同一句可能有复述/泛化两条记录，取最早到期的那条。
@@ -128,7 +128,7 @@ async function pickDueMaterials(limit = TALK_MATERIALS_MAX) {
   ordered.sort((a, b) => starLevelOf(b) - starLevelOf(a)); // 稳定排序：星级高的提前，其余保持到期/新序
   const chosen = ordered.slice(0, limit);
   return chosen.map((it) => ({
-    intent: it.intent || it.situation || "",
+    intent: it.situation || it.intent || "",
     expression: it.better,
     construct: it.construct || "",
   }));
@@ -246,7 +246,8 @@ async function bumpMasteryByExpression(expression) {
   const expr = String(expression || "").trim();
   if (!expr) return;
   const [corr, drill] = await Promise.all([getLocalMap(CORR_KEY), getLocalMap(DRILL_KEY)]);
-  const item = Object.values(corr).find((it) => it && it.better && String(it.better).trim() === expr);
+  const match = Object.entries(corr).find(([, it]) => it && NuanceLearning.stateOf(it) === "active" && it.better && String(it.better).trim() === expr);
+  const item = match ? { ...match[1], key: match[0] } : null;
   if (!item || !item.key) return;
   const id = `${item.key}::replay`;
   const now = Date.now();
@@ -687,7 +688,7 @@ async function loadRehearsePlan() {
   const loading = appendMsg("them", "正在根据你的收藏素材，为你安排一场对练……", "");
   const materials = await pickDueMaterials(20); // 不再硬卡 5 条，交给模型按情景取舍
   if (!materials.length) {
-    loading.enEl.textContent = "你还没有可以用来对练的收藏素材。先去润色/场景里收藏一些地道说法吧～";
+    loading.enEl.textContent = "还没有「正在练」的表达。到表达库挑少量近期想用的表达即可，不必先润色。";
     setComposer("waiting");
     return;
   }

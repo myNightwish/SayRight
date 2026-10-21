@@ -56,3 +56,10 @@ test('extension model routing uses loopback independently of cloud sync',()=>{
  const manifest=JSON.parse(fs.readFileSync('manifest.json','utf8'));
  assert.ok(manifest.host_permissions.includes('http://127.0.0.1:48773/*'));
 });
+test('cloud cutoff removes old browser scripts from local cache',async()=>{
+ let release;const gate=new Promise(r=>release=r);
+ const s=setup(async()=>{await gate;return {ok:true,json:async()=>({...empty(),tombstones:{__sceneScriptsClearedBefore:20}})};});
+ s.data.set('sceneScripts',JSON.stringify({old:{savedAt:10,dialogue:[{text:'old'}]}}));
+ release();await s.api.syncNow();
+ assert.equal(Object.keys(JSON.parse(s.data.get('sceneScripts'))).length,0);
+});

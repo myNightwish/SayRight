@@ -2,7 +2,7 @@
 //   复述练习(replay)：题面用 situation 真实情境 → 你用英文表达。
 //   泛化练习(transfer)：用收藏的泛化情境(situations[])出新场景 → 用同一 pattern 造句。
 //   判定完全交给用户自评（对照地道说法后点「我答对了 / 没答对」）——机器判不准，你说了算。
-const STORAGE_KEY = "corrections";
+const STORAGE_KEY = window.NUANCE_PREVIEW ? "nuanceCapturePreviewCorrections" : "corrections";
 const GOOGLE_ENDPOINT = "https://translate.googleapis.com/translate_a/single";
 const SERVER_ORIGIN = window.NUANCE_MODEL_ORIGIN || location.origin;
 const POLISH_API = `${SERVER_ORIGIN}/polish`; // 复习时「换个情境提示」：把 better 回喂 /polish，只取新的 situation(s)
@@ -19,9 +19,8 @@ function apiHeaders() {
   if (TUTOR_KEY) h["x-tutor-key"] = TUTOR_KEY;
   return h;
 }
-const DRILL_KEY = "drillState"; // 跨会话按条掌握度（Leitner 盒子），跟随云同步
-const PASS_THRESHOLD = 0.85;    // 本地词级比对的软建议阈值：≥此值默认高亮「我答对了」，仅作提示
-const GROUP_SIZE = 15;          // 一组复习的题量：到期优先，不足用新条补满，最多 15，控制单次时长与同步时机
+const DRILL_KEY = window.NUANCE_PREVIEW ? "nuanceCapturePreviewDrill" : "drillState"; // 跨会话按条掌握度（Leitner 盒子），跟随云同步
+const GROUP_SIZE = 5;          // 一组最多 5 个情境，先完成短练习，再按需继续。
 const DAY = 86400000;
 // Leitner 间隔（天），按 box 索引：box1..5。box0 = 全新未练。答对推后一格，答错回 box1。
 const BOX_DAYS = [0, 1, 2, 4, 7, 15];
@@ -85,7 +84,7 @@ function drillIdOf(item, m) { return `${item.key}::${m || mode}`; }
 // Leitner 更新：答对推后一格、答错拉回 box1。只落地本地 drillState（不逐题上行网络）。
 // 一组题的掌握度改动攒在本地，整组做完后由 flushGroupSync() 一次性上行——大幅减少 /sync 调用。
 // 本地已先持久化，即便中途退出也不丢：下次开页/切后台的 flushSync 会补传。
-async function scheduleUpdate(item, m, isPass) {
+async function scheduleUpdate(item, m, isPass, outcome = {}) {
   const id = drillIdOf(item, m);
   const now = Date.now();
   const prev = drillMap[id] || { box: 0, due: 0, reps: 0, lapses: 0 };
@@ -95,7 +94,9 @@ async function scheduleUpdate(item, m, isPass) {
   if (isPass) box = Math.min(5, box + 1);
   else { box = 1; lapses += 1; }
   const interval = BOX_DAYS[box] || 0;
-  drillMap[id] = { box, due: now + interval * DAY, reps, lapses, savedAt: now };
+  drillMap[id] = { ...prev, box, due: now + interval * DAY, reps, lapses,
+    communicationSuccess: outcome.communicationSuccess ?? null,
+    targetUsed: outcome.targetUsed ?? isPass, savedAt: now };
   await setDrillState(drillMap);
 }
 
@@ -229,75 +230,16 @@ function speak(text) {
 
 
 // 把句子拆成小写词（去标点），用于宽松比对——天然忽略大小写与标点。
-function tokenize(text) {
-  return (text || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9'\s]/g, " ")
-    .split(/\s+/)
-    .filter(Boolean);
-}
-
-// 单词级 LCS 比对：标出对/多/漏的词，返回命中比例。忽略大小写与标点。
-function compareAnswer(your, answer) {
-  const a = tokenize(your);
-  const b = tokenize(answer);
-  const n = a.length, m = b.length;
-  const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
-  for (let i = n - 1; i >= 0; i--) {
-    for (let j = m - 1; j >= 0; j--) {
-      dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
-    }
-  }
-  const yourMarks = [], answerMarks = [];
-  let i = 0, j = 0;
-  while (i < n && j < m) {
-    if (a[i] === b[j]) {
-      yourMarks.push({ w: a[i], ok: true });
-      answerMarks.push({ w: b[j], hit: true });
-      i++; j++;
-    } else if (dp[i + 1][j] >= dp[i][j + 1]) {
-      yourMarks.push({ w: a[i], ok: false });
-      i++;
-    } else {
-      answerMarks.push({ w: b[j], hit: false });
-      j++;
-    }
-  }
-  while (i < n) yourMarks.push({ w: a[i++], ok: false });
-  while (j < m) answerMarks.push({ w: b[j++], hit: false });
-  const matched = answerMarks.filter((x) => x.hit).length;
-  const score = m ? matched / m : 0;
-  const yourHtml = yourMarks
-    .map((x) => `<span class="${x.ok ? "w-ok" : "w-bad"}">${escapeHtml(x.w)}</span>`).join(" ");
-  const answerHtml = answerMarks
-    .map((x) => `<span class="${x.hit ? "w-ok" : "w-miss"}">${escapeHtml(x.w)}</span>`).join(" ");
-  return { score, yourHtml, answerHtml };
-}
-
-// 一条收藏是「单词题」还是「句子题」：润色收藏没有 word 字段，
-// 统一按句子题处理（看中文默写英文）。保留判断以便将来扩展单词题。
 function isWordItem(item) {
   return item && item.kind === "word" && item.word;
 }
 
 
 let allItems = []; // 全部可练收藏（有 better 的），用于范围选择
-let starOnly = false; // 「只练核心」：只练打了星（产出核心）的收藏——练习优先服务产出核心
-
-// 星级：0=只在接收库；1–5=产出核心。兼容早期布尔 starred（视作 3 星）。
-function starLevelOf(it) {
-  if (!it) return 0;
-  if (typeof it.stars === "number") return it.stars;
-  return it.starred ? 3 : 0;
-}
-
 // 当前练习池：按模式过滤（泛化需有泛化情境）+ 可选只练产出核心。
 function currentPool() {
-  let pool = mode === "transfer"
-    ? allItems.filter((it) => Array.isArray(it.situations) && it.situations.length)
-    : allItems;
-  if (starOnly) pool = pool.filter((it) => starLevelOf(it) >= 1);
-  return pool;
+  const active = allItems.filter(it => NuanceLearning.stateOf(it) === "active");
+  return mode === "transfer" ? active.filter(it => Array.isArray(it.situations) && it.situations.length) : active;
 }
 
 // 模式选择页：先选「复述练习 / 泛化练习」。
@@ -307,8 +249,8 @@ function renderModePicker() {
       <div class="kind-label">选择练习模式</div>
       <div class="mode-grid">
         <button class="mode-btn" data-mode="replay" type="button">
-          <span class="mode-name">复述练习</span>
-          <span class="mode-desc">回到当时的情境，把学过的表达再说出来</span>
+          <span class="mode-name">情境表达</span>
+          <span class="mode-desc">回到使用情境，用自己的话把意思说清楚</span>
         </button>
         <button class="mode-btn" data-mode="transfer" type="button">
           <span class="mode-name">泛化练习</span>
@@ -325,17 +267,16 @@ function renderModePicker() {
   });
 }
 
-// 范围选择页：改为「调度驱动」。顶部两个主选项：今日复习（到期+新条）/ 全部练一遍；
+// 范围选择页：改为「调度驱动」。顶部两个主选项：今日复习（到期+新条）/ 正在练的都练一遍；
 // 下方保留按时间线分组，想定向补练某天仍可点。
 function renderRangePicker() {
   // 泛化模式只能练「有泛化情境」的收藏；复述模式全部可练。可叠加「只练核心」。
   const pool = currentPool();
-  const starTotal = allItems.filter((it) => starLevelOf(it) >= 1).length;
-  if (mode === "transfer" && !pool.length && !starOnly) {
+  if (mode === "transfer" && !pool.length) {
     stageEl.innerHTML = `
       <div class="card">
         <div class="kind-label">泛化练习</div>
-        <div class="empty">还没有可做泛化练习的收藏。<br/>新收藏会自动带「同类新场景」，收藏几条新的再来练。</div>
+        <div class="empty">正在练的表达还没有新场景提示。可以先练原情境；直接加入的表达不会自动生成新场景。<br/><a href="collection.html">管理正在练的表达</a></div>
         <div class="actions"><button class="btn-ghost" id="backMode" type="button">返回</button></div>
       </div>`;
     stageEl.querySelector("#backMode").addEventListener("click", renderModePicker);
@@ -385,7 +326,7 @@ function renderRangePicker() {
 
   stageEl.innerHTML = `
     <div class="card">
-      <div class="kind-label">${mode === "transfer" ? "泛化练习" : "复述练习"}</div>
+      <div class="kind-label">${mode === "transfer" ? "泛化练习" : "情境表达"}</div>
       <div class="mastery">
         <div class="mastery-head">
           <span>已练 <b>${practiced}</b> / ${poolTotal}</span>
@@ -393,23 +334,20 @@ function renderRangePicker() {
         </div>
         <div class="mastery-bar"><div class="mastery-fill" style="width:${pct}%"></div></div>
         <div class="mastery-legend">
-          <span class="lg lg-mastered">已掌握 ${mastered}</span>
+          <span class="lg lg-mastered">长间隔复习 ${mastered}</span>
           <span class="lg lg-learning">巩固中 ${learning}</span>
           <span class="lg lg-due">待复习 ${due}</span>
           <span class="lg lg-fresh">全新 ${fresh}</span>
         </div>
       </div>
-      <button class="star-toggle ${starOnly ? "on" : ""}" id="starToggle" type="button"
-        ${starTotal ? "" : "disabled"} title="只练打了星、晋升进产出核心的高频表达">
-        ${starOnly ? "★ 只练核心" : "☆ 只练核心"} · ${starTotal} 条
-      </button>
+      <p class="verdict-hint">只练「正在练」的表达；暂存和归档不产生复习任务。<a href="collection.html">调整学习范围 →</a></p>
       <div class="range-grid">
         <button class="range-btn range-all" data-range="__due__" type="button" ${groupN ? "" : "disabled"}>
           <span class="range-name">复习一组${groupN ? ` · ${groupN} 题` : ""}</span>
           <span class="range-count">${todayDesc}</span>
         </button>
         <button class="range-btn range-cram" data-range="__all__" type="button" ${pool.length ? "" : "disabled"}>
-          <span class="range-name">全部练一遍</span>
+          <span class="range-name">正在练的都练一遍</span>
           <span class="range-count">${pool.length} 条</span>
         </button>
       </div>
@@ -420,14 +358,6 @@ function renderRangePicker() {
       <div class="actions"><button class="btn-ghost" id="backMode" type="button">‹ 换模式</button></div>
     </div>`;
   progressEl.textContent = "";
-  const starToggle = stageEl.querySelector("#starToggle");
-  if (starToggle) {
-    starToggle.addEventListener("click", () => {
-      if (starToggle.disabled) return;
-      starOnly = !starOnly;
-      renderRangePicker();   // 重渲染：统计与列表都跟着「只练核心」变
-    });
-  }
   stageEl.querySelectorAll(".range-btn").forEach((btn) => {
     btn.addEventListener("click", () => { if (!btn.disabled) startRound(btn.dataset.range); });
   });
@@ -449,6 +379,7 @@ function startRound(range) {
       else if ((st.due || 0) <= now) dueItems.push(it);
     }
     // 到期优先塞满一组；还差多少用新条补。整组不超过 GROUP_SIZE。
+    dueItems.sort((a, b) => (drillMap[drillIdOf(a, mode)].due || 0) - (drillMap[drillIdOf(b, mode)].due || 0));
     items = dueItems.slice(0, GROUP_SIZE);
     if (items.length < GROUP_SIZE) {
       items = items.concat(newItems.slice(0, GROUP_SIZE - items.length));
@@ -473,7 +404,7 @@ function startRound(range) {
 }
 
 function updateProgress() {
-  progressEl.textContent = `已过关 ${passed}/${total} · 队列剩 ${queue.length} · 没过 ${misses} 次`;
+  progressEl.textContent = `已完成沟通 ${passed}/${total} · 剩余 ${queue.length} · 提示后重试 ${misses} 次`;
 }
 
 // 取队首作为当前题；队列空 = 全部过关，结算。
@@ -511,8 +442,19 @@ async function nextQuestion() {
 
 // 过关：计入 passed，进入下一题。未过：重新排队尾，misses+1。
 // 两者都按当前模式记一次 Leitner 调度（答对推后、答错拉近），只落地本地；整组做完再一次性上行。
-function markPass() { scheduleUpdate(current, mode, true); passed++; updateProgress(); nextQuestion(); }
-function markFail() { scheduleUpdate(current, mode, false); misses++; queue.push(stripExtra(current)); updateProgress(); nextQuestion(); }
+async function markPass() {
+  await scheduleUpdate(current, mode, true, { communicationSuccess: true, targetUsed: true });
+  passed++; updateProgress(); nextQuestion();
+}
+async function markAlternative() {
+  await scheduleUpdate(current, mode, false, { communicationSuccess: true, targetUsed: false });
+  // 沟通已完成，继续下一题；目标表达较早复习，不强迫当场背标准答案。
+  passed++; updateProgress(); nextQuestion();
+}
+async function markFail() {
+  await scheduleUpdate(current, mode, false, { communicationSuccess: false, targetUsed: false });
+  misses++; queue.push(stripExtra(current)); updateProgress(); nextQuestion();
+}
 function stripExtra(item) { const { prompt, ...rest } = item; return rest; }
 
 // 复习中删除这条收藏：库里确实不值得学的就地移除。删除要尽快传播（否则被别端旧数据复活），故立即上行。
@@ -531,33 +473,48 @@ async function deleteCurrent() {
   nextQuestion();
 }
 
-// 结果页的裁定按钮：没有机器判定了，完全你自评。左「我答对了」右「没答对，重考」。
-// suggestPass 仅作视觉提示（哪个高亮），来自本地词级比对，点谁都行。
-function verdictActionsHtml(suggestPass) {
-  const passCls = suggestPass ? "btn-primary" : "btn-ghost";
-  const failCls = suggestPass ? "btn-ghost" : "btn-primary";
+// 用户分别自评沟通是否完成、目标表达是否用上。
+function verdictActionsHtml() {
   return `
-    <div class="verdict-hint">对照上面的地道说法，自己判定这次算不算过</div>
+    <div class="verdict-hint">先判断意思是否说清，再判断目标表达能否调出来。这是自评，不是 AI 评分。</div>
     <div class="actions">
-      <button class="${passCls}" id="passBtn" type="button">✓ 我答对了</button>
-      <button class="${failCls}" id="failBtn" type="button">✕ 没答对，重考</button>
+      <button class="btn-primary" id="passBtn" type="button">说清楚了，也用上了目标表达</button>
+      <button class="btn-ghost" id="alternativeBtn" type="button">说清楚了，用的是另一种说法</button>
+      <button class="btn-ghost" id="failBtn" type="button">需要提示，再练一次</button>
     </div>
-    <button class="quiz-del" id="delBtn" type="button" title="这条不值得学？从收藏里删掉">🗑 删掉这条，不再复习</button>`;
+    <button class="btn-ghost" id="archiveBtn" type="button">暂时不需要练了，归档保留</button>`;
 }
 function bindVerdictActions() {
   const p = stageEl.querySelector("#passBtn");
   const f = stageEl.querySelector("#failBtn");
-  const d = stageEl.querySelector("#delBtn");
+  const alternative = stageEl.querySelector("#alternativeBtn");
+  const archive = stageEl.querySelector("#archiveBtn");
   if (p) p.addEventListener("click", markPass);
   if (f) f.addEventListener("click", markFail);
-  if (d) d.addEventListener("click", deleteCurrent);
+  if (alternative) alternative.addEventListener("click", markAlternative);
+  if (archive) archive.addEventListener("click", async () => {
+    const map = await getCorrections();
+    if (map[current.key]) {
+      map[current.key].createdAt ||= map[current.key].savedAt || Date.now();
+      map[current.key].studyState = "archived"; map[current.key].savedAt = Date.now();
+      await setCorrections(map); window.NuanceSync?.syncSoon();
+    }
+    queue = queue.filter(it => it.key !== current.key);
+    allItems = allItems.map(it => it.key === current.key ? { ...it, studyState: "archived" } : it);
+    total = Math.max(passed, total - 1); nextQuestion();
+  });
+  for (const button of [p, f, alternative, archive].filter(Boolean)) {
+    button.addEventListener("click", () => {
+      for (const other of [p, f, alternative, archive].filter(Boolean)) other.disabled = true;
+    }, { once: true });
+  }
 }
 
 function renderQuestion() {
   const kind = mode === "transfer" ? "新场景 · 用上学过的表达思路" : "回到这个情境，用英文表达";
   const hint = mode === "transfer"
-    ? "这是一个新场景，但能用到你学过的某个表达方式。试着说出来。"
-    : "回忆当时你想怎么说，写出你的英文。";
+    ? "换一个情境，把意思说清楚；有机会时试着用上学过的表达。"
+    : "想象对方就在面前，用自己的话回应，不必逐字复现。";
   stageEl.innerHTML = `
     <div class="card">
       <button class="quiz-del-icon" id="delIcon" type="button" title="删掉这条，不再复习">🗑</button>
@@ -609,33 +566,31 @@ function submit() {
 // 结果页：展示你写的（高亮对/多/漏词）+ 地道说法（可朗读）+ 收藏时的 note，
 // 然后你自评对错。suggestPass 由本地比对分给出，仅决定哪个按钮高亮。
 function renderResult(your) {
-  const { score, yourHtml, answerHtml } = compareAnswer(your, current.better);
-  const isPass = score >= PASS_THRESHOLD;
-  const cls = isPass ? "ok" : (score >= 0.5 ? "near" : "miss");
-  const label = isPass ? "看起来对上了" : (score >= 0.5 ? "差一点" : "差得有点多");
   const note = current.note ? `<div class="note">${escapeHtml(current.note)}</div>` : "";
-  const yourBlock = your.trim()
-    ? `<div class="answer-text">${yourHtml}</div>`
-    : `<div class="answer-text" style="color:#9aa0c0">（空）</div>`;
+  const yourBlock = your.trim() ? `<div class="answer-text">${escapeHtml(your)}</div>` : '<div class="answer-text">这次没有作答，可以先看参考，再试一次。</div>';
   stageEl.innerHTML = `
     <div class="card">
       <div class="kind-label">${mode === "transfer" ? "新场景" : "情境"}</div>
       <div class="prompt" style="font-size:16px">${escapeHtml(current.prompt || current.input || "")}</div>
       <div class="result">
-        <div class="verdict ${cls}">${label}（词面命中 ${Math.round(score * 100)}%，仅供参考）</div>
+        <div class="verdict">意思说清楚，比逐字复现更重要。参考表达不是唯一答案。</div>
         <div class="answer-block"><div class="answer-label">你写的</div>${yourBlock}</div>
         <div class="answer-block">
-          <div class="answer-label">${mode === "transfer" ? "你学过的地道说法" : "地道说法"}</div>
-          <div class="answer-text">${answerHtml}
+          <div class="answer-label">参考表达（不是唯一答案）</div>
+          <div class="answer-text">${escapeHtml(current.better)}
             <button class="speak" id="speakBtn" title="朗读">🔊</button>
           </div>
         </div>
         ${note}
       </div>
-      ${verdictActionsHtml(isPass)}
+      ${verdictActionsHtml()}
     </div>`;
   stageEl.querySelector("#speakBtn").addEventListener("click", () => speak(current.better));
   bindVerdictActions();
+  if (!your.trim()) {
+    stageEl.querySelector("#passBtn").disabled = true;
+    stageEl.querySelector("#alternativeBtn").disabled = true;
+  }
   speak(current.better);
 }
 
@@ -648,7 +603,7 @@ function renderDone() {
         <img src="images/mascot-success-v1.gif" alt="Coco 正在庆祝本组练习完成" />
         <div>
           <div class="prompt">这一组过完啦</div>
-          <div class="done-stat">共 ${total} 题 · 过程中没过 ${misses} 次</div>
+          <div class="done-stat">共 ${total} 个情境 · 提示后重试 ${misses} 次</div>
         </div>
       </div>
       <div class="actions">
@@ -670,7 +625,7 @@ function renderEmpty() {
     <div class="card">
       <div class="empty quiz-state-media">
         <img src="images/mascot-comfort-v2.png" alt="Coco 正在等你添加练习内容" />
-        <span>还没有可练习的收藏。<br/>先润色并收藏几句话，再回来练习。</span>
+        <span>还没有可练习的收藏。<br/>可直接粘贴表达，再挑少量设为「正在练」。<br/><a href="collection.html">加入或管理表达 →</a></span>
       </div>
     </div>`;
   progressEl.textContent = "";
@@ -683,7 +638,13 @@ async function init() {
     .map(([key, value]) => ({ key, ...value }))
     .filter((it) => it && it.better && it.better.trim())
     .sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
-  if (!allItems.length) { renderEmpty(); return; }
+  if (!allItems.some(it => NuanceLearning.stateOf(it) === "active")) { renderEmpty(); return; }
+  const capturedKey = new URLSearchParams(location.search).get("capture");
+  const captured = allItems.find(item => item.captureId && item.captureId === capturedKey && NuanceLearning.stateOf(item) === "active");
+  if (captured) {
+    mode = "replay"; queue = [captured]; total = 1; passed = 0; misses = 0; current = null;
+    await nextQuestion(); return;
+  }
   renderModePicker();
 }
 
@@ -695,6 +656,11 @@ window.addEventListener("nuance:synced", async () => {
     .map(([key, value]) => ({ key, ...value }))
     .filter((it) => it && it.better && it.better.trim())
     .sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+  if (stageEl.querySelector("#backMode")) renderRangePicker();
+  else if (stageEl.querySelector(".mode-grid") || stageEl.querySelector(".empty")) {
+    if (allItems.some(it => NuanceLearning.stateOf(it) === "active")) renderModePicker();
+    else renderEmpty();
+  }
 });
 
 init();

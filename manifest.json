@@ -1,11 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Nuance 语差",
-  "description": "翻译 + 地道润色练习。收藏你的「语差」，随机出题、主动回忆。",
-  "version": "0.1.0",
+  "description": "遇到想会用的表达，选中后带回真实情境，下一次用自己的话说出来。",
+  "version": "0.2.0",
   "permissions": [
     "clipboardWrite",
-    "storage"
+    "storage",
+    "alarms"
   ],
   "host_permissions": [
     "https://translate.googleapis.com/*",
@@ -29,5 +30,21 @@
       "128": "icons/icon128.png"
     }
   },
-  "options_page": "collection.html"
+  "options_page": "collection.html",
+  "background": {
+    "service_worker": "extension-background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "selection-capture.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
 }
