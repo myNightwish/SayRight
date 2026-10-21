@@ -1,7 +1,7 @@
 /* global chrome, NuanceLearning, NuanceCapture */
 importScripts('learning.js', 'capture-core.js', 'feedback-core.js', 'dictionary-core.js');
 const MODEL_ORIGIN = 'http://127.0.0.1:48773';
-const SYNC_ORIGIN = 'https://sayright-x4a0.onrender.com';
+const SYNC_ORIGIN = 'https://nuance-drfi.onrender.com';
 const FIELDS = ['corrections','sceneSaves','sceneScripts','drillState'];
 let mutation = Promise.resolve();
 function serialized(action) { const task=mutation.then(action); mutation=task.catch(()=>{}); return task; }

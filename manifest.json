@@ -11,7 +11,7 @@
   "host_permissions": [
     "https://translate.googleapis.com/*",
     "https://api.mymemory.translated.net/*",
-    "https://sayright-x4a0.onrender.com/*",
+    "https://nuance-drfi.onrender.com/*",
     "http://127.0.0.1:48773/*"
   ],
   "icons": {

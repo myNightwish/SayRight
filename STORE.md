@@ -12,7 +12,7 @@ bash package.sh   # 生成 nuance-语差-v0.2.0.zip
    `TUTOR_DAILY_QUOTA=200`（每口令每日上限）。谁把口令转给别人，配额会被一起刷爆、
    从日志能看出异常，直接从变量里删掉那个口令即可单独吊销。
 2. **隐私政策要有公网 URL**：`privacy.html` 已随服务托管，地址为
-   `https://sayright-x4a0.onrender.com/privacy.html`，填进上架表单的隐私政策栏。
+   `https://nuance-drfi.onrender.com/privacy.html`，填进上架表单的隐私政策栏。
 3. 当前版本通过 `http://127.0.0.1:48773/*` 调用本机模型服务。安装/更新时需允许普通网页划词访问，Chrome 内置页、商店页等不支持注入。
 
 ## 三、商店信息文案
@@ -37,7 +37,7 @@ bash package.sh   # 生成 nuance-语差-v0.2.0.zip
 
 ## 四、隐私 / 权限（审核必填）
 
-**隐私政策 URL**：`https://sayright-x4a0.onrender.com/privacy.html`
+**隐私政策 URL**：`https://nuance-drfi.onrender.com/privacy.html`
 
 **单一用途说明**：
 > 帮助用户练习地道英文表达：润色点评、场景预演、对话演练与复习。
@@ -47,7 +47,7 @@ bash package.sh   # 生成 nuance-语差-v0.2.0.zip
 |---|---|
 | `storage` | 在本机保存学习数据与设置，并按配置同步表达和进度。 |
 | `clipboardWrite` | 让用户一键复制润色结果。 |
-| `host: sayright-x4a0.onrender.com` | 云同步服务，按访问口令保存和合并表达与练习进度。 |
+| `host: nuance-drfi.onrender.com` | 云同步服务，按访问口令保存和合并表达与练习进度。 |
 | `host: translate.googleapis.com / mymemory` | 基础中英互译。 |
 
 **数据用途声明**：不要求姓名邮箱，不出售或追踪；输入与所选文本用于学习功能，表达和生成的情境会按配置持久同步。未保存的网页上下文不写入收藏存储。

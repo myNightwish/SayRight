@@ -5,7 +5,7 @@ if(!key) throw new Error('需要现有线上访问口令 TUTOR_MIGRATION_KEY');
 const dir=`backups/sync-live-clear-scripts-${Date.now()}`;
 await fs.mkdir(dir,{recursive:true});
 async function sync(body){
- const response=await fetch('https://sayright-x4a0.onrender.com/sync',{method:'POST',headers:{'Content-Type':'application/json','x-tutor-key':key},body:JSON.stringify(body),signal:AbortSignal.timeout(45000)});
+ const response=await fetch('https://nuance-drfi.onrender.com/sync',{method:'POST',headers:{'Content-Type':'application/json','x-tutor-key':key},body:JSON.stringify(body),signal:AbortSignal.timeout(45000)});
  if(!response.ok)throw new Error(`同步 HTTP ${response.status}`);
  return response.json();
 }

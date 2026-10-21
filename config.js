@@ -1,7 +1,7 @@
 // config.js —— 全站共享的运行期配置，必须最先加载（在 auth.js 和各页脚本之前）。
 //
 // 收藏始终走同一线上环境；扩展模型请求走本机内网桥接服务。
-window.NUANCE_REMOTE_ORIGIN = "https://sayright-x4a0.onrender.com";
+window.NUANCE_REMOTE_ORIGIN = "https://nuance-drfi.onrender.com";
 window.NUANCE_LOCAL_MODEL_ORIGIN = "http://127.0.0.1:48773";
 window.NUANCE_MODEL_ORIGIN = location.protocol === "chrome-extension:"
   ? window.NUANCE_LOCAL_MODEL_ORIGIN
