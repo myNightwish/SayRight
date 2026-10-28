@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-CN" data-nuance-pdf-reader>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nuance · PDF 阅读</title><link rel="stylesheet" href="pdf-reader.css"></head>
+<body>
+<header class="toolbar">
+ <a class="brand" href="collection.html" target="_blank">Nuance <span>PDF 阅读</span></a>
+ <label class="open" for="pdfFile">打开 PDF</label><input id="pdfFile" type="file" accept="application/pdf,.pdf">
+ <span id="fileName">本地阅读</span>
+ <nav aria-label="阅读控制"><select id="selectionMode" aria-label="选择范围"><option value="english">只选英文</option><option value="all">全部文字</option></select><button id="previous" title="上一页" aria-label="上一页" disabled>‹</button><label><input id="pageNumber" type="number" min="1" value="1" aria-label="页码" disabled> / <span id="pageCount">—</span></label><button id="next" title="下一页" aria-label="下一页" disabled>›</button><select id="zoom" aria-label="缩放" disabled><option value="fit">适合宽度</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option><option value="2">200%</option></select></nav>
+</header>
+<p id="status" role="status" aria-live="polite">PDF 留在本机；选中文字后，可直接翻译、收藏或记录对比。</p>
+<main id="reader" aria-label="PDF 阅读区">
+ <section id="empty"><div class="book-icon" aria-hidden="true">▤</div><h1>边读，边把表达带走</h1><p>打开一本 PDF，选中文字就能用。</p><button id="chooseFile">选择本地 PDF</button><p class="muted">也可以拖入文件 · 支持可选中文字的 PDF</p></section>
+ <article id="pdfPage" hidden><canvas id="canvas" aria-hidden="true"></canvas><div id="textLayer" class="textLayer"></div></article>
+</main>
+<script src="config.js"></script><script src="auth.js"></script><script src="sync.js"></script><script src="learning.js"></script><script src="queue-core.js"></script><script src="queue-store.js"></script><script src="capture-core.js"></script><script src="feedback-core.js"></script><script src="dictionary-core.js"></script><script src="pdf-source.js"></script><script src="pdf-selection.js"></script><script src="selection-capture.js"></script><script type="module" src="pdf-reader.js"></script>
+</body></html>

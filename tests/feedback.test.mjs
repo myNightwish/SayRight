@@ -43,11 +43,11 @@ test('re-activating a pattern preserves previous notes, prompt and record identi
  assert.equal(second.key,first.key);assert.equal(second.item.createdAt,200);assert.equal(second.item.situation,'My own prompt');
  assert.equal(second.item.note,'My note');assert.equal(Object.keys(second.map).length,2);
 });
-test('recording feedback does not bypass the existing active practice limit',()=>{
- const map=Object.fromEntries(Array.from({length:20},(_,i)=>[i,{studyState:'active'}]));
+test('marking feedback material keeps existing records and adds a candidate',()=>{
+ const map=Object.fromEntries(Array.from({length:10},(_,i)=>[i,{studyState:'active'}]));
  map.session=core.session(data,source,'Daily','id',100);
- assert.throws(()=>core.activate(map,'session',0,200,learning.canActivate),/20/);
- assert.equal(Object.keys(map).length,21);
+ const result=core.activate(map,'session',0,200,learning.canActivate);assert.equal(result.item.studyState,'active');
+ assert.equal(Object.keys(map).length,11);
 });
 
 test('image endpoint rejects malformed and oversized images before calling the model',async()=>{

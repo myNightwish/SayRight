@@ -14,7 +14,7 @@ window.NUANCE_MODEL_ORIGIN = location.protocol === "chrome-extension:"
   const path = location.pathname.replace(/\/+$/, "");
   const page = path.split("/").pop() || "index.html";
   const active = page === "collection.html"
-    ? "collection"
+    ? (location.hash === "#queue" ? "quiz" : "collection")
     : page === "scene.html"
       ? "scene"
       : page === "chat.html"
@@ -27,8 +27,8 @@ window.NUANCE_MODEL_ORIGIN = location.protocol === "chrome-extension:"
     { key: "collection", href: "collection.html", image: "images/mascot-success-v2.png", label: "表达库" },
     { key: "scene", href: "scene.html", image: "images/mascot-study-v2.png", label: "场景" },
     { key: "polish", href: "polish.html", image: "images/mascot-encourage-v2.png", label: "表达", primary: true },
-    { key: "chat", href: "chat.html?talk=1", image: "images/mascot-waiting-v2.png", label: "对练" },
-    { key: "quiz", href: "quiz.html", image: "images/mascot-thinking-v2.png", label: "练习" },
+    { key: "chat", href: "chat.html?rehearse=1", image: "images/mascot-waiting-v2.png", label: "情境对话" },
+    { key: "quiz", href: "collection.html#queue", image: "images/mascot-thinking-v2.png", label: "正在练" },
   ];
 
   const style = document.createElement("style");

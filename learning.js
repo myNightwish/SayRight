@@ -1,6 +1,6 @@
 // Shared learning rules. Existing records are interpreted without rewriting them.
 (function () {
-  const ACTIVE_LIMIT = 20;
+  const ACTIVE_LIMIT = 10;
   function stateOf(item) {
     if (['inbox', 'active', 'archived'].includes(item.studyState)) return item.studyState;
     return (item.stars > 0 || item.starred) ? 'active' : 'inbox';
@@ -23,8 +23,16 @@
       sourceLabel: source.trim(), origin: 'direct', studyState: 'inbox',
       situations: [], chunks: [], stars: 0, createdAt: now, savedAt: now };
   }
-  function canActivate(map, item) {
-    return stateOf(item) === 'active' || Object.values(map).filter(it => stateOf(it) === 'active').length < ACTIVE_LIMIT;
+  // Marking learning material is unlimited; admission to the pinned window is capped in queue-core.js.
+  function canActivate() { return true; }
+  // Learning state has its own version: a newer note/star must not undo an archive on another device.
+  function mergeVersions(a,b){
+    if(!a)return b;if(!b)return a;
+    const latest=(b.savedAt||0)>=(a.savedAt||0)?b:a;
+    const queue=(b.queueChangedAt||0)>(a.queueChangedAt||0)?b:a;
+    const merged=queue.queueChangedAt?{...latest,studyState:queue.studyState,queueChangedAt:queue.queueChangedAt,queueJoinedAt:queue.queueJoinedAt,queueRoundId:queue.queueRoundId}:latest;
+    const expression=(b.expressionChangedAt||0)>(a.expressionChangedAt||0)?b:a;
+    return expression.expressionChangedAt?{...merged,better:expression.better,originalBetter:expression.originalBetter,adoptedAttemptId:expression.adoptedAttemptId,expressionChangedAt:expression.expressionChangedAt}:merged;
   }
   function addRows(map, rows, source, now) {
     const result = { ...map }; let added = 0;
@@ -36,5 +44,5 @@
     }
     return { map: result, added };
   }
-  (typeof window === "undefined" ? globalThis : window).NuanceLearning = { ACTIVE_LIMIT, stateOf, keyOf, parse, create, canActivate, addRows };
+  (typeof window === "undefined" ? globalThis : window).NuanceLearning = { ACTIVE_LIMIT, stateOf, keyOf, parse, create, canActivate, addRows, mergeVersions };
 })();

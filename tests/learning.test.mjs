@@ -26,9 +26,9 @@ test('explicit states win over legacy stars; legacy data is interpreted without 
  assert.equal(learning.stateOf({stars:4,studyState:'archived'}),'archived');
  assert.equal(learning.stateOf({stars:4,studyState:'inbox'}),'inbox');
 });
-test('active limit prevents additions without evicting legacy active items',()=>{
- const map=Object.fromEntries(Array.from({length:20},(_,i)=>[i,{stars:1}]));
- assert.equal(learning.canActivate(map,{studyState:'inbox'}),false);
+test('marking candidates is unlimited; window admission is capped separately',()=>{
+ const map=Object.fromEntries(Array.from({length:10},(_,i)=>[i,{stars:1}]));
+ assert.equal(learning.canActivate(map,{studyState:'inbox'}),true);
  assert.equal(learning.canActivate(map,map[0]),true);
  map[0]={studyState:'archived',stars:5};
  assert.equal(learning.canActivate(map,{studyState:'inbox'}),true);
@@ -59,11 +59,11 @@ test('practice pool excludes inbox and archived, including starred archived item
  assert.equal(c.currentPool().map(x=>x.better).join(','),'active,legacy');
  c.mode='transfer';assert.equal(c.currentPool().map(x=>x.better).join(','),'active');
 });
-test('chat retrieves active due materials using map keys, not missing embedded keys',async()=>{
+test('chat only uses its explicitly bound window, with no fallback to older library material',async()=>{
  const source=fs.readFileSync('chat.js','utf8');
- const corrections={a:{better:'Due',studyState:'active',situation:'使用情境'},b:{better:'Not due',studyState:'active'},c:{better:'Archived',studyState:'archived',stars:5},d:{better:'Inbox',studyState:'inbox'}};
- const drill={'a::replay':{due:1},'b::replay':{due:Date.now()+86400000}};
- const c={NuanceLearning:learning,CORR_KEY:'c',DRILL_KEY:'d',TALK_MATERIALS_MAX:5,getLocalMap:async key=>key==='c'?corrections:drill};
+ const c={conversationMaterials:null,TALK_MATERIALS_MAX:5,getLocalMap:async()=>assert.fail('must not read an unrelated pool')};
  vm.createContext(c);vm.runInContext(source.slice(source.indexOf('async function pickDueMaterials'),source.indexOf('function escapeHtml')),c);
- const items=await c.pickDueMaterials();assert.equal(items.length,1);assert.equal(items[0].expression,'Due');assert.equal(items[0].intent,'使用情境');
+ assert.equal((await c.pickDueMaterials()).length,0);
+ c.conversationMaterials=[{key:'current',expression:'My approved example'}];
+ const result=await c.pickDueMaterials();assert.equal(result[0].expression,'My approved example');
 });

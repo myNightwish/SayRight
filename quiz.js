@@ -72,7 +72,10 @@ function getDrillState() {
     }
   });
 }
-function setDrillState(map) {
+async function setDrillState(map) {
+  const fresh=await getDrillState();
+  const merged={...fresh};for(const [key,value] of Object.entries(map))if(!merged[key]||(value.savedAt||0)>=(merged[key].savedAt||0))merged[key]=value;
+  map=merged;
   if (hasChromeStorage) return new Promise((r) => chrome.storage.local.set({ [DRILL_KEY]: map }, r));
   try { localStorage.setItem(DRILL_KEY, JSON.stringify(map)); } catch (_) {}
   return Promise.resolve();
@@ -238,7 +241,8 @@ function isWordItem(item) {
 let allItems = []; // 全部可练收藏（有 better 的），用于范围选择
 // 当前练习池：按模式过滤（泛化需有泛化情境）+ 可选只练产出核心。
 function currentPool() {
-  const active = allItems.filter(it => NuanceLearning.stateOf(it) === "active");
+  const active = typeof NuanceQueue!=='undefined'?NuanceQueue.snapshot(Object.fromEntries(allItems.map(x=>[x.key,x])),drillMap).items:allItems.filter(it => NuanceLearning.stateOf(it) === "active");
+  if(active.length>NuanceLearning.ACTIVE_LIMIT)return [];
   return mode === "transfer" ? active.filter(it => Array.isArray(it.situations) && it.situations.length) : active;
 }
 
@@ -493,12 +497,8 @@ function bindVerdictActions() {
   if (f) f.addEventListener("click", markFail);
   if (alternative) alternative.addEventListener("click", markAlternative);
   if (archive) archive.addEventListener("click", async () => {
-    const map = await getCorrections();
-    if (map[current.key]) {
-      map[current.key].createdAt ||= map[current.key].savedAt || Date.now();
-      map[current.key].studyState = "archived"; map[current.key].savedAt = Date.now();
-      await setCorrections(map); window.NuanceSync?.syncSoon();
-    }
+    try{await NuanceQueueStore.run({type:'state',key:current.key,state:'archived'});}
+    catch(error){alert(error.message);archive.disabled=false;return;}
     queue = queue.filter(it => it.key !== current.key);
     allItems = allItems.map(it => it.key === current.key ? { ...it, studyState: "archived" } : it);
     total = Math.max(passed, total - 1); nextQuestion();

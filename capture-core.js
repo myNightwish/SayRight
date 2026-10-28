@@ -27,7 +27,9 @@
     if (!item.situation) item.situation = generated.practiceCue;
     if (!item.personalContext) item.personalContext = generated.personalContext;
     if (!Array.isArray(item.situations) || !item.situations.length) item.situations = [generated.transferCue];
-    item.studyState = active ? 'active' : 'inbox';
+    const nextState=active?'active':'inbox';
+    if(!previous||root.NuanceLearning.stateOf(previous)!==nextState){item.queueChangedAt=now;item.queueJoinedAt=active?now:item.queueJoinedAt;item.queueRoundId=null;}
+    item.studyState = nextState;
     item.createdAt ||= previous?.savedAt || now;
     item.savedAt = now;
     const result = { ...map };
@@ -38,7 +40,7 @@
     const corrections = {...server.corrections};
     for (const [key,item] of Object.entries(fresh.corrections || {})) {
       if (key === '__proto__') continue;
-      if (!corrections[key] || (item.savedAt||0) >= (corrections[key].savedAt||0)) corrections[key]=item;
+      corrections[key]=root.NuanceLearning.mergeVersions(corrections[key],item);
     }
     const tombstones={...server.tombstones};
     for (const [key,time] of Object.entries(fresh.tombstones || {})) tombstones[key]=Math.max(tombstones[key]||0,time);

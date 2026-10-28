@@ -23,7 +23,7 @@ for item in root.iterdir():
         shutil.copy2(item, target)
         if item.name == '.env':
             os.chmod(target, 0o600)
-for folder in ('images', 'icons'):
+for folder in ('images', 'icons', 'vendor'):
     shutil.copytree(root / folder, runtime / folder, dirs_exist_ok=True)
 plist_path.parent.mkdir(parents=True, exist_ok=True)
 log_dir.mkdir(parents=True, exist_ok=True)

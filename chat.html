@@ -371,19 +371,20 @@
     <div class="aurora"></div>
     <div class="wrap">
       <div class="topbar">
-        <span class="brand-name">对练</span>
+        <span class="brand-name">情境对话</span>
         <span id="chatScene" class="scene-label"></span>
         <span id="roleTag" class="role-tag"></span>
         <span class="spacer"></span>
         <a href="polish.html" class="pill topbar-home" title="返回表达页">‹ 表达</a>
         <button id="swapBtn" class="pill top-action" type="button" title="互换角色"><span aria-hidden="true">↔</span><span class="action-label">互换角色</span></button>
         <button id="endBtn" class="pill top-action hidden" type="button" title="结束并复盘"><span aria-hidden="true">✓</span><span class="action-label">结束并复盘</span></button>
-        <button id="restartBtn" class="pill top-action" type="button" title="重新开始"><span aria-hidden="true">↻</span><span class="action-label">重练</span></button>
+        <button id="restartBtn" class="pill top-action" type="button" title="重新开始"><span aria-hidden="true">↻</span><span class="action-label">重新开始</span></button>
       </div>
 
       <!-- 上：对话窗口 -->
       <section class="panel chat-panel">
         <div class="section-title"><span class="dot"></span>对话</div>
+        <p id="materialUpdateNotice" class="chat-hint hidden" role="status"></p>
         <!-- 情景对练：情景卡（你演谁 / 对方谁 / 这场目标），仅 rehearse 模式显示 -->
         <div id="rehearseCard" class="rehearse-card hidden"></div>
         <!-- 陪伴角色：仅日常对练(talk-mode)显示，随对话状态变表情 -->
@@ -429,7 +430,7 @@
     <script src="config.js"></script>
     <script src="auth.js"></script>
     <script src="sync.js"></script>
-    <script src="learning.js"></script>
+    <script src="learning.js"></script><script src="queue-core.js"></script><script src="queue-store.js"></script>
     <script src="chat.js"></script>
   </body>
 </html>

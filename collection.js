@@ -9,6 +9,11 @@ const clearAllBtn = document.querySelector("#clearAll");
 
 let allItems = [];
 let studyFilter = "all";
+let collectionView="library";
+let queueData={items:[],open:[],history:[]};
+let queueDrill={};
+const pendingStars=new Set();
+const pendingLearningRatings=new Set();
 
 const hasChromeStorage = typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
 
@@ -119,7 +124,7 @@ function scorePill(label, val) {
 function feedbackCardHtml(item) {
   const rows = Array.isArray(item.adjustments) ? item.adjustments : [];
   return `<details class="card" data-key="${escapeHtml(item.key)}">
-    <summary class="card-summary"><div class="card-head"><span class="intent-title">${escapeHtml(item.sourceLabel || "本次表达调整")}</span><span class="meta">${rows.length} 处对比 · 不自动复习</span></div><p>${escapeHtml(item.personalContext || "")}</p></summary>
+    <summary class="card-summary"><button class="card-icon card-delete" data-remove="${escapeHtml(item.key)}" type="button" title="删除这份记录" aria-label="删除这份记录"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><div class="card-head"><span class="intent-title">${escapeHtml(item.sourceLabel || "本次表达调整")}</span><span class="meta">${rows.length} 处对比 · 不自动复习</span></div><p>${escapeHtml(item.personalContext || "")}</p></summary>
     <div class="card-body">${item.omitted ? `<p class="feedback-note">有 ${item.omitted} 项无法与原反馈核对或题面包含答案，未纳入记录。</p>` : ""}<p class="feedback-note">这是一份反馈记录，不是 ${rows.length} 项待办。只在近期想再用时，挑一个表达思路安排练习。</p>
       ${!item.originalParagraph ? '<p class="feedback-note">未提供完整原段落，以下只保留反馈中明确出现的原表达，不推测还原。</p>' : `<details><summary>查看原段落</summary><p class="feedback-source">${escapeHtml(item.originalParagraph)}</p></details>`}
       ${item.polishedParagraph ? `<details><summary>查看当时的润色段落</summary><p class="feedback-source">${escapeHtml(item.polishedParagraph)}</p></details>` : ""}
@@ -132,7 +137,6 @@ function feedbackCardHtml(item) {
           <button class="pill" type="button" data-feedback-session="${escapeHtml(item.key)}" data-feedback-index="${index}" ${active ? "disabled" : ""}>${active ? "已安排下次试用" : "下次试用这个表达思路"}</button></section>`;
       }).join("")}
       <details><summary>查看原始 AI 反馈</summary><div class="feedback-source">${escapeHtml(item.sourceFeedback || "")}</div></details>
-      <div class="card-actions"><button class="btn-del" data-remove="${escapeHtml(item.key)}">删除这份记录</button></div>
     </div></details>`;
 }
 
@@ -155,11 +159,13 @@ function cardHtml(item) {
   const toneTag = item.tone ? `<span class="tone-tag">${escapeHtml(item.tone)}语气</span>` : "";
   // 星级：0=只在接收库；1–5=产出核心（星越多越高频，练习/对练优先）。这里可改，收藏当下在 polish 页也能标。
   const studyState = NuanceLearning.stateOf(item);
-  const stateLabel = { inbox: "暂存", active: "正在练", archived: "已能用 / 归档" };
-  const starBox = `<span class="meta">${stateLabel[studyState]}</span>`;
-  const stateControl = `<label class="study-control">学习状态 <select data-study-key="${escapeHtml(item.key)}" aria-label="学习状态：${escapeHtml(item.better)}">${Object.entries(stateLabel).map(([key, label]) => `<option value="${key}" ${key === studyState ? "selected" : ""}>${label}</option>`).join("")}</select></label>
-    <button class="pill" data-edit-cue="${escapeHtml(item.key)}" type="button">编辑使用情境</button>
-    ${item.sourceLabel ? `<p class="note">来源：${/^https?:\/\//.test(item.sourceUrl || "") ? `<a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.sourceLabel)}</a>` : escapeHtml(item.sourceLabel)}</p>` : ""}`;
+  const stateLabel = { inbox: "已收藏", active: "正在练", archived: "归档保留" };
+  const starred = item.stars > 0 || Boolean(item.starred);
+  const pendingMaterial=studyState==='active'&&!queueData.items.some(x=>x.key===item.key);
+  const starBox = `<span class="queue-state ${studyState==='active'&&!pendingMaterial?'is-active':''}">${pendingMaterial?'候补':stateLabel[studyState]}</span>
+    <button type="button" class="header-star ${starred?'is-starred':''}" data-toggle-star="${escapeHtml(item.key)}" aria-label="${starred?'取消标星':'标星'}" aria-pressed="${starred}" title="${starred?'取消标星':'标星'}">${starred?'★':'☆'}</button>`;
+  const queueActions=pendingMaterial?'<button type="button" class="queue-card-action" data-show-queue>查看候补</button>':collectionView==='queue'?`<span class="queue-card-actions"><button type="button" class="queue-card-action" data-queue-state="inbox" data-queue-key="${escapeHtml(item.key)}">移回表达库</button><button type="button" class="queue-card-action" data-queue-state="archived" data-queue-key="${escapeHtml(item.key)}">归档</button></span>`:studyState==='active'?`<button type="button" class="queue-card-action" data-show-queue>查看正在练</button>`:`<button type="button" class="queue-card-action primary" data-queue-state="active" data-queue-key="${escapeHtml(item.key)}">${studyState==='archived'?'重新标记想练':'标记想练'}</button>`;
+  const source = item.sourceLabel ? `<span class="card-source" title="${escapeHtml(item.sourceLabel)}">来源：${/^https?:\/\//.test(item.sourceUrl || "") ? `<a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.sourceLabel)}</a>` : escapeHtml(item.sourceLabel)}</span>` : "";
   const inputLine = item.input && item.input !== item.better
     ? `<div class="input-line">原句：${escapeHtml(item.input)}</div>`
     : "";
@@ -192,39 +198,20 @@ function cardHtml(item) {
         .join("")}</div>`
     : "";
 
-  // 语气版本：作为展开区内容之一。每种语气一行、标签点亮、可单独朗读。
-  let tonesHtml = "";
-  if (Array.isArray(item.tones) && item.tones.length) {
-    const rows = item.tones.map((t) =>
-      `<div class="tone-row">
-        <span class="tone-name">${escapeHtml(t.label)}</span>
-        <span class="tone-val">${escapeHtml(t.text)}</span>
-        <button class="speak tone-speak" data-speak-text="${escapeHtml(t.text)}" title="朗读">🔊</button>
-      </div>`
-    ).join("");
-    tonesHtml = `<div class="tones-block">
-      <div class="tones-title">换个语气这样说 · ${item.tones.length} 种</div>
-      ${rows}
-    </div>`;
-  }
-
-  // 展开区里有多少「额外信息」，用来在摘要上给个小标记（让人知道点开有货）。
-  const extras = [construct, impression, scoresHtml, inputLine, note, tonesHtml].filter(Boolean).length;
-  const toneCount = Array.isArray(item.tones) ? item.tones.length : 0;
-  const moreHint = toneCount
-    ? `<span class="more-hint">含 ${toneCount} 种语气</span>`
-    : (extras ? `<span class="more-hint">展开看详情</span>` : "");
+  const extras = [construct, impression, scoresHtml, inputLine, note].filter(Boolean).length;
+  const moreHint = extras ? `<span class="more-hint">展开看详情</span>` : "";
 
   // 整张卡片折叠：<details> 默认收起，只显示摘要（场景标签 + 意图 + 地道说法）。
-  // 点标题展开才显示构式/评分/语气/笔记等，一屏能扫更多条、按需深入。
+  // 点标题展开才显示构式/评分/笔记等，一屏能扫更多条、按需深入。
   return `
-    <details class="card ${studyState === "active" ? "starred" : ""}" data-key="${escapeHtml(item.key)}">
+    <details class="card ${starred ? "starred" : ""}" data-key="${escapeHtml(item.key)}">
       <summary class="card-summary">
+        <button class="card-icon card-delete" data-remove="${escapeHtml(item.key)}" type="button" title="删除这条表达" aria-label="删除这条表达"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
         <div class="card-head">
           <div class="title-wrap">
-            ${sceneTag}
-            ${toneTag}
-            <span class="intent-title">${escapeHtml(title)}</span>
+            <span class="card-tags">${sceneTag}${toneTag}${source}</span>
+            <span class="title-with-edit"><span class="intent-title">${escapeHtml(title)}</span>
+            <button class="card-icon card-edit" data-edit-cue="${escapeHtml(item.key)}" type="button" title="编辑使用情境" aria-label="编辑使用情境"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15l-1 6Z"/></svg></button></span>
           </div>
           <div class="head-right">
             ${starBox}
@@ -237,6 +224,7 @@ function cardHtml(item) {
         </div>
         <div class="summary-foot">
           ${moreHint}
+          ${queueActions}
           <span class="chevron" aria-hidden="true">▾</span>
         </div>
       </summary>
@@ -246,31 +234,36 @@ function cardHtml(item) {
         ${scoresHtml}
         ${inputLine}
         ${note}
-        ${tonesHtml}
-        ${stateControl}
-        <div class="card-actions">
-          <button class="btn-del" data-remove="${escapeHtml(item.key)}">删除</button>
-        </div>
       </div>
     </details>
   `;
 }
 
 function render(items) {
+  const openKeys=new Set([...listEl.querySelectorAll("details[data-key][open]")].map(card=>card.dataset.key));
   const expressions=allItems.filter(it => it.origin !== "feedback-session");
   const active = expressions.filter(it => NuanceLearning.stateOf(it) === "active").length;
   const inbox = expressions.filter(it => NuanceLearning.stateOf(it) === "inbox").length;
   const feedbackCount=allItems.length-expressions.length;
-  if (!document.querySelector("#paneCorrections").classList.contains("hidden")) countEl.textContent = `正在练 ${active} / ${NuanceLearning.ACTIVE_LIMIT} · 暂存 ${inbox} · 调整记录 ${feedbackCount} 次`;
+  if (!document.querySelector("#paneCorrections").classList.contains("hidden")) countEl.textContent = collectionView==='queue'?(queueData.needsSelection?'本轮待选材料':`${queueData.items.length} 条本轮材料`): `共 ${expressions.length} 条表达 · ${feedbackCount} 次调整记录`;
 
+  if(collectionView==='queue'){
+    listNavEl.innerHTML='';
+    NuanceWorkspace.render(queueData,{host:listEl,openLibrary:()=>switchTab('corrections'),notice:message=>document.querySelector('#queueStatus').textContent=message,
+      admit:async key=>{await NuanceQueueStore.run({type:'admit',key});await load();},
+      newWindow:async()=>{await NuanceQueueStore.run({type:'new-window'});await load();},
+      rate:async(key,score)=>{pendingLearningRatings.add(key);try{const saved=await NuanceQueueStore.run({type:'rate',key,score});return updateLearningState(saved);}finally{pendingLearningRatings.delete(key);}},
+      adopt:async(key,attemptId)=>{await NuanceQueueStore.run({type:'adopt',key,attemptId});await load();},
+      check:async input=>{const saved=await NuanceQueueStore.check(input);return {...saved,snapshot:saved.corrections?updateLearningState(saved):queueData};}
+    });return;
+  }
   if (!items.length) {
     listNavEl.innerHTML = "";
-    const message = allItems.length
-      ? "没有匹配的收藏。"
-      : "可以直接粘贴学到的表达，不必先润色。";
+    const message = collectionView==='queue'?(searchEl.value.trim()?'没有匹配的正在练表达。':'先从表达库挑一两条近期想用的表达，不必填满 10 条。'):allItems.length?'没有匹配的收藏。':'暂无收藏。阅读网页或 PDF 时，可以选中表达收藏。';
     listEl.innerHTML = `<div class="empty"><img src="images/mascot-comfort-v2.png" alt="Coco 正在等待你的收藏" /><span>${message}</span></div>`;
     return;
   }
+
 
   // 先按日期聚合，给每个日期一个锚点 id，供左侧目录跳转。
   const dayGroups = [];
@@ -303,14 +296,15 @@ function render(items) {
     html += `<div class="cards-grid">${g.items.map(cardHtml).join("")}</div>`;
   }
   listEl.innerHTML = html;
+  for(const card of listEl.querySelectorAll("details[data-key]"))if(openKeys.has(card.dataset.key))card.open=true;
 }
 
 function applyFilter() {
   const q = searchEl.value.trim().toLowerCase();
-  let items = allItems;
+  let items = collectionView==='queue'?queueData.items:allItems;
   // 「只看核心」：只留星级≥1（已晋升进产出核心）的。
-  if (studyFilter === "feedback") items=items.filter(it => it.origin === "feedback-session");
-  else if (studyFilter !== "all") items = items.filter(it => it.origin !== "feedback-session" && NuanceLearning.stateOf(it) === studyFilter);
+  if (collectionView==='library' && studyFilter === "feedback") items=items.filter(it => it.origin === "feedback-session");
+  else if (collectionView==='library' && studyFilter !== "all") items = items.filter(it => it.origin !== "feedback-session" && NuanceLearning.stateOf(it) === studyFilter);
   if (q) {
     items = items.filter((item) => {
       const hay = `${item.situation || ""} ${item.intent || ""} ${item.scene || ""} ${item.input || ""} ${item.better || ""} ${item.note || ""} ${item.sourceLabel || ""} ${item.personalContext || ""} ${JSON.stringify(item.adjustments || [])}`;
@@ -320,22 +314,61 @@ function applyFilter() {
   render(items);
 }
 
-async function load() {
-  const map = await getCorrections();
-  allItems = Object.entries(map)
-    .map(([key, value]) => ({ key, ...value }))
-    .sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+async function load({skipUnchanged=false}={}) {
+  const beforeWindow=windowSignature(queueData);
+  const result=await NuanceQueueStore.run({type:'reconcile'});
+  const map=result.corrections;queueDrill=result.drillState;
+  queueData=NuanceQueue.snapshot(map,queueDrill);renderQueueOverview();
+  const nextItems = Object.entries(map)
+    .map(([key, value]) => Object.assign({ key }, value, { key }))
+    .sort((a, b) => (b.createdAt || b.savedAt || 0) - (a.createdAt || a.savedAt || 0) || a.key.localeCompare(b.key));
+  // A successful sync commonly returns the same local edit; keep the live DOM and focus.
+  if(skipUnchanged && JSON.stringify(nextItems)===JSON.stringify(allItems)){if(collectionView==='queue'&&beforeWindow!==windowSignature(queueData))applyFilter();return;}
+  allItems=nextItems;
   applyFilter();
 }
 
 listEl.addEventListener("click", async (event) => {
+  const showQueue=event.target.closest('[data-show-queue]');
+  if(showQueue){event.preventDefault();event.stopPropagation();switchTab('queue');return;}
+  const queueButton=event.target.closest('[data-queue-state]');
+  if(queueButton){
+    event.preventDefault();event.stopPropagation();queueButton.disabled=true;
+    try{
+      await NuanceQueueStore.run({type:'state',key:queueButton.dataset.queueKey,state:queueButton.dataset.queueState});
+      document.querySelector('#queueStatus').textContent=queueButton.dataset.queueState==='active'?'已标记想练；本轮已开始时，需在候补中确认补入。':queueButton.dataset.queueState==='archived'?'已归档保留，不会自动补入新表达。':'已移回表达库，收藏与练习历史保留。';
+      await load();
+    }catch(error){document.querySelector('#queueStatus').textContent=error.message;queueButton.disabled=false;}
+    return;
+  }
+  const star=event.target.closest('[data-toggle-star]');
+  if(star){
+    event.preventDefault();event.stopPropagation();
+    const key=star.dataset.toggleStar;if(pendingStars.has(key))return;
+    pendingStars.add(key);star.setAttribute('aria-busy','true');
+    try{
+      const map=await getCorrections(),item=map[star.dataset.toggleStar];if(!item)return;
+      // Preserve legacy learning state: starring is an independent preference.
+      item.studyState=NuanceLearning.stateOf(item);
+      const enabled=item.stars>0||Boolean(item.starred);
+      item.stars=enabled?0:1;item.starred=!enabled;
+      item.createdAt ||= item.savedAt||Date.now();item.savedAt=Date.now();
+      // Cache the local edit before storage.onChanged can echo it back.
+      const cached=allItems.find(x=>x.key===key);if(cached)Object.assign(cached,item);
+      const card=star.closest('details');card?.classList.toggle('starred',!enabled);
+      star.classList.toggle('is-starred',!enabled);star.textContent=enabled?'☆':'★';
+      star.title=star.ariaLabel=enabled?'标星':'取消标星';star.setAttribute('aria-pressed',String(!enabled));
+      await setCorrections(map);window.NuanceSync?.syncSoon();
+    }catch(_){await load();alert('标星未保存，请重试。');}
+    finally{pendingStars.delete(key);star.removeAttribute('aria-busy');}
+    return;
+  }
+
   const practice=event.target.closest("[data-feedback-session]");
   if(practice){
     practice.disabled=true;
     try {
-      const latest=await getCorrections();
-      const result=NuanceFeedback.activate(latest,practice.dataset.feedbackSession,Number(practice.dataset.feedbackIndex),Date.now(),NuanceLearning.canActivate);
-      await setCorrections(result.map);window.NuanceSync?.syncSoon();await load();
+      await NuanceQueueStore.run({type:'feedback',sessionKey:practice.dataset.feedbackSession,index:Number(practice.dataset.feedbackIndex)});await load();
       const section=[...listEl.querySelectorAll("details[data-key]")].find(el=>el.dataset.key===practice.dataset.feedbackSession);
       if(section)section.open=true;
     } catch(error) {alert(error.message || "未能保存，请重试");practice.disabled=false;}
@@ -343,6 +376,7 @@ listEl.addEventListener("click", async (event) => {
   }
   const edit = event.target.closest("[data-edit-cue]");
   if (edit) {
+    event.preventDefault();event.stopPropagation();
     const map = await getCorrections();
     const item = map[edit.dataset.editCue];
     if (!item) return;
@@ -368,13 +402,19 @@ listEl.addEventListener("click", async (event) => {
     return;
   }
 
-  const key = event.target.getAttribute("data-remove");
-  if (!key) return;
-  const map = await getCorrections();
-  delete map[key];
-  await setCorrections(map);
-  if (window.NuanceSync) window.NuanceSync.recordDelete(key);
-  await load();
+  const remove = event.target.closest("[data-remove]");
+  if (!remove) return;
+  event.preventDefault();event.stopPropagation();
+  const key = remove.dataset.remove;
+  if (!confirm("确定删除这条收藏吗？删除后会同步到其他设备。")) return;
+  remove.disabled=true;
+  try {
+    const map = await getCorrections();
+    delete map[key];
+    await setCorrections(map);
+    if (window.NuanceSync) window.NuanceSync.recordDelete(key);
+    await load();
+  } catch (_) {alert("删除失败，请重试。");remove.disabled=false;}
 });
 
 clearAllBtn.addEventListener("click", async () => {
@@ -408,15 +448,15 @@ listNavEl.addEventListener("click", (event) => {
 if (hasChromeStorage) {
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "local") return;
-    if (changes[STORAGE_KEY]) load();
+    if (changes[STORAGE_KEY]||changes.drillState) load({skipUnchanged:true}).catch(queueLoadError);
     if (changes[SCENE_KEY]) loadScenes();
   });
 }
 
 // 云同步写回本地后，重渲染两个 tab（拉到别的设备新增/删除的收藏）。
-window.addEventListener("nuance:synced", () => { load(); loadScenes(); });
+window.addEventListener("nuance:synced", () => { load({skipUnchanged:true}).catch(queueLoadError); loadScenes(); });
 
-load();
+load().catch(queueLoadError);
 
 // ===== tab 2：场景预演收藏 =====
 // 与润色收藏(corrections)隔离，单独存在 sceneSaves 键，按「场景空间」分组展示。
@@ -454,14 +494,28 @@ function setScenes(map) {
 
 function switchTab(tab) {
   const isScenes = tab === "scenes";
+  history.replaceState(null,'',tab==='queue'?'#queue':tab==='scenes'?'#scenes':'#library');
   tabScenes.classList.toggle("active", isScenes);
-  tabCorrections.classList.toggle("active", !isScenes);
+  collectionView=tab==='queue'?'queue':'library';
+  document.querySelector('#tabQueue').classList.toggle('active',tab==='queue');
+  tabCorrections.classList.toggle("active", !isScenes&&tab!=='queue');
   paneScenes.classList.toggle("hidden", !isScenes);
   paneCorrections.classList.toggle("hidden", isScenes);
-  pageTitle.textContent = isScenes ? "我的场景演练收藏" : "我的表达";
+  pageTitle.textContent = isScenes ? "我的场景演练收藏" : collectionView==='queue'?'正在练':'我的表达';
+  document.querySelector('#queueOverview').hidden=isScenes||collectionView!=='queue';
+  document.querySelector('#paneCorrections .toolbar').hidden=collectionView==='queue';
+  document.querySelector('#queueHistory').hidden=isScenes||collectionView!=='queue';
+  document.querySelector('#studyFilter').closest('label').hidden=collectionView==='queue';
+  document.querySelector('#libraryManagement').hidden=collectionView==='queue';
+  for(const link of document.querySelectorAll('#paneCorrections .toolbar > a'))link.hidden=collectionView==='queue';
+  document.querySelector('#paneCorrections .scene-layout').classList.toggle('is-queue',collectionView==='queue');
+  searchEl.placeholder=collectionView==='queue'?'搜索正在练的表达…':'搜索意图、场景、原句或地道说法…';
+  document.querySelector('#queueStatus').textContent='';
+  if(!isScenes)applyFilter();else countEl.textContent=`共 ${sceneItems.length} 条场景收藏`;
 }
 tabCorrections.addEventListener("click", () => switchTab("corrections"));
 tabScenes.addEventListener("click", () => switchTab("scenes"));
+document.querySelector("#tabQueue").addEventListener("click",()=>switchTab("queue"));
 
 function sceneCardHtml(item) {
   const isWord = item.type === "word";
@@ -564,7 +618,7 @@ function applySceneFilter() {
 async function loadScenes() {
   const map = await getScenes();
   sceneItems = Object.entries(map)
-    .map(([key, value]) => ({ key, ...value }))
+    .map(([key, value]) => Object.assign({ key }, value, { key }))
     .sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
   applySceneFilter();
 }
@@ -657,124 +711,52 @@ window.addEventListener("scroll", () => {
 
 loadScenes();
 
-// Direct capture is deliberately local: no polish request and no rewrite.
-const captureText = document.querySelector("#captureText");
-const capturePreview = document.querySelector("#capturePreview");
-const captureStatus = document.querySelector("#captureStatus");
-const saveCapture = document.querySelector("#saveCapture");
-let captureRows = [];
-function invalidateCapture() { captureRows = []; capturePreview.innerHTML = ""; saveCapture.hidden = true; }
-captureText.addEventListener("input", invalidateCapture);
-document.querySelector("#previewCapture").addEventListener("click", async () => {
-  captureRows = NuanceLearning.parse(captureText.value);
-  if (captureRows.length > 200) { captureStatus.textContent = "一次最多 200 条，请分批加入。"; invalidateCapture(); return; }
-  const map = await getCorrections();
-  capturePreview.innerHTML = captureRows.map((row, i) => {
-    const exists = Object.hasOwn(map, NuanceLearning.keyOf(row.expression));
-    return `<label class="capture-row"><input type="checkbox" data-capture-index="${i}" ${exists ? "disabled" : "checked"} /> ${escapeHtml(row.expression)} ${exists ? "（已存在，保留原记录）" : ""}${row.cue ? `<br/><small>${escapeHtml(row.cue)}</small>` : ""}</label>`;
-  }).join("");
-  saveCapture.hidden = !captureRows.some(row => !Object.hasOwn(map, NuanceLearning.keyOf(row.expression)));
-  captureStatus.textContent = captureRows.length ? "取消勾选不想留下的表达。重复项不会覆盖已有内容或进度。" : "请先粘贴至少一条表达。";
-});
-saveCapture.addEventListener("click", async () => {
-  saveCapture.disabled = true;
-  try {
-    const latest = await getCorrections(); // Re-read after preview; never overwrite an existing record.
-    const selected = [...capturePreview.querySelectorAll("input:checked:not(:disabled)")].map(checkbox => captureRows[Number(checkbox.dataset.captureIndex)]);
-    const { map, added } = NuanceLearning.addRows(latest, selected, document.querySelector("#captureSource").value, Date.now());
-    if (!added) { captureStatus.textContent = "没有选中新的表达。"; return; }
-    await setCorrections(map);
-    window.NuanceSync?.syncSoon();
-    captureText.value = ""; invalidateCapture(); await load();
-    captureStatus.textContent = `已在本机暂存 ${added} 条。云同步成功后会显示确认；从列表中选择少量表达设为「正在练」。`;
-  } catch (_) { captureStatus.textContent = "未能保存，请保留输入并检查本地存储空间。"; }
-  finally { saveCapture.disabled = false; }
-});
-window.addEventListener("nuance:synced", () => { if (captureStatus.textContent.startsWith("已在本机暂存")) captureStatus.textContent = "已同步到云端。挑少量表达开始练习即可。"; });
-window.addEventListener("nuance:sync-error", () => { captureStatus.textContent = "云同步暂未完成；已保存的表达仍在本机，稍后重试。"; });
-listEl.addEventListener("change", async event => {
-  const control = event.target.closest("[data-study-key]");
-  if (!control) return;
-  try {
-    const map = await getCorrections(), item = map[control.dataset.studyKey];
-    if (!item) return;
-    const next = control.value;
-    if (next === "active" && NuanceLearning.stateOf(item) !== "active") {
-      if (!NuanceLearning.canActivate(map, item)) {
-        alert("正在练的表达已有 20 条。先将暂时不需要的表达移回暂存或归档，再加入新的。已有数据不会被移除。"); await load(); return;
-      }
-      if (!item.situation && !item.intent) {
-        const cue = prompt("什么情况下你会想用这句话？补充一个中文情境，练习时不会显示答案。", "");
-        if (!cue?.trim()) { await load(); return; }
-        item.situation = cue.trim();
-      }
-    }
-    item.createdAt ||= item.savedAt || Date.now();
-    item.studyState = next; item.savedAt = Date.now();
-    await setCorrections(map); window.NuanceSync?.syncSoon(); await load();
-  } catch (_) { alert("状态未保存，请检查本地存储空间后重试。"); await load(); }
-});
+listEl.addEventListener('change',async event=>{const control=event.target.closest('[data-study-key]');if(!control)return;try{await NuanceQueueStore.run({type:'state',key:control.dataset.studyKey,state:control.value});await load();}catch(error){alert(error.message);await load();}});
 
-// Record a whole coaching feedback as one session, without manufacturing a full original paragraph.
-const feedbackText=document.querySelector("#feedbackText");
-const feedbackStatus=document.querySelector("#feedbackStatus");
-const saveFeedback=document.querySelector("#saveFeedback");
-saveFeedback.addEventListener("click", async()=>{
-  const text=feedbackText.value.trim();
-  if(text.length<20||text.length>20000){feedbackStatus.textContent="请粘贴包含对比部分的完整反馈（20～20000 字符）。";return;}
-  saveFeedback.disabled=true;
-  feedbackStatus.textContent="正在整理原表达、调整与原因，不会重新润色你的段落…";
-  try {
-    const bytes=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(text));
-    const id=Array.from(new Uint8Array(bytes),value=>value.toString(16).padStart(2,"0")).join("");
-    const key="feedback:"+id;
-    let latest=await getCorrections();
-    if(!Object.hasOwn(latest,key)){
-      const response=await fetch(`${window.NUANCE_MODEL_ORIGIN || location.origin}/feedback`,{
-        method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text}),signal:AbortSignal.timeout(150000)
-      });
-      const result=await response.json();if(!response.ok)throw new Error(result.error||"整理失败，请重试");
-      const data=NuanceFeedback.validate(result,text);if(data && Number.isInteger(result.omitted))data.omitted=result.omitted;if(!data)throw new Error("返回内容无法与原反馈核对，没有保存。请重试。");
-      latest=await getCorrections();
-      if(!Object.hasOwn(latest,key)){
-        const title=document.querySelector("#feedbackTitle").value.trim()||`每日英语 · ${new Date().toLocaleDateString("zh-CN")}`;
-        Object.defineProperty(latest,key,{value:NuanceFeedback.session(data,text,title,id,Date.now()),enumerable:true,writable:true,configurable:true});
-        await setCorrections(latest);window.NuanceSync?.syncSoon();
-      }
-      feedbackStatus.textContent=`已在本机记下这次反馈的 ${data.adjustments.length} 处调整，没有增加复习任务。`;
-    } else feedbackStatus.textContent="这份反馈已经记录过，已为你打开，没有重复新增或覆盖原记录。";
-    studyFilter="feedback";document.querySelector("#studyFilter").value="feedback";await load();
-    const card=[...listEl.querySelectorAll("details[data-key]")].find(el=>el.dataset.key===key);
-    if(card){card.open=true;card.scrollIntoView({behavior:"smooth",block:"start"});}
-    if(feedbackText.value.trim()===text)feedbackText.value="";
-  } catch(error){feedbackStatus.textContent=error.message||"未能记录，请保留粘贴的内容后重试。";}
-  finally{saveFeedback.disabled=false;}
-});
-window.addEventListener("nuance:synced",()=>{if(feedbackStatus.textContent.startsWith("已在本机记下"))feedbackStatus.textContent=feedbackStatus.textContent.replace("已在本机记下","已同步保存");});
+const libraryMenu=document.querySelector('.library-management');
+document.addEventListener('pointerdown',event=>{if(libraryMenu?.open&&!libraryMenu.contains(event.target))libraryMenu.open=false;});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&libraryMenu?.open){libraryMenu.open=false;libraryMenu.querySelector('summary').focus();}});
 
-// A deliberate paste/file choice is the only image input; never poll the clipboard.
-let imageFeedbackBusy=false;
-async function recordFeedbackImage(file){
-  if(imageFeedbackBusy)return;
-  if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>5*1024*1024){feedbackStatus.textContent='请使用不超过 5 MB 的 PNG、JPEG 或 WebP 图片';return;}
-  imageFeedbackBusy=true;saveFeedback.disabled=true;feedbackStatus.textContent='正在识别截图并整理对比…';
-  try{
-    const image=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('图片读取失败'));r.readAsDataURL(file);});
-    const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(image));
-    const id=Array.from(new Uint8Array(hash),x=>x.toString(16).padStart(2,'0')).join(''),key='feedback-image:'+id;
-    let latest=await getCorrections();
-    if(!Object.hasOwn(latest,key)){
-      const response=await fetch(`${window.NUANCE_MODEL_ORIGIN||location.origin}/feedback-image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image}),signal:AbortSignal.timeout(110000)});
-      const result=await response.json();if(!response.ok)throw new Error(result.error||'图片识别失败');
-      const data=NuanceFeedback.validate(result,result.extractedText);if(!data)throw new Error('识别结果不完整，没有保存');
-      latest=await getCorrections();
-      if(!Object.hasOwn(latest,key)){latest[key]=NuanceFeedback.session(data,result.extractedText,document.querySelector('#feedbackTitle').value.trim()||'截图中的表达调整',id,Date.now());await setCorrections(latest);window.NuanceSync?.syncSoon();}
-    }
-    feedbackStatus.textContent=`已在本机记下 ${latest[key].adjustments.length} 组调整，请核对识别文字。没有增加复习任务。`;
-    studyFilter='feedback';document.querySelector('#studyFilter').value='feedback';await load();
-    const card=[...listEl.querySelectorAll('details[data-key]')].find(el=>el.dataset.key===key);if(card){card.open=true;card.scrollIntoView({behavior:'smooth',block:'start'});}
-  }catch(error){feedbackStatus.textContent=error.message||'识别失败，请重试';}
-  finally{imageFeedbackBusy=false;saveFeedback.disabled=false;document.querySelector('#feedbackImage').value='';}
+function renderQueueOverview(){
+  const count=queueData.items.length;
+  document.querySelector('#queueTabCount').textContent=count;
+  document.querySelector('#queueTitle').textContent=`正在练 · ${count} / 10`;
+  const start=queueData.open.length?Math.min(...queueData.open.map(x=>x.startedAt)):null;
+  document.querySelector('#queueDescription').textContent=`${queueData.readyCount||0} / ${count} 张自评达到 4 分。全部达到 4 分后，可开启情境对话。`;
+  document.querySelector('#queueWarning').hidden=true;
+  document.querySelector('#endRound').disabled=!queueData.open.length;
+  document.querySelector('#manageRound').hidden=!queueData.candidates?.length;
+  const dialogue=document.querySelector('#startLearnedDialogue');dialogue.disabled=!queueData.ready;dialogue.textContent=queueData.ready?'开启情境对话':count?`情境对话 · 还差 ${count-(queueData.readyCount||0)} 张达到 4 分`:'情境对话';
+  document.querySelector('#roundCount').textContent=queueData.history.length;
+  document.querySelector('#roundHistoryList').innerHTML=queueData.history.length?queueData.history.map(round=>`<article class="round-record"><h3>${new Date(round.startedAt).toLocaleDateString('zh-CN')} — ${new Date(round.endedAt).toLocaleDateString('zh-CN')} · ${round.members.size} 条表达</h3><p>${round.endReason==='selection'?'历史标记已整理，原资料保留。':'已结束本轮关注，归档不代表永久掌握。'}</p><ul>${[...round.members.values()].map(item=>`<li>${escapeHtml(item.expression)} <span class="meta">${item.status==='archive'?'归档保留':item.status==='leave'?'已移出':'本轮记录'}</span></li>`).join('')}</ul></article>`).join(''):'<p>结束本轮后，可在这里回看成员记录。</p>';
 }
-document.querySelector('#feedbackImage').addEventListener('change',event=>{if(event.target.files[0])recordFeedbackImage(event.target.files[0]);});
-feedbackText.addEventListener('paste',event=>{const file=[...event.clipboardData.items].find(x=>x.kind==='file'&&x.type.startsWith('image/'))?.getAsFile();if(file){event.preventDefault();recordFeedbackImage(file);}});
+let confirmedBatch=null;
+const queueEndDialog=document.querySelector('#queueEndDialog');
+document.querySelector('#endRound').addEventListener('click',()=>{
+  const keys=queueData.items.map(x=>x.key),roundIds=queueData.open.map(x=>x.id);if(!roundIds.length)return;
+  confirmedBatch={keys,roundIds};
+  document.querySelector('#queueEndMessage').textContent=`当前 ${keys.length} 条表达将归档保留，不会自动补入新表达。`;
+  queueEndDialog.showModal();
+});
+document.querySelector('#cancelEndRound').addEventListener('click',()=>{confirmedBatch=null;queueEndDialog.close();});
+document.querySelector('#confirmEndRound').addEventListener('click',async event=>{
+  if(!confirmedBatch)return;const batch=confirmedBatch,button=event.currentTarget;button.disabled=true;
+  try{await NuanceQueueStore.run({type:'end',...batch});confirmedBatch=null;queueEndDialog.close();await load();document.querySelector('#queueStatus').textContent='本轮已结束。准备好时，再从表达库选择下一轮。';}
+  catch(error){document.querySelector('#queueEndMessage').textContent=error.message;}
+  finally{button.disabled=false;}
+});
+queueEndDialog.addEventListener('cancel',()=>{confirmedBatch=null;});
+function queueLoadError(error){document.querySelector('#queueStatus').textContent=error.message||'学习数据暂未加载，请重试。';}
+
+if(location.hash==='#queue')switchTab('queue');else if(location.hash==='#scenes')switchTab('scenes');
+
+document.querySelector('#manageRound').addEventListener('click',()=>NuanceWorkspace.manage());
+
+function windowSignature(value){return JSON.stringify([value.windowId,(value.items||[]).map(x=>[x.key,pendingLearningRatings.has(x.key)?0:x.selfRating]),(value.candidates||[]).map(x=>x.key)]);}
+function updateLearningState(saved){queueDrill=saved.drillState;queueData=NuanceQueue.snapshot(saved.corrections,queueDrill);renderQueueOverview();return queueData;}
+document.querySelector('#startLearnedDialogue').addEventListener('click',async()=>{
+  const saved=await NuanceQueueStore.run({type:'reconcile'}),current=updateLearningState(saved);
+  if(!current.ready){document.querySelector('#queueStatus').textContent='本轮所有卡片自评达到 4 分后，再开启对话。';return;}
+  location.href='chat.html?rehearse=1&window='+encodeURIComponent(current.windowId)+'&start='+Date.now();
+});
+document.querySelector('#openPracticeWindow').addEventListener('click',event=>{event.preventDefault();switchTab('queue');});

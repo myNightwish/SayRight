@@ -74,7 +74,7 @@
     for (const [k, v] of Object.entries(incoming || {})) {
       if (!v || typeof v !== "object") continue;
       const cur = out[k];
-      if (!cur || (v.savedAt || 0) >= (cur.savedAt || 0)) out[k] = v;
+      out[k]=window.NuanceLearning?.mergeVersions(cur,v)||(!cur||(v.savedAt||0)>=(cur.savedAt||0)?v:cur);
     }
     return out;
   }

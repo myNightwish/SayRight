@@ -1,0 +1,4779 @@
+{
+  "metadata": {
+    "episode": "S01E01",
+    "source_docx": "/Users/maomao/Desktop/the big bang theroy/S01/docx/TheBigBangS01E01.docx",
+    "review_date": "2026-10-26",
+    "verification": "已逐条审阅用户提供的双语文本编号1至416；未核对原剧音视频，未与独立官方剧本交叉核对。",
+    "frequency_basis": "常用性为教学判断，未进行语料库频率统计。",
+    "tiers": {
+      "A": "优先主动练习",
+      "B": "进阶复用，注意语气或结构",
+      "C": "辨认即可，暂不主动模仿"
+    },
+    "counts": {
+      "A": 40,
+      "B": 36,
+      "C": 8
+    }
+  },
+  "reviewed_line_count": 416,
+  "lines": [
+    {
+      "source_line": 1,
+      "source_text": [
+        "将光子正对平面上的双缝 观察任意一个隙缝",
+        "so ***** with two slits in it and either slit is observed,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "物理讨论；保留可复用的追问，其余专业内容不作核心",
+      "source_issue": "英文缺失"
+    },
+    {
+      "source_line": 2,
+      "source_text": [
+        "它不会穿过那两个隙缝",
+        "it will not go through both slits."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "物理讨论；保留可复用的追问，其余专业内容不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 3,
+      "source_text": [
+        "如果没被观察 那就会",
+        "If it's unobserved, it will."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "物理讨论；保留可复用的追问，其余专业内容不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 4,
+      "source_text": [
+        "总之 如果观察它在离开平面到击中目标之前",
+        "However,if it's observed after it's left the plane but before it hits its target,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "物理讨论；保留可复用的追问，其余专业内容不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 5,
+      "source_text": [
+        "它就不会穿过那两个隙缝",
+        "it will not have gone though both slits."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "物理讨论；保留可复用的追问，其余专业内容不作核心",
+      "source_issue": "though 应为 through"
+    },
+    {
+      "source_line": 6,
+      "source_text": [
+        "没错 但你为什么要说这个?",
+        "Agreed. What's your point?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-041"
+      ],
+      "review_note": "原句可能显得不耐烦；先练例句这类缓和表达。",
+      "source_issue": null
+    },
+    {
+      "source_line": 7,
+      "source_text": [
+        "没什么 我只是觉得这个主意 可以用于设计T恤衫",
+        "There's no point. I just think it's a good idea for a t-shirt."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "物理讨论；保留可复用的追问，其余专业内容不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 8,
+      "source_text": [
+        "请问",
+        "Excuse me."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-001"
+      ],
+      "review_note": "第238条同一句是对前句话的疑问；含义随语境变化。",
+      "source_issue": null
+    },
+    {
+      "source_line": 9,
+      "source_text": [
+        "等等",
+        "Hang on."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-002"
+      ],
+      "review_note": "可表示等时间，也可表示“等等，你是说……”；口语。",
+      "source_issue": null
+    },
+    {
+      "source_line": 10,
+      "source_text": [
+        "横1是Aegean (爱情海)",
+        "Uh,one across is \"aegean. \""
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 11,
+      "source_text": [
+        "竖8是Nabokov (小说洛丽塔的作者) 横26是MCM",
+        "Eight down is \"nabokov. \" 26 across is \"mcm. \""
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 12,
+      "source_text": [
+        "竖14是...手指挪开点",
+        "14 down is... move your finger..."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 13,
+      "source_text": [
+        "Phylum (生物门类) 这样一来横14就是Port-au-Prince (太子港)",
+        "\"phylum\" which makes 14 across \"port-au-prince\""
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 14,
+      "source_text": [
+        "瞧 提示是\"Papa doc的首都\" (海地前总统) 所以是太子港",
+        "see,\"papa doc's capitol idea,\" that's \"port-au-prince. \""
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 15,
+      "source_text": [
+        "海地的",
+        "Haiti."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 16,
+      "source_text": [
+        "- 能为你效劳吗? - 是的",
+        "- Can I help you? - Yes."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-003"
+      ],
+      "review_note": "有时也可能带警觉或质问，取决于场景和语气。",
+      "source_issue": null
+    },
+    {
+      "source_line": 17,
+      "source_text": [
+        "这里是高智商精子银行吗?",
+        "Um... is this the high-iq sperm bank?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 18,
+      "source_text": [
+        "如果你这么问 也许你不该来这",
+        "If you have to ask, maybe you shouldn't be here."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-077"
+      ],
+      "review_note": "不作为主动社交表达练习，容易冒犯。",
+      "source_issue": null
+    },
+    {
+      "source_line": 19,
+      "source_text": [
+        "我想就是这没错了",
+        "I think this is the place."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-004"
+      ],
+      "review_note": "I think 表示判断留有余地。",
+      "source_issue": null
+    },
+    {
+      "source_line": 20,
+      "source_text": [
+        "- 把这个填一填 - 谢谢",
+        "- Fill these out. - Thank you."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-005"
+      ],
+      "review_note": "fill out a form；代词要放中间：fill it out。例句比原句礼貌。",
+      "source_issue": null
+    },
+    {
+      "source_line": 21,
+      "source_text": [
+        "我们马上好",
+        "We'll be right back."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-006"
+      ],
+      "review_note": "right back 表示很快回来，不承诺具体分钟数。",
+      "source_issue": null
+    },
+    {
+      "source_line": 22,
+      "source_text": [
+        "慢慢来 我还要玩填字游戏",
+        "Oh,take your time. I'll just finish my crossword puzzle."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-007"
+      ],
+      "review_note": "原场景略显漫不经心；日常可用来体贴地表示不催。",
+      "source_issue": null
+    },
+    {
+      "source_line": 23,
+      "source_text": [
+        "噢 慢着",
+        "Oh,wait."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 24,
+      "source_text": [
+        "Leonard 我办不到",
+        "Leonard,I don't think I can do this."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-008"
+      ],
+      "review_note": "比 I can't do this 多一层试探，不等于客观能力不足。",
+      "source_issue": null
+    },
+    {
+      "source_line": 25,
+      "source_text": [
+        "开玩笑? 你可是半职业人士",
+        "What,are you kidding? You're a semi-pro."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-042"
+      ],
+      "review_note": "可喜可怒；音调与上下文决定情绪。",
+      "source_issue": null
+    },
+    {
+      "source_line": 26,
+      "source_text": [
+        "不 我们这样是诈骗",
+        "No. We are committing genetic fraud."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 27,
+      "source_text": [
+        "我们没法保证 生出来的一定是高智商小孩",
+        "There's no guarantee that our sperm is going to generate high-iq offspring. Think about that."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-043"
+      ],
+      "review_note": "迁移时替换成日常主题，无需保留成人情节。",
+      "source_issue": null
+    },
+    {
+      "source_line": 28,
+      "source_text": [
+        "我姐姐跟我有一套相同的基本基因 她却在Fuddrucker餐厅当服务生",
+        "I have a sister with the same basic dna mix who hostesses at fuddruckers."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 29,
+      "source_text": [
+        "Sheldon 这可是你的主意啊",
+        "Sheldon,this was your idea."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 30,
+      "source_text": [
+        "轻松赚点钱 就有钱能升级我们的网络带宽",
+        "A little extra money to get fractional t-1 bandwith in the apartment."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": "bandwith 应为 bandwidth"
+    },
+    {
+      "source_line": 31,
+      "source_text": [
+        "我知道 我确实很渴望高速下载",
+        "I know, and I do yearn for faster downloads."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 32,
+      "source_text": [
+        "但一些可怜的女人 会把希望寄托在我的精子上",
+        "But there's some poor woman who's gonna pin her hopes on my sperm."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 33,
+      "source_text": [
+        "万一生出来一个 连曲线下部的面积用积分还是微分算",
+        "What if she winds up with a toddler who doesn't know if he should use an integral or a differential"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-044"
+      ],
+      "review_note": "wind up doing / wind up + 名词；过去式 wound up。",
+      "source_issue": null
+    },
+    {
+      "source_line": 34,
+      "source_text": [
+        "都搞不清楚的小屁孩怎么办?",
+        "to solve the area under a curve?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 35,
+      "source_text": [
+        "我想她还是会爱那个宝宝的",
+        "I'm sure she'll still love him."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 36,
+      "source_text": [
+        "我不会",
+        "I wouldn'T."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 37,
+      "source_text": [
+        "你想要怎样?",
+        "Well,what do you want to do?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-009"
+      ],
+      "review_note": "want to 口语可弱化；对陌生人可用 What would you like to do?",
+      "source_issue": null
+    },
+    {
+      "source_line": 38,
+      "source_text": [
+        "- 我想要走 - 好吧",
+        "- I want to leave. - Okay."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 39,
+      "source_text": [
+        "离开时要怎么说呢?",
+        "What's the protocol for leaving?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 40,
+      "source_text": [
+        "我不知道 我可从没有拒绝过提供精子的要求",
+        "I don't know- I've never reneged on a proffer of sperm before."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 41,
+      "source_text": [
+        "我们就直接走出去吧",
+        "Let's try just walking out."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 42,
+      "source_text": [
+        "好",
+        "Okay."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "柜台与退出计划；基础回应去重，成人情节及刻意书面用语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 43,
+      "source_text": [
+        "- 再见 - 再见 很高兴认识你",
+        "- Bye. - Bye. Nice meeting you."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-010"
+      ],
+      "review_note": "Nice to meet you 常用于刚见面；Nice meeting you 常用于结束会面。",
+      "source_issue": null
+    },
+    {
+      "source_line": 44,
+      "source_text": [
+        "你还在为精子银行的事生气吗?",
+        "Are you still made about the sperm bank?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-045"
+      ],
+      "review_note": "原文 made 应为 mad；也可问 upset，语气更温和。",
+      "source_issue": "made 应为 mad"
+    },
+    {
+      "source_line": 45,
+      "source_text": [
+        "没有",
+        "No."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "楼梯话题；重复回应、科学细节及贬损人物的笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 46,
+      "source_text": [
+        "你想听一件关于楼梯的趣事吗?",
+        "You want to hear an interesting thing about stairs?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "楼梯话题；重复回应、科学细节及贬损人物的笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 47,
+      "source_text": [
+        "不是很想",
+        "Not really."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-011"
+      ],
+      "review_note": "比直接 No 软一些，但不一定表示“有一点”。",
+      "source_issue": null
+    },
+    {
+      "source_line": 48,
+      "source_text": [
+        "如果一阶楼梯比普通的矮个2毫米 大部分人都会绊倒",
+        "If the height of a single step"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "楼梯话题；重复回应、科学细节及贬损人物的笑话不作核心",
+      "source_issue": "英文截断"
+    },
+    {
+      "source_line": 49,
+      "source_text": [
+        "不关我事",
+        "I don't care."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-078"
+      ],
+      "review_note": "替代句用于“我都可以”，不是原句在所有场景的同义词。",
+      "source_issue": null
+    },
+    {
+      "source_line": 50,
+      "source_text": [
+        "2毫米? 不会吧",
+        "Two milli... that doesn't seem right."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-012"
+      ],
+      "review_note": "seem 表示根据现有信息作判断，比 You're wrong 缓和。",
+      "source_issue": null
+    },
+    {
+      "source_line": 51,
+      "source_text": [
+        "是真的 我12岁时做了一系列的实验",
+        "No,it's true. I did a series of experiments when I was 12."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "楼梯话题；重复回应、科学细节及贬损人物的笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 52,
+      "source_text": [
+        "我爸爸因此还跌断了锁骨",
+        "My father broke his clavicle."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "楼梯话题；重复回应、科学细节及贬损人物的笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 53,
+      "source_text": [
+        "所以他们把你送去寄宿学校?",
+        "Is that why they sent you to boarding school?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "楼梯话题；重复回应、科学细节及贬损人物的笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 54,
+      "source_text": [
+        "不 那是因为我研究激光惹的事",
+        "No. That was a result of my work with lasers."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "楼梯话题；重复回应、科学细节及贬损人物的笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 55,
+      "source_text": [
+        "- 新邻居? - 显然是",
+        "- new neighbor? - Evidently."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "楼梯话题；重复回应、科学细节及贬损人物的笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 56,
+      "source_text": [
+        "比上一任有了明显可观的改善",
+        "Significant improvement over the old neighbor."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "楼梯话题；重复回应、科学细节及贬损人物的笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 57,
+      "source_text": [
+        "那个200磅重还患有皮肤病的异装癖? 噢 绝对是",
+        "200-pound transvestite with a skin condition? Yes,she is."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "楼梯话题；重复回应、科学细节及贬损人物的笑话不作核心",
+      "source_issue": "中英不协调"
+    },
+    {
+      "source_line": 58,
+      "source_text": [
+        "- 嗨 - 嗨",
+        "- Oh,hi. - Hi."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 59,
+      "source_text": [
+        "- 嗨 - 嗨",
+        "- Hi. - Hi."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 60,
+      "source_text": [
+        "- 嗨 - 嗨?",
+        "- Hi. - Hi?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 61,
+      "source_text": [
+        "我们不想打扰你 我们是住对面的邻居",
+        "We don't mean to interrupt. We live across the hall."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-013",
+        "S01E01-014"
+      ],
+      "review_note": "mean to do 表示有意做；单人用 I。；across the hall 是同一走廊另一侧，不是街对面。",
+      "source_issue": null
+    },
+    {
+      "source_line": 62,
+      "source_text": [
+        "啊 太好了",
+        "Oh,that's nice."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 63,
+      "source_text": [
+        "噢不 我们不是同居",
+        "Oh,no,uh,we don't live together."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 64,
+      "source_text": [
+        "我是说 虽然住在一起 但是在不同的...",
+        "I mean,we live together, but in separate,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 65,
+      "source_text": [
+        "直男房间里",
+        "heterosexual bedrooms."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 66,
+      "source_text": [
+        "那好吧 我是你们的新邻居 我叫Penny",
+        "Oh. Okay,well,guess I'm your new neighbor. Penny."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 67,
+      "source_text": [
+        "我是Leonard 他是Sheldon",
+        "Oh. Leonard. Sheldon."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 68,
+      "source_text": [
+        "- 嗨 - 嗨",
+        "- Hi. - Hi."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 69,
+      "source_text": [
+        "- 嗨 - 嗨",
+        "Hi. Hi. Hi."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 70,
+      "source_text": [
+        "欢迎你搬来",
+        "Well,uh... oh,uh,welcome to the building."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 71,
+      "source_text": [
+        "谢谢 有空一起喝个咖啡吧",
+        "Oh,thank you. Maybe we can have coffee sometime."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-015"
+      ],
+      "review_note": "sometime 是未定的某个时候；不是已经约好，需后续落实时间。",
+      "source_issue": null
+    },
+    {
+      "source_line": 72,
+      "source_text": [
+        "- 噢 好啊 - 好啊",
+        "- Oh,great. - Great."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 73,
+      "source_text": [
+        "- 好啊 - 好啊",
+        "- Great. - Great."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 74,
+      "source_text": [
+        "- 那么 再见啦 - 再见",
+        "- Well,uh,bye. - Bye."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 75,
+      "source_text": [
+        "- 再见 - 再见",
+        "- Bye. - Bye."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 76,
+      "source_text": [
+        "我们应该邀请她共进午餐吗?",
+        "Should we have invited her for lunch?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-046"
+      ],
+      "review_note": "should have + 过去分词，谈已经过去的事；不是未来安排。",
+      "source_issue": null
+    },
+    {
+      "source_line": 77,
+      "source_text": [
+        "不 我们要看Battlestar Galactica第二季 (太空堡垒卡拉狄加)",
+        "No. We're gonna start season two of battlestar galactica."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 78,
+      "source_text": [
+        "我们已经看过第二季的DVD了",
+        "We already watched the season two dvds."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 79,
+      "source_text": [
+        "那时候没带评论音轨一起看啊",
+        "Not with commentary."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 80,
+      "source_text": [
+        "我们应该做好邻居 请她过来 让她感受到我们对她的欢迎",
+        "I think we should be good neighbors and invite her over, make her feel welcome."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-047"
+      ],
+      "review_note": "over 带“过来做客”之意，invite out 则偏邀请外出。",
+      "source_issue": null
+    },
+    {
+      "source_line": 81,
+      "source_text": [
+        "我们从来没请那个Louis还不Louise过来啊",
+        "We never invited louie-slash-louise over."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 82,
+      "source_text": [
+        "那是我们不对",
+        "Well... and that was wrong of us."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 83,
+      "source_text": [
+        "我们要扩大社交圈",
+        "We need to widen our circle."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 84,
+      "source_text": [
+        "我的社交圈很广",
+        "I have a very wide circle."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 85,
+      "source_text": [
+        "我在MySpace上有212个朋友",
+        "I have 212 friends on myspace."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 86,
+      "source_text": [
+        "是的 但你从没见过任何一个真人",
+        "Yes,and you've never met one of them."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 87,
+      "source_text": [
+        "这正是它的美好之处",
+        "That's the beauty of it."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-048"
+      ],
+      "review_note": "原场景是幽默反转；短语本身可真诚使用。",
+      "source_issue": null
+    },
+    {
+      "source_line": 88,
+      "source_text": [
+        "我去请她过来",
+        "I'm gonna invite her over."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-047"
+      ],
+      "review_note": "over 带“过来做客”之意，invite out 则偏邀请外出。",
+      "source_issue": null
+    },
+    {
+      "source_line": 89,
+      "source_text": [
+        "我们好好吃一餐 闲聊一下",
+        "We'll have a nice meal and... chat."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 90,
+      "source_text": [
+        "闲聊? 我们不闲聊 至少不线下闲聊",
+        "Chat? We don't chat. At least not offline."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 91,
+      "source_text": [
+        "不会很难的 你就听她说",
+        "Well,it's not difficult. You just listen to what she says"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 92,
+      "source_text": [
+        "然后给一些适当的回应就好了",
+        "and then you say something appropriate in response."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 93,
+      "source_text": [
+        "直到什么时候?",
+        "To what end?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 94,
+      "source_text": [
+        "嗨 又是我们",
+        "Hi. Again."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 95,
+      "source_text": [
+        "- 嗨 - 嗨",
+        "- Hi. - Hi."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 96,
+      "source_text": [
+        "我们买了些印度菜",
+        "Anyway,um... we brought home indian food."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 97,
+      "source_text": [
+        "那个...",
+        "And,um..."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 98,
+      "source_text": [
+        "我知道搬家会很累人",
+        "I know that moving can be stressful,"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-049"
+      ],
+      "review_note": "stressful 形容事情使人有压力；stressed 形容人的状态。",
+      "source_issue": null
+    },
+    {
+      "source_line": 99,
+      "source_text": [
+        "当我觉得很累的时候",
+        "and,and,I find that when I'm undergoing stress,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 100,
+      "source_text": [
+        "吃顿好的 跟人聊聊天 会让我放松很多",
+        "that good food and company can have a comforting effect."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 101,
+      "source_text": [
+        "此外 咖喱是天然的温和泻药",
+        "Also, curry is a natural laxative, and I don't have to tell you,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 102,
+      "source_text": [
+        "你也知道干净的结肠 会让你省去件烦心事",
+        "that,you know,a clean colon is just one less thing to worry about."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 103,
+      "source_text": [
+        "Leonard 虽然我不是专家 但我相信当你邀请人吃午饭的时候",
+        "Leonard,I'm no expert here, but I believe in the context of a luncheon invitation,"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-050"
+      ],
+      "review_note": "形式较缓和，但也可能带纠正意味；不是单纯猜“你可能想”。",
+      "source_issue": null
+    },
+    {
+      "source_line": 104,
+      "source_text": [
+        "最好省略关于肠部运动的话题",
+        "you might want to skip the reference to bowel movements."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-050"
+      ],
+      "review_note": "形式较缓和，但也可能带纠正意味；不是单纯猜“你可能想”。",
+      "source_issue": null
+    },
+    {
+      "source_line": 105,
+      "source_text": [
+        "你们是在邀我一起吃饭?",
+        "Oh,you're inviting me over to eat?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 106,
+      "source_text": [
+        "是啊",
+        "Uh... yes."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 107,
+      "source_text": [
+        "真是太好了 我很愿意",
+        "Oh,that's so nice. I'd love to."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-016"
+      ],
+      "review_note": "I'd = I would；若有转折 I'd love to, but... 才是婉拒。",
+      "source_issue": null
+    },
+    {
+      "source_line": 108,
+      "source_text": [
+        "很好",
+        "Great."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 109,
+      "source_text": [
+        "你们平时都玩什么呢?",
+        "So,what do you guys do for fun around here?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-017"
+      ],
+      "review_note": "you guys 较随意；do for fun 是“平时有什么消遣”。",
+      "source_issue": null
+    },
+    {
+      "source_line": 110,
+      "source_text": [
+        "今天我们尝试了靠手淫挣钱",
+        "Well,today we tried masturbating for money."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "新邻居与邀请；重复寒暄合并，生理笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 111,
+      "source_text": [
+        "* 宇宙是个大火炉 *",
+        "Our whole universe was in a hot,dense state"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "主题曲歌词，非本集日常对话目标",
+      "source_issue": null
+    },
+    {
+      "source_line": 112,
+      "source_text": [
+        "* 140亿年前大爆炸 稍等 *",
+        "then nearly 14 billion years ago expansion started... wait!"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "主题曲歌词，非本集日常对话目标",
+      "source_issue": null
+    },
+    {
+      "source_line": 113,
+      "source_text": [
+        "* 地球开始冷却 生物开始繁衍 *",
+        "The earth began to cool the autotrophs began to drool,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "主题曲歌词，非本集日常对话目标",
+      "source_issue": null
+    },
+    {
+      "source_line": 114,
+      "source_text": [
+        "* 尼安得特尔人发明工具 我们建造墙瓦 *",
+        "neanderthals developed tools we built the wall"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "主题曲歌词，非本集日常对话目标",
+      "source_issue": null
+    },
+    {
+      "source_line": 115,
+      "source_text": [
+        "* 我们创造金字塔 数学 科学 历史 *",
+        "we built the pyramids math,science,history,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "主题曲歌词，非本集日常对话目标",
+      "source_issue": null
+    },
+    {
+      "source_line": 116,
+      "source_text": [
+        "* 揭露奥秘 *",
+        "unraveling the mystery that all started"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "主题曲歌词，非本集日常对话目标",
+      "source_issue": null
+    },
+    {
+      "source_line": 117,
+      "source_text": [
+        "* 就从宇宙大爆炸开始! *",
+        "with a big bang bang!"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "主题曲歌词，非本集日常对话目标",
+      "source_issue": null
+    },
+    {
+      "source_line": 118,
+      "source_text": [
+        "请随意",
+        "yourself at home."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": "疑似缺句首 Make"
+    },
+    {
+      "source_line": 119,
+      "source_text": [
+        "谢谢",
+        "Okay. Thank you."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 120,
+      "source_text": [
+        "不客气",
+        "You're very welcome."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 121,
+      "source_text": [
+        "这些看起来好深奥啊 Leonard 这是你写的吗?",
+        "This looks like some serious stuff. Leonard,did you do this?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 122,
+      "source_text": [
+        "实际上 那些是我做的",
+        "Actually,that's my work."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 123,
+      "source_text": [
+        "哇",
+        "Wow."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 124,
+      "source_text": [
+        "就是些量子力学而已 边上我随便胡写了一点弦理论",
+        "Yeah. Well,it's just some quantum mechanics with a little string theory doodling around the edges."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 125,
+      "source_text": [
+        "那个部分 是开玩笑的",
+        "That part there, that's just a joke."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 126,
+      "source_text": [
+        "是我乱改的伯恩-奥本海默近似版",
+        "It's a spoof of the born-oppenheimer approximation."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 127,
+      "source_text": [
+        "看来你是\"美丽心灵\"那部电影 里面的那种天才人物啊",
+        "So you're like one of those beautiful mind genius guys."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 128,
+      "source_text": [
+        "可以这么说",
+        "Yeah."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 129,
+      "source_text": [
+        "好厉害啊",
+        "This is really impressive."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-018"
+      ],
+      "review_note": "impressive 是令人赞叹，不是“印象深刻的”一律直译。",
+      "source_issue": null
+    },
+    {
+      "source_line": 130,
+      "source_text": [
+        "我也有块纸板 如果你喜欢 这边是我的纸板",
+        "I have a board. If you like boards, this is my board."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 131,
+      "source_text": [
+        "我的妈呀",
+        "Holy smokes."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 132,
+      "source_text": [
+        "如果你说的\"我的妈呀\" 指的是在麻省理工大学",
+        "If by \"holy smokes\" you mean a derivative restatement of the kind of stuff"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 133,
+      "source_text": [
+        "任何一个男生宿舍墙上都能看到的涂写 那我想是的",
+        "you can find scribbled on the wall of any men's room at mit,sure."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": "men's room 译义有误"
+    },
+    {
+      "source_line": 134,
+      "source_text": [
+        "- 什么? - 得了吧",
+        "- What? - Come on."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 135,
+      "source_text": [
+        "谁没见过\"我伤心地坐在这\" 下面的微分演算啊?",
+        "Who hasn't seen this differential below \"here I sit, broken-hearted\"?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 136,
+      "source_text": [
+        "至少我不用自己发明26种量纲 才能让演算成立",
+        "At least I didn't have to invent 26 dimensions just to make the mathouome ct."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": "英文损坏"
+    },
+    {
+      "source_line": 137,
+      "source_text": [
+        "我没有发明它们 它们本来就是存在的",
+        "I didn't invent them. They're there."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 138,
+      "source_text": [
+        "在哪个世界上存在啊?",
+        "In what universe?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 139,
+      "source_text": [
+        "所有的世界里都存在 这正是关键",
+        "In all of them- that is the point."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "做客与研究白板；专业争论、受损转录不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 140,
+      "source_text": [
+        "我可以开动了吗?",
+        "Uh... do you guys mind if I start?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-019"
+      ],
+      "review_note": "回答 No, go ahead. 表示不介意；回答 Yes 表示介意。",
+      "source_issue": null
+    },
+    {
+      "source_line": 141,
+      "source_text": [
+        "Penny",
+        "Um... penny..."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 142,
+      "source_text": [
+        "你坐了我的座位",
+        "that's where i sit."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 143,
+      "source_text": [
+        "那你坐我旁边嘛",
+        "So,sit next to me."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 144,
+      "source_text": [
+        "不行 我只坐那个座位",
+        "No... I sit there."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 145,
+      "source_text": [
+        "- 有什么区别? - 有什么区别?",
+        "- What's the difference? - What's the difference?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-051"
+      ],
+      "review_note": "原句带质疑，教学先用带具体比较对象的形式。",
+      "source_issue": null
+    },
+    {
+      "source_line": 146,
+      "source_text": [
+        "又来了",
+        "Here we go."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-079"
+      ],
+      "review_note": "本场景是“又来了”；别处可以是“开始吧”，需结合语境。",
+      "source_issue": null
+    },
+    {
+      "source_line": 147,
+      "source_text": [
+        "冬天 那个位置跟电暖炉之间的距离 正好能让人保持温暖",
+        "In the winter,that seat is close enough to the radiator to remain warm,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 148,
+      "source_text": [
+        "而又不会太近导致出汗",
+        "and yet not so close as to cause perspiration in the summer,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 149,
+      "source_text": [
+        "夏天 坐在这儿正好能吹到 从这个窗口到那个窗口对吹的风",
+        "it's directly in the path of a cross-breeze created by opening windows there and there"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 150,
+      "source_text": [
+        "而且这里对着电视的角度正好",
+        "it faces the television at an angle that is neither direct,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 151,
+      "source_text": [
+        "既不会妨碍跟他人谈话",
+        "thus discouraging conversation,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 152,
+      "source_text": [
+        "又不用把头扭得太过去 以致造成视差畸变",
+        "nor so far wide as to create a parallax distortion."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 153,
+      "source_text": [
+        "我还能继续解释下去 但我想你应该明白了",
+        "I could go on,but I think I've made my point."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-052"
+      ],
+      "review_note": "原句容易显得强硬或自满；例句是更柔和的替代表达，不是同义逐字改写。",
+      "source_issue": null
+    },
+    {
+      "source_line": 154,
+      "source_text": [
+        "你要我移开吗?",
+        "Do you want me to move?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 155,
+      "source_text": [
+        "- 嗯... - 你就坐到旁边去吧",
+        "- Well... - just sit somewhere else."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 156,
+      "source_text": [
+        "好吧",
+        "Fine."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 157,
+      "source_text": [
+        "Sheldon 给我坐下!",
+        "Sheldon,sit!"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 158,
+      "source_text": [
+        "啊",
+        "Ah."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 159,
+      "source_text": [
+        "这样很不错",
+        "Well,this is nice."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 160,
+      "source_text": [
+        "我们不是经常有朋友过来",
+        "We don't have a lot of company over."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 161,
+      "source_text": [
+        "你胡扯 Koothrappali和Wolowitz天天都来",
+        "That's not true- koothrappali and wolowitz come over all the time."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 162,
+      "source_text": [
+        "我知道 但...",
+        "Yes,I know,but..."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 163,
+      "source_text": [
+        "星期二晚上 我们玩Klingon拼字游戏到夜里1点",
+        "tuesday night we played klingon boggle till 1:00 in the morning."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 164,
+      "source_text": [
+        "是啦 我记得",
+        "Yeah,I remember."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 165,
+      "source_text": [
+        "我讨厌你说我们没有朋友",
+        "I resent you saying we don't have company."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 166,
+      "source_text": [
+        "- 抱歉 - 那会产生消极的交际暗示",
+        "- I'm sorry. - That has negative social implications."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 167,
+      "source_text": [
+        "我说了我很抱歉!",
+        "I said I'm sorry!"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "座位争执；冗长技术说明和命令语气不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 168,
+      "source_text": [
+        "Klingon拼字游戏是什么?",
+        "So... klingon boggle?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 169,
+      "source_text": [
+        "就像普通的拼字游戏 但是是Klingon语的 (星际迷航中外星武士一族的怪异语言)",
+        "Yeah. It's like regular boggle,but... in klingon."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 170,
+      "source_text": [
+        "不聊我们了 说说你的事吧",
+        "That's probably enough about us. So,tell us about you."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-020"
+      ],
+      "review_note": "原句偏随意；yourself 是常用变体，并非原句转录。",
+      "source_issue": null
+    },
+    {
+      "source_line": 171,
+      "source_text": [
+        "我? 好啊",
+        "Um... me? Okay."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 172,
+      "source_text": [
+        "我是人马座的 这一点就很能说明我的个性啦",
+        "I'm a sagittarius, which probably tells you way more than you need to know."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 173,
+      "source_text": [
+        "是啊 它告诉我们你也是 迷信那种大众文化妄想的一员",
+        "Yes. It tells us that you participate in the mass cultural delusion"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 174,
+      "source_text": [
+        "你相信你出生时太阳的视位置 跟任意划分的星群间的关系",
+        "that the sun's apparent position relative to arbitrarily defined constellations at the time of your birth"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 175,
+      "source_text": [
+        "能以某种方式影响你的性格",
+        "somehow affects your personality."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 176,
+      "source_text": [
+        "我相信什么?",
+        "Participate in the what?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 177,
+      "source_text": [
+        "我想Sheldon是说 你第一眼看上去不像人马座",
+        "I think what sheldon's trying to say is that sagittarius wouldn't have been our first guess."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 178,
+      "source_text": [
+        "对啊 很多人觉得我像水相星座",
+        "Oh,yeah. A lot of people think I'm a water sign. Penny:"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": "混入人物标签"
+    },
+    {
+      "source_line": 179,
+      "source_text": [
+        "让我想想 还有什么",
+        "Okay,let's see, what else."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-021"
+      ],
+      "review_note": "Let's see 在此是思考填充语，不是“我们看见”。",
+      "source_issue": null
+    },
+    {
+      "source_line": 180,
+      "source_text": [
+        "我是个素食者 嗯 鱼除外",
+        "Oh,I'm a vegetarian. Except for fish."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 181,
+      "source_text": [
+        "偶尔我也吃牛排 我好爱牛排!",
+        "And the occasional steak. I love steak!"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 182,
+      "source_text": [
+        "那真是有趣 Leonard不能消化玉米",
+        "Well,that's interesting. Leonard can't process corn."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 183,
+      "source_text": [
+        "你做什么工作呢?",
+        "Well,uh,do you have some sort of a job?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-080"
+      ],
+      "review_note": "some sort of 在这里显得冒失；练更自然的例句。",
+      "source_issue": null
+    },
+    {
+      "source_line": 184,
+      "source_text": [
+        "我在\"芝士蛋糕工厂\"当女招待",
+        "Oh,yeah. I'm a waitress at the cheesecake factory."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 185,
+      "source_text": [
+        "我很喜欢芝士蛋糕",
+        "Oh... I love cheesecake."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 186,
+      "source_text": [
+        "你都不能忍受乳糖",
+        "You're lactose-intolerant."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 187,
+      "source_text": [
+        "我不吃 不代表我不欣赏它",
+        "I don't eat it- I just think it's a good idea."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 188,
+      "source_text": [
+        "不管怎样 我还在写剧本",
+        "Oh. Anyways,I'm also writing a screenplay."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 189,
+      "source_text": [
+        "是关于一个感情细腻的女孩 从内布拉斯加州Lincoln小镇来到洛杉矶",
+        "It's about this sensitive girl who comes to L.A. From lincoln,nebraska,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 190,
+      "source_text": [
+        "梦想成为演员 却只能在芝士蛋糕工厂当女招待",
+        "to be an actress and winds up a waitress at the cheesecake factory."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-044"
+      ],
+      "review_note": "wind up doing / wind up + 名词；过去式 wound up。",
+      "source_issue": null
+    },
+    {
+      "source_line": 191,
+      "source_text": [
+        "剧本是根据你的经历改编的哦?",
+        "So,it's based on your life."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-053"
+      ],
+      "review_note": "原文以 So 开头；based on 表示以……为基础，不保证每个细节真实。",
+      "source_issue": null
+    },
+    {
+      "source_line": 192,
+      "source_text": [
+        "不 我是从奥马哈市来的",
+        "No,I'm from omaha."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 193,
+      "source_text": [
+        "如果真的拍成电影 我肯定会去看的",
+        "Well,if that was movie, I would go see it."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": "疑似漏冠词"
+    },
+    {
+      "source_line": 194,
+      "source_text": [
+        "我知道 故事不错是吧?",
+        "I know,right?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-022"
+      ],
+      "review_note": "不是“不知道答案所以问对不对”；熟人间较自然。",
+      "source_issue": null
+    },
+    {
+      "source_line": 195,
+      "source_text": [
+        "我想想 还有什么?",
+        "Okay,let's see,what else... um..."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-021"
+      ],
+      "review_note": "Let's see 在此是思考填充语，不是“我们看见”。",
+      "source_issue": null
+    },
+    {
+      "source_line": 196,
+      "source_text": [
+        "好像差不多了",
+        "guess that's about it."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-023"
+      ],
+      "review_note": "原文省略 I；此处补出主语作为教学形式，about it 表示大致说完。",
+      "source_issue": "主语省略，教学补 I"
+    },
+    {
+      "source_line": 197,
+      "source_text": [
+        "这就是Penny的故事",
+        "That's the story of penny."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 198,
+      "source_text": [
+        "听起来很棒啊",
+        "Well,it sounds wonderful."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 199,
+      "source_text": [
+        "以前是的",
+        "It was."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 200,
+      "source_text": [
+        "直到我爱上了那个混球",
+        "Until I fell in love with a jerk!"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "自我介绍；职业与兴趣基础句留在语境中，星座争论和刻意冒失问法不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 201,
+      "source_text": [
+        "<i>怎么了?</i>",
+        "What's happening?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 202,
+      "source_text": [
+        "<i>我不知道</i>"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": "英文缺失"
+    },
+    {
+      "source_line": 203,
+      "source_text": [
+        "你知道吗 我跟他同居了4年",
+        "God,you know, four years I lived with him."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 204,
+      "source_text": [
+        "4年 跟高中一样久了",
+        "Four years- that's like as long as high school."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 205,
+      "source_text": [
+        "你花了4年才上完高中?",
+        "It took you four years to get through high school?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 206,
+      "source_text": [
+        "我不敢相信我居然那么信任他",
+        "It just... I can't believe I trusted him."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-054"
+      ],
+      "review_note": "过去时 trusted 指已经发生的信任；不能一律理解为现在仍相信。",
+      "source_issue": null
+    },
+    {
+      "source_line": 207,
+      "source_text": [
+        "我该说些什么吗? 我觉得我该说些什么",
+        "Should I say something? I feel like I should say something."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 208,
+      "source_text": [
+        "你? 千万别 你只会让事情变得更糟糕",
+        "You? No,you'll only make it worse."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-055"
+      ],
+      "review_note": "原句责备感较强；例句提供更温和的说法。",
+      "source_issue": null
+    },
+    {
+      "source_line": 209,
+      "source_text": [
+        "你知道最可悲的是什么吗?",
+        "You want to know the most pathetic part?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 210,
+      "source_text": [
+        "尽管我对他的谎言欺骗恨之入骨",
+        "Even though I hate his lying, cheating guts..."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 211,
+      "source_text": [
+        "我还是爱着他",
+        "I still love him."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 212,
+      "source_text": [
+        "是不是很疯狂?",
+        "Is that crazy?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 213,
+      "source_text": [
+        "是的",
+        "Yes."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 214,
+      "source_text": [
+        "不 那不是疯狂",
+        "No,it's not crazy."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 215,
+      "source_text": [
+        "你只是... 陷入一种矛盾",
+        "It's uh... uh... it's a paradox."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 216,
+      "source_text": [
+        "矛盾是我们天性的一部分",
+        "Paradoxes are part of nature."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 217,
+      "source_text": [
+        "你想想光 惠更斯认为光是一种波动",
+        "Think about light. If you look at huygens, light is a wave,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 218,
+      "source_text": [
+        "双缝实验证明了这一论点",
+        "as confirmed by the double - slit experiments,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 219,
+      "source_text": [
+        "但后来 爱因斯坦出现了 他发现光也具有粒子的表现特征",
+        "but then along comes albert einstein and discovers that light behaves like particles,too."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 220,
+      "source_text": [
+        "呃 我没让情况变得更糟",
+        "Well,I didn't make it worse."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 221,
+      "source_text": [
+        "很抱歉 我真是一团糟",
+        "I'm so sorry. I'm such a mess."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-024"
+      ],
+      "review_note": "此处主要是情绪崩溃，也可依场景说外表狼狈，不是房间很乱。",
+      "source_issue": null
+    },
+    {
+      "source_line": 222,
+      "source_text": [
+        "除了那些烂事 我搬家弄得一身臭汗 该死的淋浴还坏掉了",
+        "On top of everything else, I'm all gross from moving and my stupid shower doesn't even work."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-025",
+        "S01E01-026"
+      ],
+      "review_note": "常用于坏事叠加，但本身不限定负面。；从原句提取简化，原文含 my stupid shower；even 加强抱怨。",
+      "source_issue": null
+    },
+    {
+      "source_line": 223,
+      "source_text": [
+        "我们的淋浴房能用",
+        "Our shower works."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 224,
+      "source_text": [
+        "真的? 我用你们的淋浴房 会不会很奇怪?",
+        "Really? Would it be totally weird if I used it?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-056"
+      ],
+      "review_note": "原句 if 后 used 是假设语气，不指过去；okay 版本适用面更广。",
+      "source_issue": null
+    },
+    {
+      "source_line": 225,
+      "source_text": [
+        "会",
+        "Yes."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 226,
+      "source_text": [
+        "- 当然不会 - 不会?",
+        "- No. - No?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 227,
+      "source_text": [
+        "- 不会 - 不会",
+        "- No. - No."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失恋安慰与借浴室；物理类比、重复附和不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 228,
+      "source_text": [
+        "就在厅后面",
+        "It's right down the hall."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-027"
+      ],
+      "review_note": "原中文“厅后面”不够准确；right 在此加强“就在那里”。",
+      "source_issue": "中文方位不够准确"
+    },
+    {
+      "source_line": 229,
+      "source_text": [
+        "谢谢 你们真是大好人",
+        "Thanks. You guys are really sweet."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-028"
+      ],
+      "review_note": "sweet 在此形容体贴，不是味道甜；商务场景可用 kind。",
+      "source_issue": null
+    },
+    {
+      "source_line": 230,
+      "source_text": [
+        "真是有趣的进展啊",
+        "well,this is an interesting development."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 231,
+      "source_text": [
+        "为什么?",
+        "How so?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-057"
+      ],
+      "review_note": "只用于追问理由或方式，不是 How are you?",
+      "source_issue": null
+    },
+    {
+      "source_line": 232,
+      "source_text": [
+        "已经有好长一段时间 没有女人在我们的公寓里脱光了",
+        "It has been some time since we've had a woman take her clothes off in our apartment."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 233,
+      "source_text": [
+        "不对吧 还记得感恩节我那阿兹海默症 (老年痴呆)的奶奶病发闹出的那一段吗?",
+        "That's not true. Remember at thanksgiving my grandmother with alzheimer's had that episode?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 234,
+      "source_text": [
+        "有道理 已经有好长一段时间 没有女人在我们公寓里脱光",
+        "Point taken. It has been some time since we've had a woman take her clothes off,"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-058"
+      ],
+      "review_note": "略显简短；不是“收到信息”所有场景都能代替 Got it。",
+      "source_issue": null
+    },
+    {
+      "source_line": 235,
+      "source_text": [
+        "而且我们不会想抠出自己的眼睛!",
+        "after which we didn't want to rip our eyes out."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 236,
+      "source_text": [
+        "看着她乱搞那只火鸡 是最折磨人的",
+        "The worst part was watching her carve that turkey."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 237,
+      "source_text": [
+        "你到底希望达到什么目标呢?",
+        "So what exactly are you trying to accomplish here?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 238,
+      "source_text": [
+        "你说什么?",
+        "Excuse me?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 239,
+      "source_text": [
+        "那个女孩不会跟你上床的",
+        "That woman in there is not going to have sex with you."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 240,
+      "source_text": [
+        "我不是想跟她上床",
+        "Well,I'm not trying to have sex with her."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 241,
+      "source_text": [
+        "很好 那你就不会失望了",
+        "Oh,good. Then you won't be disappointed."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 242,
+      "source_text": [
+        "你为什么认定她不会跟我上床?",
+        "What makes you think she wouldn't have sex with me?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-059"
+      ],
+      "review_note": "可中性可带挑战；需注意语调。",
+      "source_issue": null
+    },
+    {
+      "source_line": 243,
+      "source_text": [
+        "我是男人 她是女人",
+        "I'm a male and she's a female."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 244,
+      "source_text": [
+        "对 但你们不是一个种族的",
+        "Yes,but not of the same species."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 245,
+      "source_text": [
+        "我不想跟你在这瞎猜",
+        "I'm not going to engage in hypotheticals here."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 246,
+      "source_text": [
+        "我只是想当个好邻居",
+        "I'm just trying to be a good neighbor."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 247,
+      "source_text": [
+        "当然了",
+        "Oh,of course."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 248,
+      "source_text": [
+        "但是如果真的要发展到肉体关系 我也不会拒绝的",
+        "That's not to say that if a carnal relationship were to develop that I wouldn't participate."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 249,
+      "source_text": [
+        "不管那有多短暂",
+        "However briefly."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 250,
+      "source_text": [
+        "你觉得让她发现你的 \"天行者Luke\"无泪洗发水",
+        "Do you think this possibility will be helped or hindered"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 251,
+      "source_text": [
+        "是会帮助还是阻碍你们的发展呢?",
+        "when she discovers your luke skywalker no-more-tears shampoo?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 252,
+      "source_text": [
+        "那是Darth Vader洗发液 (星球大战中角色)",
+        "It's darth vader shampoo."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 253,
+      "source_text": [
+        "\"天行者Luke\"是护发素",
+        "luke skywalker's the conditioner."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "讨论动机；成人玩笑、刻意书面结构不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 254,
+      "source_text": [
+        "你们得看看这个",
+        "Wait till you see this."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-060"
+      ],
+      "review_note": "till = until；不是指真的必须一直站着等。",
+      "source_issue": null
+    },
+    {
+      "source_line": 255,
+      "source_text": [
+        "超级赞 不可置信",
+        "It's fantastic, unbelievable."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 256,
+      "source_text": [
+        "看什么?",
+        "See what?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 257,
+      "source_text": [
+        "是施蒂芬-霍金于1974年 在麻省理工做的演讲",
+        "It's a stephen hawking lecture from mit in 1974."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 258,
+      "source_text": [
+        "现在不方便",
+        "This isn't a good time."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-029"
+      ],
+      "review_note": "附上替代时间更体贴；原场景带急于送客的意思。",
+      "source_issue": null
+    },
+    {
+      "source_line": 259,
+      "source_text": [
+        "这是在他变成诡异的 电脑合成声音之前的讲座",
+        "It's before he became a creepy computer voice. Leonard:"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": "混入人物标签"
+    },
+    {
+      "source_line": 260,
+      "source_text": [
+        "很好 你们得走了",
+        "That's great. You guys have to go."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 261,
+      "source_text": [
+        "为什么?",
+        "Why?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 262,
+      "source_text": [
+        "现在不方便啊",
+        "It's just not a good time."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-029"
+      ],
+      "review_note": "附上替代时间更体贴；原场景带急于送客的意思。",
+      "source_issue": null
+    },
+    {
+      "source_line": 263,
+      "source_text": [
+        "Leonard有女人拜访",
+        "Leonard has a lady over."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 264,
+      "source_text": [
+        "这样啊 你奶奶又进城了?",
+        "Yeah,right- your grandmother back in town?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 265,
+      "source_text": [
+        "不是什么女人的艳遇啦",
+        "No. And she's not a lady."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 266,
+      "source_text": [
+        "只是我们的新邻居",
+        "She's just a new neighbor."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 267,
+      "source_text": [
+        "你等等 这儿真有个女人?",
+        "Hang on,there really is a lady here?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-002"
+      ],
+      "review_note": "可表示等时间，也可表示“等等，你是说……”；口语。",
+      "source_issue": null
+    },
+    {
+      "source_line": 268,
+      "source_text": [
+        "没错",
+        "Uh-huh."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 269,
+      "source_text": [
+        "你要我们走 是因为你准备跟她交媾?",
+        "And you want us out because you're anticipating coitus?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 270,
+      "source_text": [
+        "我没准备跟她交媾",
+        "I'm not anticipating coitus."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 271,
+      "source_text": [
+        "那她可以跟别人交媾?",
+        "So she's available for coitus?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 272,
+      "source_text": [
+        "能不能别用\"交媾\"这个词?",
+        "Can we please just stop saying \"coitus\"?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 273,
+      "source_text": [
+        "用术语来说 就是交媾中止",
+        "Technically,that would be \"coitus interruptus. \""
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 274,
+      "source_text": [
+        "从泡浴换成淋浴 是不是有个开关?",
+        "Hey,is there a trick to getting it to switch from tub to shower...?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-061"
+      ],
+      "review_note": "to 为介词，后接 getting；原句以 switch from tub to shower 结尾。",
+      "source_issue": null
+    },
+    {
+      "source_line": 275,
+      "source_text": [
+        "噢 很抱歉 你们好",
+        "Oh,hi. Sorry. Hello."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 276,
+      "source_text": [
+        "很高兴认识您 小姐",
+        "Enchant? mademoiselle."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": "法语损坏"
+    },
+    {
+      "source_line": 277,
+      "source_text": [
+        "我是Howard Wolowitz 加州理工大应用物理系",
+        "Howard wolowitz caltech department of applied physics."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 278,
+      "source_text": [
+        "你可能对我的工作成果有所了解",
+        "You may be familiar with some of my work."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 279,
+      "source_text": [
+        "它现在正绕着木星最大的卫星旋转 拍摄高清数码照片",
+        "It's currently orbiting jupiter's largest moon taking high-resolution digital photographs."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 280,
+      "source_text": [
+        "我是Penny 我在芝士蛋糕工厂做侍应",
+        "Penny. I work at the cheesecake factory."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 281,
+      "source_text": [
+        "来吧 我告诉你开关在哪",
+        "Come on,I'll show you the trick with the shower."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 282,
+      "source_text": [
+        "Bonne douche!",
+        "Bonne douche."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 283,
+      "source_text": [
+        "你说什么?",
+        "I'M... I'm sorry?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 284,
+      "source_text": [
+        "法语的\"洗个痛快澡\"",
+        "It's french for \"good shower. \""
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 285,
+      "source_text": [
+        "我能用六国语言表达这一祝愿",
+        "It's a sentiment I can express in six languages."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 286,
+      "source_text": [
+        "留着在你的Blog上写吧 Howard",
+        "Save it for your blog,howard."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-081"
+      ],
+      "review_note": "不是友好建议，别照搬到初次见面。",
+      "source_issue": null
+    },
+    {
+      "source_line": 287,
+      "source_text": [
+        "洗个痛快澡 (中文)",
+        "细鐾纯快澡"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": "中文拟音损坏"
+    },
+    {
+      "source_line": 288,
+      "source_text": [
+        "这样就行 开关卡住了 抱歉",
+        "all right, there it goes. It sticks. I'm sorry."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-062"
+      ],
+      "review_note": "it 指开关，不是“它粘住了东西”；stuck 常形容已经卡住的状态。",
+      "source_issue": null
+    },
+    {
+      "source_line": 289,
+      "source_text": [
+        "好的 谢谢",
+        "Okay,thanks."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 290,
+      "source_text": [
+        "不客气 你只要向右... 好 我撤了",
+        "Reyou' welcome. Oh,you're just going to step right... okay,I'll..."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": "英文损坏"
+    },
+    {
+      "source_line": 291,
+      "source_text": [
+        "- Leonard - 那些洗发产品是Sheldon的",
+        "- hey,leonard... - the hair products are sheldon'S."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 292,
+      "source_text": [
+        "好的",
+        "Okay."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "朋友来访与淋浴；炫耀、成人笑话、外语及损坏文本不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 293,
+      "source_text": [
+        "我能麻烦你帮个忙吗?",
+        "Um,can I ask you a favor?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-030"
+      ],
+      "review_note": "ask someone a favor 和 do someone a favor 搭配不同。",
+      "source_issue": null
+    },
+    {
+      "source_line": 294,
+      "source_text": [
+        "帮忙?",
+        "A favor?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 295,
+      "source_text": [
+        "你当然可以要我帮忙 我很乐意帮你忙",
+        "Sure,you can ask me a favor. I would do you a favor for you."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": "重复赘语不作标准句"
+    },
+    {
+      "source_line": 296,
+      "source_text": [
+        "你不答应也没事",
+        "It's okay if you say no."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-031"
+      ],
+      "review_note": "用在请求后；说完也应接受对方拒绝。",
+      "source_issue": null
+    },
+    {
+      "source_line": 297,
+      "source_text": [
+        "噢 我应该会答应的",
+        "Oh,I'll probably say yes."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 298,
+      "source_text": [
+        "这不是那种 你会请刚认识的人帮的忙",
+        "It's just not the kind of thing you ask a guy you just met."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 299,
+      "source_text": [
+        "哇",
+        "Wow."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 300,
+      "source_text": [
+        "我们得回顾下这起事件的前因后果",
+        "I really think we should examine the chain of causality here."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 301,
+      "source_text": [
+        "一定要吗?",
+        "Must we?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 302,
+      "source_text": [
+        "事件A: 一个美女在我们的浴室裸体",
+        "Event a- a beautiful woman stands naked in our shower."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 303,
+      "source_text": [
+        "事件B: 我们开车穿越整个小镇 就为了搬台电视机回来",
+        "Event b- we drive halfway across town to retrieve a television set"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 304,
+      "source_text": [
+        "目的地就在刚刚提到的美女的前男友家",
+        "from the aforementioned woman's ex-boyfriend."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 305,
+      "source_text": [
+        "提问: 这两件事之间 存在任何甚至半理性的关联吗?",
+        "Query- on what plane of existence is there even a semi-rational link between these events?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 306,
+      "source_text": [
+        "因为Penny请我帮个忙 Sheldon",
+        "She asked me to do her a favor,sheldon."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-063"
+      ],
+      "review_note": "与第293条 ask someone a favor 对照学习。",
+      "source_issue": null
+    },
+    {
+      "source_line": 307,
+      "source_text": [
+        "是啊 那也许是最近似可能的起因了",
+        "Ah,yes. Well,that may be the proximal cause of our journey,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 308,
+      "source_text": [
+        "但我们都知道 它和更高级的末端起因截然不同",
+        "but we both know it only exists in contradistinction to the higher level distal cause."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 309,
+      "source_text": [
+        "那是什么意思?",
+        "Which is?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 310,
+      "source_text": [
+        "你用你的老二思考",
+        "You think with your penis."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 311,
+      "source_text": [
+        "这在生理上是不可能的",
+        "That's a biological impossibility."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 312,
+      "source_text": [
+        "你也不一定要来啊",
+        "And you didn't have to come."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-064"
+      ],
+      "review_note": "原场景偏防御；不等于“你不该来”，也不表示对方没来。",
+      "source_issue": null
+    },
+    {
+      "source_line": 313,
+      "source_text": [
+        "对 我可以留在家里看着Wolowitz 试图用俄语 阿拉伯语及波斯语搭讪Penny",
+        "Oh,right,yes,I could have stayed behind and watch wolowitz try to hit on penny in russian, arabic and farsi."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": "语法转录疑点"
+    },
+    {
+      "source_line": 314,
+      "source_text": [
+        "她为什么不能自己去拿?",
+        "Why can't she get her own tv?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 315,
+      "source_text": [
+        "你知道分手这种事啦",
+        "Come on,you know how it is with breakups."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-065"
+      ],
+      "review_note": "对方未必有同样经历；本集下一句正是在否认这个前提。",
+      "source_issue": null
+    },
+    {
+      "source_line": 316,
+      "source_text": [
+        "不 我不知道 你也不知道",
+        "No,I don'T... and neither do you."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 317,
+      "source_text": [
+        "什么啊 我跟Joyce Kim分过手",
+        "I broke up with joyce kim."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 318,
+      "source_text": [
+        "你才没有和Joyce Kim分手 是她跑到韩国去了",
+        "You did not break up with joyce kim. She defected to north korea."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 319,
+      "source_text": [
+        "为了修复她受伤的心灵",
+        "To mend her broken heart."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 320,
+      "source_text": [
+        "现在这情况更加复杂",
+        "This situation is much less complicated."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": "中英比较方向相反"
+    },
+    {
+      "source_line": 321,
+      "source_text": [
+        "Penny和她前男友不能达成一致 究竟电视机该归谁",
+        "There's some kind of dispute between penny and her ex-boyfriend as to who gets custody of the tv."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 322,
+      "source_text": [
+        "她不想再和他当面争执",
+        "She just wanted to avoid having a scene with him."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-066"
+      ],
+      "review_note": "make a scene 是相关常用搭配；不是“和某人拍一场戏”。",
+      "source_issue": null
+    },
+    {
+      "source_line": 323,
+      "source_text": [
+        "所以我们去和他当面争执?",
+        "So we get to have a scene with him?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-066"
+      ],
+      "review_note": "make a scene 是相关常用搭配；不是“和某人拍一场戏”。",
+      "source_issue": null
+    },
+    {
+      "source_line": 324,
+      "source_text": [
+        "Sheldon 根本不会有争执",
+        "No,sheldon,there's not going to be a scene."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 325,
+      "source_text": [
+        "我们两人 他一人",
+        "There's two of us and one of him."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 326,
+      "source_text": [
+        "Leonard 我们俩加起来都抗不动一台电视",
+        "Leonard,the two of us can't even carry a tv."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "请求取电视；书面因果讨论、重复争执和政治笑话不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 327,
+      "source_text": [
+        "你们跟Leonard和Sheldon一起在学校做事?",
+        "So,you guys work with leonard and sheldon at the university?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 328,
+      "source_text": [
+        "不好意思 你会说英语吗?",
+        "Um,I'm sorry. Do you speak english?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 329,
+      "source_text": [
+        "他会 只是不能跟女人说",
+        "Oh,he speaks english. Hecaust jn't speak to women."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": "英文损坏"
+    },
+    {
+      "source_line": 330,
+      "source_text": [
+        "真的? 为什么?",
+        "Really? Why?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 331,
+      "source_text": [
+        "因为他是个书呆子",
+        "He's kind of a nerd."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 332,
+      "source_text": [
+        "盒装果汁? (谐音G-Spot 即高潮快点)",
+        "Juice box?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 333,
+      "source_text": [
+        "我来跟他理论",
+        "I'll do the talking. Man:"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-067"
+      ],
+      "review_note": "不保证会说服对方；也可能显得控制欲强，看关系。",
+      "source_issue": "混入人物标签"
+    },
+    {
+      "source_line": 334,
+      "source_text": [
+        "谁?",
+        "Yeah?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 335,
+      "source_text": [
+        "嗨 我是Leonard 他是Sheldon",
+        "Uh,hi,I'm leonard, this is sheldon."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 336,
+      "source_text": [
+        "- 你好 - 我...",
+        "- Hello. - Let'S..."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 337,
+      "source_text": [
+        "我们来拿Penny的电视",
+        "uh,we're here to pick up penny's tv."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-032"
+      ],
+      "review_note": "pick up 在此是取回；也可接人，需看宾语。",
+      "source_issue": null
+    },
+    {
+      "source_line": 338,
+      "source_text": [
+        "滚",
+        "Get lost."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-082"
+      ],
+      "review_note": "强烈无礼，只作识别。",
+      "source_issue": null
+    },
+    {
+      "source_line": 339,
+      "source_text": [
+        "好的 打搅你了",
+        "Okay,thanks for you time."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-033"
+      ],
+      "review_note": "原文 you time 为明确笔误，教学修正为 your time。",
+      "source_issue": "you 应为 your"
+    },
+    {
+      "source_line": 340,
+      "source_text": [
+        "我们不能就这么放弃",
+        "We're not going to give up just like that."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-068"
+      ],
+      "review_note": "give up 放弃；just like that 在此强调太轻易。",
+      "source_issue": null
+    },
+    {
+      "source_line": 341,
+      "source_text": [
+        "Leonard 电视在这楼里",
+        "Leonard,the tv's in the building."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 342,
+      "source_text": [
+        "他不放我们进去 我们没辙",
+        "We have been denied access to the building- ergo,we are done."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 343,
+      "source_text": [
+        "不好意思",
+        "Excuse me."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 344,
+      "source_text": [
+        "如果我第一次受挫就放弃 我就永远不可能在大爆炸理论提出后",
+        "If I were to give up on the first little hitch I never would have been able to identify the fingerprints"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 345,
+      "source_text": [
+        "发现关于弦理论的蛛丝马迹",
+        "of string theory in the aftermath of the big bang."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 346,
+      "source_text": [
+        "我道歉 你打算怎么做?",
+        "My apologies. What's your plan?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 347,
+      "source_text": [
+        "看到你如此专注工作 真是种荣幸",
+        "It's just a privilege to watch your mind at work."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 348,
+      "source_text": [
+        "来吧 我们俩智商加起来有360",
+        "Come on,we have a combined iq of 360."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 349,
+      "source_text": [
+        "我们绝对能够想办法进入这蠢楼",
+        "We should be able"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": "英文截断"
+    },
+    {
+      "source_line": 350,
+      "source_text": [
+        "你觉得她俩智商加起来多少?",
+        "what do you think their combined iq is?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 351,
+      "source_text": [
+        "快去留住门!",
+        "Just grab the door!"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 352,
+      "source_text": [
+        "就是这",
+        "This is it."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-069"
+      ],
+      "review_note": "本场景是找到目的地；其他场景也可能表示关键时刻到了。",
+      "source_issue": null
+    },
+    {
+      "source_line": 353,
+      "source_text": [
+        "我来跟他理论",
+        "I'll do the talking."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-067"
+      ],
+      "review_note": "不保证会说服对方；也可能显得控制欲强，看关系。",
+      "source_issue": null
+    },
+    {
+      "source_line": 354,
+      "source_text": [
+        "好主意 我用武力威慑",
+        "Good thinking. I'll just be the muscle."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-070"
+      ],
+      "review_note": "后半句是喜剧反差，短语本身常用。",
+      "source_issue": null
+    },
+    {
+      "source_line": 355,
+      "source_text": [
+        "什么事?",
+        "Yeah?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 356,
+      "source_text": [
+        "我是Leonard 他是Sheldon",
+        "I'm leonard, this is sheldon."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 357,
+      "source_text": [
+        "刚刚在对讲机上的",
+        "From the intercom."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 358,
+      "source_text": [
+        "他妈的你们怎么进来的?",
+        "How the hell did you get in the building?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 359,
+      "source_text": [
+        "我们是科学家",
+        "Uh... we're scientists."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 360,
+      "source_text": [
+        "告诉他我们的智商",
+        "Tell him about our iq."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 361,
+      "source_text": [
+        "- Leonard - 什么?",
+        "- Leonard... - what?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 362,
+      "source_text": [
+        "那条裤子是我妈给我买的",
+        "My mom bought me those pants."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 363,
+      "source_text": [
+        "真抱歉",
+        "I'm sorry."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 364,
+      "source_text": [
+        "你得给她打电话",
+        "You're going to have to call her."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "交涉取电视；基础自介去重，侮辱或残句不作主动范本",
+      "source_issue": null
+    },
+    {
+      "source_line": 365,
+      "source_text": [
+        "Sheldon 真对不起把你也扯进来了",
+        "Sheldon,I am so sorry I dragged you through this."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-034"
+      ],
+      "review_note": "原句 through this 强调经历折腾；into this 是另一个常用变体。",
+      "source_issue": null
+    },
+    {
+      "source_line": 366,
+      "source_text": [
+        "没关系 这不是我第一次掉裤子了 也不会是最后一次",
+        "It's okay. It wasn't my first pantsing and it won't be my last."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失败后的反思；自嘲与挖苦只解释情境",
+      "source_issue": null
+    },
+    {
+      "source_line": 367,
+      "source_text": [
+        "你说得对 关于我的动机",
+        "And you were right about my motives."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失败后的反思；自嘲与挖苦只解释情境",
+      "source_issue": null
+    },
+    {
+      "source_line": 368,
+      "source_text": [
+        "我是指望着能跟Penny建立某种关系 并最终发展成肉体关系",
+        "I was hoping to establish a relationship with penny that might have someday led to sex."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失败后的反思；自嘲与挖苦只解释情境",
+      "source_issue": null
+    },
+    {
+      "source_line": 369,
+      "source_text": [
+        "你倒是成功地脱下了我的裤子",
+        "Well,you got me out of my pants."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失败后的反思；自嘲与挖苦只解释情境",
+      "source_issue": null
+    },
+    {
+      "source_line": 370,
+      "source_text": [
+        "无论如何 我得到了教训",
+        "Anyway,I've learned my lesson."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-035"
+      ],
+      "review_note": "lesson 在此指教训，不是上完一节课程。",
+      "source_issue": null
+    },
+    {
+      "source_line": 371,
+      "source_text": [
+        "我配不上她 我放弃了",
+        "She's out of my league, I'm done with her."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-071"
+      ],
+      "review_note": "常反映说话人的自我评价；不应当作对他人客观价值的判断。",
+      "source_issue": null
+    },
+    {
+      "source_line": 372,
+      "source_text": [
+        "我有工作 有一天我会赢得诺贝尔奖 然后孤老死去",
+        "Got my work,one day I'll win the nobel prize and then I'll die alone."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失败后的反思；自嘲与挖苦只解释情境",
+      "source_issue": null
+    },
+    {
+      "source_line": 373,
+      "source_text": [
+        "别那么想 你不会孤老而死",
+        "Don't think like that. You're not going to die alone."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失败后的反思；自嘲与挖苦只解释情境",
+      "source_issue": null
+    },
+    {
+      "source_line": 374,
+      "source_text": [
+        "谢谢你 Sheldon 你真是个好朋友",
+        "Thank you,sheldon. You're a good friend."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失败后的反思；自嘲与挖苦只解释情境",
+      "source_issue": null
+    },
+    {
+      "source_line": 375,
+      "source_text": [
+        "你当然也没可能赢诺贝尔奖",
+        "And you're certainly not going to win a nobel prize."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "失败后的反思；自嘲与挖苦只解释情境",
+      "source_issue": null
+    },
+    {
+      "source_line": 376,
+      "source_text": [
+        "这里是我最喜欢的探险后休息的地方",
+        "This is one of my favorite places to kick back after a quest."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-072"
+      ],
+      "review_note": "随意口语；名词 kickback 另有含义，不混用。",
+      "source_issue": null
+    },
+    {
+      "source_line": 377,
+      "source_text": [
+        "他家的啤酒很好喝",
+        "They have a great house ale."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 378,
+      "source_text": [
+        "好酷的老虎",
+        "Wow,a cool tiger."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 379,
+      "source_text": [
+        "是的 我从10级开始就养它了",
+        "Yeah,I've had him since level ten."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 380,
+      "source_text": [
+        "它叫扣扣",
+        "His name is buttons."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 381,
+      "source_text": [
+        "如果你也有自己的在线游戏人物 我们可以一起玩玩 一起探险",
+        "Anyway,if you had your own game character we could hang out, maybe go on a quest."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-036"
+      ],
+      "review_note": "从原句截取；不一定是约会，具体看关系与上下文。",
+      "source_issue": null
+    },
+    {
+      "source_line": 382,
+      "source_text": [
+        "听上去挺有趣",
+        "Sounds interesting."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 383,
+      "source_text": [
+        "那么 你会想想这个提议啦?",
+        "So you'll think about it?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-037"
+      ],
+      "review_note": "原句有 So；陈述语序加问号是口语确认。",
+      "source_issue": null
+    },
+    {
+      "source_line": 384,
+      "source_text": [
+        "我想这个点子会让我思考许久的",
+        "Oh,I don't think I'll be able to stop thinking about it."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 385,
+      "source_text": [
+        "干得漂亮",
+        "Smooth."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-083"
+      ],
+      "review_note": "本场景非真诚赞美；不能脱离语气机械翻成“干得漂亮”。",
+      "source_issue": null
+    },
+    {
+      "source_line": 386,
+      "source_text": [
+        "我们回来了",
+        "We're home."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 387,
+      "source_text": [
+        "老天啊 发生了什么事?",
+        "Oh,my god,what happened?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 388,
+      "source_text": [
+        "你前男友让我们跟你带声问候 其他的我想应该够一目了然了",
+        "Well,your ex-boyfriend sends his regards and I think the rest is fairly self-explanatory."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-084"
+      ],
+      "review_note": "例句是真诚问候；原剧情不是正常寒暄。",
+      "source_issue": null
+    },
+    {
+      "source_line": 389,
+      "source_text": [
+        "我真抱歉",
+        "I'm so sorry."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 390,
+      "source_text": [
+        "我真的以为如果你们替我去 他不会表现那么混蛋",
+        "I really thought if you guys went instead of me he wouldn't be such an ass."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 391,
+      "source_text": [
+        "挺充分的假设",
+        "No,it was a valid hypothesis."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 392,
+      "source_text": [
+        "挺充分的假...? 你怎么了?",
+        "That was a valid...? What is happening to you?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 393,
+      "source_text": [
+        "说真的 太谢谢你们帮我跑这一趟了",
+        "Really... thank you so much for going and trying."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-038"
+      ],
+      "review_note": "for 后接名词或动名词；保留“没成功也感谢”的语境。",
+      "source_issue": null
+    },
+    {
+      "source_line": 394,
+      "source_text": [
+        "你们真是大好人",
+        "You're so terrific."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 395,
+      "source_text": [
+        "真的",
+        "Really."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 396,
+      "source_text": [
+        "你们穿上衣服 我去拿钱包 今晚我请客 好吧?",
+        "Why don't you get some clothes on, I'll get my purse, and dinner is on me,okay?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-039"
+      ],
+      "review_note": "on me = 由我付钱；不是让别人事后报销。",
+      "source_issue": null
+    },
+    {
+      "source_line": 397,
+      "source_text": [
+        "- 真的吗? 太好了! - 谢谢",
+        "- Really? Great. - Thank you."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 398,
+      "source_text": [
+        "你还没放弃 是吧?",
+        "You're not done with her,are you?"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-073"
+      ],
+      "review_note": "be done with someone 也可能很决绝；本句依剧情是没放弃追求。",
+      "source_issue": null
+    },
+    {
+      "source_line": 399,
+      "source_text": [
+        "我们的小孩肯定又聪敏又漂亮",
+        "Are babies will be smart and beautiful."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "游戏邀请及感谢；游戏细节、重复感谢和恋爱幻想不作核心",
+      "source_issue": "Are 应为 Our"
+    },
+    {
+      "source_line": 400,
+      "source_text": [
+        "而且还是想象出来的",
+        "Not to mention imaginary."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-074"
+      ],
+      "review_note": "原句是挖苦；正常使用不必带讽刺。",
+      "source_issue": null
+    },
+    {
+      "source_line": 401,
+      "source_text": [
+        "- Penny 你能吃泰国菜吗? - 可以啊",
+        "- *with you,penny? - Sure."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": "英文残缺"
+    },
+    {
+      "source_line": 402,
+      "source_text": [
+        "我们不能吃泰国菜 中午已经吃了印度菜",
+        "We can't have thai food- we had indian for lunch."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 403,
+      "source_text": [
+        "所以?",
+        "So?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 404,
+      "source_text": [
+        "它们都是以咖喱为主的菜系",
+        "They're both curry-based cuisines."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 405,
+      "source_text": [
+        "所以?",
+        "So?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 406,
+      "source_text": [
+        "那会造成\"肠胃不能承受之腹泻\"",
+        "It would be gastronomically redundant."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": "中文为改写式笑话，非字面义"
+    },
+    {
+      "source_line": 407,
+      "source_text": [
+        "我发现我们什么都得帮她解释清楚",
+        "I can see we're going to have to spell out everything for this girl."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-075"
+      ],
+      "review_note": "原场景居高临下；例句是中性请求。也有逐字母拼出的本义。",
+      "source_issue": null
+    },
+    {
+      "source_line": 408,
+      "source_text": [
+        "Raj 你有什么主意吗?",
+        "Any ideas,raj?"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 409,
+      "source_text": [
+        "在Lake街左转 朝Colorado开",
+        "Uh,turn left on lake street and head up to colorado."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 410,
+      "source_text": [
+        "那边有个带卡拉OK的寿司吧",
+        "I know a wonderful little sushi bar that has karaoke."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 411,
+      "source_text": [
+        "好像很好玩",
+        "That sounds like fun."
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-040"
+      ],
+      "review_note": "fun 是名词；也可说 That sounds fun，不能改成 funny 表同义。",
+      "source_issue": null
+    },
+    {
+      "source_line": 412,
+      "source_text": [
+        "* 宝贝 宝贝 不要被我迷上 *",
+        "Baby,baby,don't get hooked on me"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 413,
+      "source_text": [
+        "* 宝贝 宝贝 不要被我迷上 *",
+        "oh,baby,baby,don't get hooked on me..."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 414,
+      "source_text": [
+        "我不知道按整个世界算 你追她成功的机率有多大",
+        "I don't know what your odds are in the world as a whole,"
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": null
+    },
+    {
+      "source_line": 415,
+      "source_text": [
+        "但就这辆车里的人来讲",
+        "but as far as the population of this car goes,"
+      ],
+      "decision": "提取并分级",
+      "material_ids": [
+        "S01E01-076"
+      ],
+      "review_note": "只截取可复用结构；原上下文是带挖苦的安慰。",
+      "source_issue": null
+    },
+    {
+      "source_line": 416,
+      "source_text": [
+        "你绝对是名副其实的万人迷",
+        "you're a veritable mack daddy."
+      ],
+      "decision": "暂不单列为素材",
+      "material_ids": [],
+      "review_note": "晚饭安排；菜系争论、歌词、残句及过时搭讪俚语不作核心",
+      "source_issue": null
+    }
+  ]
+}

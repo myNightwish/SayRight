@@ -1,5 +1,5 @@
 /* global chrome, NuanceLearning, NuanceCapture */
-importScripts('learning.js', 'capture-core.js', 'feedback-core.js', 'dictionary-core.js');
+importScripts('learning.js', 'capture-core.js', 'feedback-core.js', 'dictionary-core.js', 'pdf-source.js', 'queue-core.js', 'queue-store.js');
 const MODEL_ORIGIN = 'http://127.0.0.1:48773';
 const SYNC_ORIGIN = 'https://nuance-drfi.onrender.com';
 const FIELDS = ['corrections','sceneSaves','sceneScripts','drillState'];
@@ -9,10 +9,13 @@ async function readState() {
   const data=await chrome.storage.local.get([...FIELDS,'syncTombstones','tutorAccessKey']);
   return {...Object.fromEntries(FIELDS.map(key=>[key,data[key]||{}])),tombstones:data.syncTombstones||{},access:data.tutorAccessKey||''};
 }
+let syncInFlight=null,syncAgain=false;
 function requestSync() {
   // Persist a retry: a suspended MV3 worker must not lose the request to sync.
   chrome.alarms.create('nuance-capture-sync',{delayInMinutes:1});
-  void serialized(syncCloud).catch(()=>{});
+  if(syncInFlight){syncAgain=true;return;}
+  // Network waits must not occupy the local mutation queue.
+  syncInFlight=syncCloud().catch(()=>{}).finally(()=>{syncInFlight=null;if(syncAgain){syncAgain=false;requestSync();}});
 }
 async function syncCloud() {
   const local=await readState();
@@ -22,16 +25,20 @@ async function syncCloud() {
   if(!response.ok)throw new Error('云同步暂未完成');
   const merged=await response.json();
   if(!merged.corrections || !merged.tombstones)throw new Error('同步响应不完整');
+  await serialized(async()=>{
   const fresh=await readState();
   const combined=NuanceCapture.mergeState(merged,fresh);
-  await chrome.storage.local.set({corrections:combined.corrections,syncTombstones:combined.tombstones,nuanceCaptureSyncPending:false});
-  if(JSON.stringify(local.corrections)!==JSON.stringify(fresh.corrections)||JSON.stringify(local.tombstones)!==JSON.stringify(fresh.tombstones)) {
+  const drillState={...(merged.drillState||{})};
+  for(const [key,value] of Object.entries(fresh.drillState||{}))if(!drillState[key]||(value.savedAt||0)>=(drillState[key].savedAt||0))drillState[key]=value;
+  await chrome.storage.local.set({corrections:combined.corrections,drillState,syncTombstones:combined.tombstones,nuanceCaptureSyncPending:false});
+  if(JSON.stringify(local.drillState)!==JSON.stringify(fresh.drillState)||JSON.stringify(local.corrections)!==JSON.stringify(fresh.corrections)||JSON.stringify(local.tombstones)!==JSON.stringify(fresh.tombstones)) {
     await chrome.storage.local.set({nuanceCaptureSyncPending:true});
     chrome.alarms.create('nuance-capture-sync',{delayInMinutes:1});
   } else await chrome.alarms.clear('nuance-capture-sync');
+  });
 }
 chrome.alarms.onAlarm.addListener(alarm=>{
-  if(alarm.name==='nuance-capture-sync') void serialized(syncCloud).catch(()=>chrome.alarms.create('nuance-capture-sync',{delayInMinutes:1}));
+  if(alarm.name==='nuance-capture-sync')requestSync();
 });
 async function resumePendingSync() {
   const state=await chrome.storage.local.get(['nuanceCaptureSyncPending']);
@@ -62,13 +69,32 @@ async function capture(message,sender) {
   return serialized(async()=>{
     const latest=await readState();
     const saved=NuanceCapture.captureInto(latest.corrections,{text,title:sender.tab.title,url:sender.tab.url},generated,Date.now());
+    if(!saved.existed&&message.pdfSource){NuancePdfSource.attach(saved.item,message.pdfSource);saved.item.input=context||text;}
     await chrome.storage.local.set({corrections:saved.map,nuanceCaptureSyncPending:true});
     requestSync();
     return {ok:true,key:saved.key,text:saved.item.better,personalContext:saved.item.personalContext,practiceCue:saved.item.situation,active:saved.active,existed:saved.existed,localOnly:!latest.access};
   });
 }
 chrome.runtime.onMessage.addListener((message,sender,respond)=>{
-  if(!sender.tab || !/^https?:\/\//.test(sender.tab.url||''))return false;
+  const ownedPages=['collection.html','chat.html','quiz.html','pdf-reader.html'];
+  if(message.type==='nuance:queue-capabilities'){
+    if(!ownedPages.some(page=>sender.url?.split(/[?#]/)[0]===chrome.runtime.getURL(page)))return false;
+    respond({ok:true,queueProtocol:NuanceQueue.PROTOCOL});return false;
+  }
+  if(message.type==='nuance:sentence-check'){
+    if(!ownedPages.some(page=>sender.url?.split(/[?#]/)[0]===chrome.runtime.getURL(page)))return false;
+    readState().then(state=>NuanceQueueStore.checkLocal(message.input,{origin:MODEL_ORIGIN,access:state.access})).then(result=>{if(result.changed)requestSync();respond(result);},error=>respond({ok:false,error:error.message}));return true;
+  }
+  if(message.type==='nuance:queue'){
+    if(!ownedPages.some(page=>sender.url?.split(/[?#]/)[0]===chrome.runtime.getURL(page)))return false;
+    serialized(()=>NuanceQueueStore.runLocal(message.action)).then(result=>{if(result.changed)requestSync();respond(result);},error=>respond({ok:false,error:error.message}));return true;
+  }
+  const web=sender.tab&&/^https?:\/\//.test(sender.tab.url||'');
+  const reader=!web&&typeof sender.url==='string'&&sender.url.split(/[?#]/)[0]===chrome.runtime.getURL('pdf-reader.html');
+  if(!web&&!reader)return false;
+  const pdfSource=reader?NuancePdfSource.validate(message.pdfSource):null;
+  if(reader){sender={...sender,tab:{...sender.tab,title:pdfSource?`${pdfSource.fileName} · 第 ${pdfSource.page} 页`:'PDF 阅读',url:''}};}
+  const attachPdf=item=>{if(pdfSource)NuancePdfSource.attach(item,pdfSource);return item;};
   const work=async()=>{
     if(message.type==='nuance:dictionary'){
       const text=typeof message.text==='string'?message.text.trim():'';
@@ -86,7 +112,7 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
       const context=typeof message.context==='string'?message.context.slice(0,3000):'';
       const state=await readState();
       const result=NuanceDictionary.save(state.corrections,text,message.entry,context,{title:sender.tab.title,url:NuanceCapture.cleanUrl(sender.tab.url)},Date.now());
-      if(!result.existed){await chrome.storage.local.set({corrections:result.map,nuanceCaptureSyncPending:true});requestSync();}
+      if(!result.existed){attachPdf(result.item);await chrome.storage.local.set({corrections:result.map,nuanceCaptureSyncPending:true});requestSync();}
       return {ok:true,existed:result.existed,localOnly:!state.access};
     });
     if(message.type==='nuance:open-library'){await chrome.tabs.create({url:chrome.runtime.getURL('collection.html')});return {ok:true};}
@@ -106,7 +132,7 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
         const fresh=await readState();
         if(!Object.hasOwn(fresh.corrections,key)){
           const item=NuanceFeedback.session(data,text,sender.tab.title||'网页中的表达调整',id,Date.now());
-          item.sourceUrl=NuanceCapture.cleanUrl(sender.tab.url);fresh.corrections[key]=item;
+          item.sourceUrl=NuanceCapture.cleanUrl(sender.tab.url);attachPdf(item);fresh.corrections[key]=item;
         }
         await chrome.storage.local.set({corrections:fresh.corrections,nuanceCaptureSyncPending:true});requestSync();
         return {ok:true,item:fresh.corrections[key],localOnly:!fresh.access};
@@ -129,12 +155,12 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
         return {ok:true,item:fresh.corrections[key]};
       });
     }
-    if(message.type==='nuance:capture')return capture(message,sender);
+    if(message.type==='nuance:capture')return capture({...message,pdfSource},sender);
     if(message.type==='nuance:practice'){
       const state=await readState();
       const item=typeof message.key==='string'&&Object.hasOwn(state.corrections,message.key)?state.corrections[message.key]:null;
       if(!item)throw new Error('这条表达已不存在');
-      const page=NuanceLearning.stateOf(item)==='active'?`quiz.html?capture=${encodeURIComponent(item.captureId || "")}`:'collection.html';
+      const page='collection.html#queue';
       await chrome.tabs.create({url:chrome.runtime.getURL(page)});return {ok:true};
     }
     if(message.type==='nuance:edit-cue')return serialized(async()=>{

@@ -1,0 +1,1121 @@
+{
+  "metadata": {
+    "episode": "S01E01",
+    "source_docx": "/Users/maomao/Desktop/the big bang theroy/S01/docx/TheBigBangS01E01.docx",
+    "review_date": "2026-10-26",
+    "verification": "已逐条审阅用户提供的双语文本编号1至416；未核对原剧音视频，未与独立官方剧本交叉核对。",
+    "frequency_basis": "常用性为教学判断，未进行语料库频率统计。",
+    "tiers": {
+      "A": "优先主动练习",
+      "B": "进阶复用，注意语气或结构",
+      "C": "辨认即可，暂不主动模仿"
+    },
+    "counts": {
+      "A": 40,
+      "B": 36,
+      "C": 8
+    }
+  },
+  "expressions": [
+    {
+      "id": "S01E01-001",
+      "tier": "A",
+      "source_lines": [
+        8
+      ],
+      "expression": "Excuse me.",
+      "meaning_zh": "打扰一下／劳驾。",
+      "source_context_zh": "柜台前先引起工作人员注意。",
+      "use_case_zh": "问路、借过、开口求助。",
+      "practice_example": "Excuse me. Is this seat taken?",
+      "usage_note_zh": "第238条同一句是对前句话的疑问；含义随语境变化。"
+    },
+    {
+      "id": "S01E01-002",
+      "tier": "A",
+      "source_lines": [
+        9,
+        267
+      ],
+      "expression": "Hang on.",
+      "meaning_zh": "等一下。",
+      "source_context_zh": "第9条让对方稍等；第267条听到有女客来访后停下来确认。",
+      "use_case_zh": "请求稍候，或暂停对话核实信息。",
+      "practice_example": "Hang on. Let me check my calendar.",
+      "usage_note_zh": "可表示等时间，也可表示“等等，你是说……”；口语。"
+    },
+    {
+      "id": "S01E01-003",
+      "tier": "A",
+      "source_lines": [
+        16
+      ],
+      "expression": "Can I help you?",
+      "meaning_zh": "有什么可以帮你的吗？",
+      "source_context_zh": "工作人员询问来意。",
+      "use_case_zh": "接待客人、主动提供帮助。",
+      "practice_example": "Can I help you carry those bags?",
+      "usage_note_zh": "有时也可能带警觉或质问，取决于场景和语气。"
+    },
+    {
+      "id": "S01E01-004",
+      "tier": "A",
+      "source_lines": [
+        19
+      ],
+      "expression": "I think this is the place.",
+      "meaning_zh": "我想就是这里了。",
+      "source_context_zh": "两人确认找到了要去的地方。",
+      "use_case_zh": "按地址找到餐厅、办公室。",
+      "practice_example": "I think this is the place. The address matches.",
+      "usage_note_zh": "I think 表示判断留有余地。"
+    },
+    {
+      "id": "S01E01-005",
+      "tier": "A",
+      "source_lines": [
+        20
+      ],
+      "expression": "Fill these out.",
+      "meaning_zh": "把这些表填一下。",
+      "source_context_zh": "工作人员让两人填写表格。",
+      "use_case_zh": "填写申请、登记表。",
+      "practice_example": "Could you fill out this form, please?",
+      "usage_note_zh": "fill out a form；代词要放中间：fill it out。例句比原句礼貌。"
+    },
+    {
+      "id": "S01E01-006",
+      "tier": "A",
+      "source_lines": [
+        21
+      ],
+      "expression": "We'll be right back.",
+      "meaning_zh": "我们马上回来。",
+      "source_context_zh": "拿到表格后暂时离开柜台。",
+      "use_case_zh": "暂离座位、通话或店铺。",
+      "practice_example": "I'll be right back. I left my phone upstairs.",
+      "usage_note_zh": "right back 表示很快回来，不承诺具体分钟数。"
+    },
+    {
+      "id": "S01E01-007",
+      "tier": "A",
+      "source_lines": [
+        22
+      ],
+      "expression": "Take your time.",
+      "meaning_zh": "慢慢来，不着急。",
+      "source_context_zh": "工作人员表示可以慢慢填，她继续做填字游戏。",
+      "use_case_zh": "让对方放心准备或考虑。",
+      "practice_example": "Take your time. We still have twenty minutes.",
+      "usage_note_zh": "原场景略显漫不经心；日常可用来体贴地表示不催。"
+    },
+    {
+      "id": "S01E01-008",
+      "tier": "A",
+      "source_lines": [
+        24
+      ],
+      "expression": "I don't think I can do this.",
+      "meaning_zh": "我觉得我做不了这件事。",
+      "source_context_zh": "Sheldon 对原来的计划打退堂鼓。",
+      "use_case_zh": "紧张、承受不住或想退出。",
+      "practice_example": "I don't think I can do this on my own.",
+      "usage_note_zh": "比 I can't do this 多一层试探，不等于客观能力不足。"
+    },
+    {
+      "id": "S01E01-009",
+      "tier": "A",
+      "source_lines": [
+        37
+      ],
+      "expression": "What do you want to do?",
+      "meaning_zh": "你想怎么办／做什么？",
+      "source_context_zh": "Leonard 询问 Sheldon 接下来如何处理。",
+      "use_case_zh": "商量安排、询问偏好。",
+      "practice_example": "What do you want to do after lunch?",
+      "usage_note_zh": "want to 口语可弱化；对陌生人可用 What would you like to do?"
+    },
+    {
+      "id": "S01E01-010",
+      "tier": "A",
+      "source_lines": [
+        43
+      ],
+      "expression": "Nice meeting you.",
+      "meaning_zh": "很高兴认识你。",
+      "source_context_zh": "离开柜台时道别。",
+      "use_case_zh": "初次见面结束时。",
+      "practice_example": "It was nice meeting you. Hope to see you again.",
+      "usage_note_zh": "Nice to meet you 常用于刚见面；Nice meeting you 常用于结束会面。"
+    },
+    {
+      "id": "S01E01-011",
+      "tier": "A",
+      "source_lines": [
+        47
+      ],
+      "expression": "Not really.",
+      "meaning_zh": "不太／其实不怎么。",
+      "source_context_zh": "被问想不想听楼梯趣事，Leonard 兴趣不大。",
+      "use_case_zh": "温和否定兴趣、程度。",
+      "practice_example": "Are you hungry? — Not really.",
+      "usage_note_zh": "比直接 No 软一些，但不一定表示“有一点”。"
+    },
+    {
+      "id": "S01E01-012",
+      "tier": "A",
+      "source_lines": [
+        50
+      ],
+      "expression": "That doesn't seem right.",
+      "meaning_zh": "听起来／看起来不太对。",
+      "source_context_zh": "Leonard 怀疑楼梯高度差的说法。",
+      "use_case_zh": "温和质疑数字、判断或安排。",
+      "practice_example": "That doesn't seem right. Could we check the total again?",
+      "usage_note_zh": "seem 表示根据现有信息作判断，比 You're wrong 缓和。"
+    },
+    {
+      "id": "S01E01-013",
+      "tier": "A",
+      "source_lines": [
+        61
+      ],
+      "expression": "We don't mean to interrupt.",
+      "meaning_zh": "我们无意打扰。",
+      "source_context_zh": "两人在 Penny 门口自我介绍前缓和打扰。",
+      "use_case_zh": "加入别人的谈话或临时打断。",
+      "practice_example": "I don't mean to interrupt, but your taxi is here.",
+      "usage_note_zh": "mean to do 表示有意做；单人用 I。"
+    },
+    {
+      "id": "S01E01-014",
+      "tier": "A",
+      "source_lines": [
+        61
+      ],
+      "expression": "We live across the hall.",
+      "meaning_zh": "我们住在走廊对面。",
+      "source_context_zh": "向新邻居说明住处。",
+      "use_case_zh": "介绍住址相对位置。",
+      "practice_example": "I live across the hall, in apartment 4B.",
+      "usage_note_zh": "across the hall 是同一走廊另一侧，不是街对面。"
+    },
+    {
+      "id": "S01E01-015",
+      "tier": "A",
+      "source_lines": [
+        71
+      ],
+      "expression": "Maybe we can have coffee sometime.",
+      "meaning_zh": "也许哪天可以一起喝杯咖啡。",
+      "source_context_zh": "Penny 礼貌回应新邻居的欢迎。",
+      "use_case_zh": "低压力地提出社交邀请。",
+      "practice_example": "Maybe we can have lunch sometime.",
+      "usage_note_zh": "sometime 是未定的某个时候；不是已经约好，需后续落实时间。"
+    },
+    {
+      "id": "S01E01-016",
+      "tier": "A",
+      "source_lines": [
+        107
+      ],
+      "expression": "I'd love to.",
+      "meaning_zh": "我很乐意。",
+      "source_context_zh": "Penny 接受一起吃饭的邀请。",
+      "use_case_zh": "热情接受邀请。",
+      "practice_example": "Would you like to join us? — I'd love to.",
+      "usage_note_zh": "I'd = I would；若有转折 I'd love to, but... 才是婉拒。"
+    },
+    {
+      "id": "S01E01-017",
+      "tier": "A",
+      "source_lines": [
+        109
+      ],
+      "expression": "What do you guys do for fun around here?",
+      "meaning_zh": "你们平时在这附近都有什么娱乐？",
+      "source_context_zh": "Penny 想了解邻居的休闲活动。",
+      "use_case_zh": "认识新朋友、了解当地生活。",
+      "practice_example": "What do you do for fun on weekends?",
+      "usage_note_zh": "you guys 较随意；do for fun 是“平时有什么消遣”。"
+    },
+    {
+      "id": "S01E01-018",
+      "tier": "A",
+      "source_lines": [
+        129
+      ],
+      "expression": "This is really impressive.",
+      "meaning_zh": "这真让人佩服。",
+      "source_context_zh": "Penny 对白板上的研究表示赞叹。",
+      "use_case_zh": "夸作品、成果或技能。",
+      "practice_example": "Your presentation was really impressive.",
+      "usage_note_zh": "impressive 是令人赞叹，不是“印象深刻的”一律直译。"
+    },
+    {
+      "id": "S01E01-019",
+      "tier": "A",
+      "source_lines": [
+        140
+      ],
+      "expression": "Do you guys mind if I start?",
+      "meaning_zh": "你们介意我先开始吗？",
+      "source_context_zh": "两人争论白板，Penny 想先吃饭。",
+      "use_case_zh": "征求先吃、先走或使用某物的许可。",
+      "practice_example": "Do you mind if I open the window?",
+      "usage_note_zh": "回答 No, go ahead. 表示不介意；回答 Yes 表示介意。"
+    },
+    {
+      "id": "S01E01-020",
+      "tier": "A",
+      "source_lines": [
+        170
+      ],
+      "expression": "Tell us about you.",
+      "meaning_zh": "跟我们说说你吧。",
+      "source_context_zh": "Leonard 把话题从自己这边转向 Penny。",
+      "use_case_zh": "让新朋友介绍自己。",
+      "practice_example": "Tell me a little about yourself.",
+      "usage_note_zh": "原句偏随意；yourself 是常用变体，并非原句转录。"
+    },
+    {
+      "id": "S01E01-021",
+      "tier": "A",
+      "source_lines": [
+        179,
+        195
+      ],
+      "expression": "Let's see. What else?",
+      "meaning_zh": "让我想想，还有什么？",
+      "source_context_zh": "Penny 自我介绍时整理思路。",
+      "use_case_zh": "回忆、列举、补充信息。",
+      "practice_example": "Let's see. What else do we need to buy?",
+      "usage_note_zh": "Let's see 在此是思考填充语，不是“我们看见”。"
+    },
+    {
+      "id": "S01E01-022",
+      "tier": "A",
+      "source_lines": [
+        194
+      ],
+      "expression": "I know, right?",
+      "meaning_zh": "就是啊／对吧！",
+      "source_context_zh": "Leonard 说愿意看她的电影，Penny 认同他的正面回应。",
+      "use_case_zh": "热情附和对方的评价。",
+      "practice_example": "This place is amazing. — I know, right?",
+      "usage_note_zh": "不是“不知道答案所以问对不对”；熟人间较自然。"
+    },
+    {
+      "id": "S01E01-023",
+      "tier": "A",
+      "source_lines": [
+        196
+      ],
+      "expression": "I guess that's about it.",
+      "meaning_zh": "我想差不多就这些了。",
+      "source_context_zh": "Penny 觉得自我介绍说得差不多了。",
+      "use_case_zh": "结束汇报、列举或说明。",
+      "practice_example": "I guess that's about it for today.",
+      "usage_note_zh": "原文省略 I；此处补出主语作为教学形式，about it 表示大致说完。"
+    },
+    {
+      "id": "S01E01-024",
+      "tier": "A",
+      "source_lines": [
+        221
+      ],
+      "expression": "I'm such a mess.",
+      "meaning_zh": "我现在真是乱成一团了。",
+      "source_context_zh": "Penny 哭诉失恋，觉得自己情绪失控。",
+      "use_case_zh": "表达情绪或状态很糟。",
+      "practice_example": "I'm such a mess today. I barely slept last night.",
+      "usage_note_zh": "此处主要是情绪崩溃，也可依场景说外表狼狈，不是房间很乱。"
+    },
+    {
+      "id": "S01E01-025",
+      "tier": "A",
+      "source_lines": [
+        222
+      ],
+      "expression": "On top of everything else, ...",
+      "meaning_zh": "除此之外，偏偏又……",
+      "source_context_zh": "失恋、搬家劳累之外，淋浴也坏了。",
+      "use_case_zh": "表达麻烦接踵而至。",
+      "practice_example": "On top of everything else, I missed my train.",
+      "usage_note_zh": "常用于坏事叠加，但本身不限定负面。"
+    },
+    {
+      "id": "S01E01-026",
+      "tier": "A",
+      "source_lines": [
+        222
+      ],
+      "expression": "My shower doesn't even work.",
+      "meaning_zh": "我的淋浴居然还坏了。",
+      "source_context_zh": "Penny 抱怨新住处的淋浴不能用。",
+      "use_case_zh": "说明设备故障。",
+      "practice_example": "My laptop doesn't even turn on.",
+      "usage_note_zh": "从原句提取简化，原文含 my stupid shower；even 加强抱怨。"
+    },
+    {
+      "id": "S01E01-027",
+      "tier": "A",
+      "source_lines": [
+        228
+      ],
+      "expression": "It's right down the hall.",
+      "meaning_zh": "就在沿着走廊过去的地方。",
+      "source_context_zh": "Leonard 指出浴室的位置。",
+      "use_case_zh": "室内指路。",
+      "practice_example": "The restroom is right down the hall, on your left.",
+      "usage_note_zh": "原中文“厅后面”不够准确；right 在此加强“就在那里”。"
+    },
+    {
+      "id": "S01E01-028",
+      "tier": "A",
+      "source_lines": [
+        229
+      ],
+      "expression": "You guys are really sweet.",
+      "meaning_zh": "你们人真好／真体贴。",
+      "source_context_zh": "Penny 感谢他们愿意借浴室。",
+      "use_case_zh": "感谢体贴、照顾或善意。",
+      "practice_example": "That's really sweet of you. Thank you.",
+      "usage_note_zh": "sweet 在此形容体贴，不是味道甜；商务场景可用 kind。"
+    },
+    {
+      "id": "S01E01-029",
+      "tier": "A",
+      "source_lines": [
+        258,
+        262
+      ],
+      "expression": "This isn't a good time.",
+      "meaning_zh": "现在不太方便。",
+      "source_context_zh": "朋友来展示讲座，Leonard 想让他们离开。",
+      "use_case_zh": "暂缓来访、谈话或请求。",
+      "practice_example": "This isn't a good time. Can I call you back in ten minutes?",
+      "usage_note_zh": "附上替代时间更体贴；原场景带急于送客的意思。"
+    },
+    {
+      "id": "S01E01-030",
+      "tier": "A",
+      "source_lines": [
+        293
+      ],
+      "expression": "Can I ask you a favor?",
+      "meaning_zh": "能请你帮个忙吗？",
+      "source_context_zh": "Penny 开口请 Leonard 帮忙取电视。",
+      "use_case_zh": "提出请求前铺垫。",
+      "practice_example": "Can I ask you a favor? Could you water my plants tomorrow?",
+      "usage_note_zh": "ask someone a favor 和 do someone a favor 搭配不同。"
+    },
+    {
+      "id": "S01E01-031",
+      "tier": "A",
+      "source_lines": [
+        296
+      ],
+      "expression": "It's okay if you say no.",
+      "meaning_zh": "你拒绝也没关系。",
+      "source_context_zh": "Penny 表示 Leonard 可以不答应。",
+      "use_case_zh": "给对方真实的拒绝空间。",
+      "practice_example": "It's okay if you say no. I know you're busy.",
+      "usage_note_zh": "用在请求后；说完也应接受对方拒绝。"
+    },
+    {
+      "id": "S01E01-032",
+      "tier": "A",
+      "source_lines": [
+        337
+      ],
+      "expression": "We're here to pick up Penny's TV.",
+      "meaning_zh": "我们来取 Penny 的电视。",
+      "source_context_zh": "两人在前男友住处说明来意。",
+      "use_case_zh": "取物、接人、取订单。",
+      "practice_example": "I'm here to pick up my order.",
+      "usage_note_zh": "pick up 在此是取回；也可接人，需看宾语。"
+    },
+    {
+      "id": "S01E01-033",
+      "tier": "A",
+      "source_lines": [
+        339
+      ],
+      "expression": "Thanks for your time.",
+      "meaning_zh": "谢谢你抽时间。",
+      "source_context_zh": "被赶走后，Leonard 匆忙礼貌结束对话。",
+      "use_case_zh": "结束咨询、面谈或求助。",
+      "practice_example": "Thanks for your time. I'll send you the details later.",
+      "usage_note_zh": "原文 you time 为明确笔误，教学修正为 your time。"
+    },
+    {
+      "id": "S01E01-034",
+      "tier": "A",
+      "source_lines": [
+        365
+      ],
+      "expression": "I'm so sorry I dragged you through this.",
+      "meaning_zh": "真抱歉，让你也跟着遭这份罪。",
+      "source_context_zh": "取电视失败且受辱后，Leonard 向 Sheldon 道歉。",
+      "use_case_zh": "自己的请求使朋友经历麻烦后。",
+      "practice_example": "I'm sorry I dragged you into this argument.",
+      "usage_note_zh": "原句 through this 强调经历折腾；into this 是另一个常用变体。"
+    },
+    {
+      "id": "S01E01-035",
+      "tier": "A",
+      "source_lines": [
+        370
+      ],
+      "expression": "I've learned my lesson.",
+      "meaning_zh": "我吸取教训了。",
+      "source_context_zh": "Leonard 因自己的动机而后悔这次行动。",
+      "use_case_zh": "失败后表示以后会注意。",
+      "practice_example": "I've learned my lesson. Next time I'll back up my files.",
+      "usage_note_zh": "lesson 在此指教训，不是上完一节课程。"
+    },
+    {
+      "id": "S01E01-036",
+      "tier": "A",
+      "source_lines": [
+        381
+      ],
+      "expression": "We could hang out.",
+      "meaning_zh": "我们可以一起待着／出去玩。",
+      "source_context_zh": "Howard 邀 Penny 用游戏角色一起活动。",
+      "use_case_zh": "朋友间随意相处。",
+      "practice_example": "We could hang out after work.",
+      "usage_note_zh": "从原句截取；不一定是约会，具体看关系与上下文。"
+    },
+    {
+      "id": "S01E01-037",
+      "tier": "A",
+      "source_lines": [
+        383
+      ],
+      "expression": "You'll think about it?",
+      "meaning_zh": "你会考虑一下吗？",
+      "source_context_zh": "Howard 追问 Penny 是否考虑游戏邀请。",
+      "use_case_zh": "不要求立刻答复。",
+      "practice_example": "Will you think about it and let me know tomorrow?",
+      "usage_note_zh": "原句有 So；陈述语序加问号是口语确认。"
+    },
+    {
+      "id": "S01E01-038",
+      "tier": "A",
+      "source_lines": [
+        393
+      ],
+      "expression": "Thank you so much for going and trying.",
+      "meaning_zh": "非常感谢你们跑这一趟，愿意去试。",
+      "source_context_zh": "虽然没取回电视，Penny 仍感谢付出的努力。",
+      "use_case_zh": "感谢尝试和投入，不只感谢成功。",
+      "practice_example": "Thank you so much for taking the time to help.",
+      "usage_note_zh": "for 后接名词或动名词；保留“没成功也感谢”的语境。"
+    },
+    {
+      "id": "S01E01-039",
+      "tier": "A",
+      "source_lines": [
+        396
+      ],
+      "expression": "Dinner is on me.",
+      "meaning_zh": "晚饭我请。",
+      "source_context_zh": "Penny 为感谢两人决定请吃晚饭。",
+      "use_case_zh": "主动买单。",
+      "practice_example": "Coffee is on me today.",
+      "usage_note_zh": "on me = 由我付钱；不是让别人事后报销。"
+    },
+    {
+      "id": "S01E01-040",
+      "tier": "A",
+      "source_lines": [
+        411
+      ],
+      "expression": "That sounds like fun.",
+      "meaning_zh": "听起来很好玩。",
+      "source_context_zh": "听到带卡拉 OK 的寿司店建议后作出积极回应。",
+      "use_case_zh": "回应活动建议。",
+      "practice_example": "A picnic by the lake? That sounds like fun.",
+      "usage_note_zh": "fun 是名词；也可说 That sounds fun，不能改成 funny 表同义。"
+    },
+    {
+      "id": "S01E01-041",
+      "tier": "B",
+      "source_lines": [
+        6
+      ],
+      "expression": "What's your point?",
+      "meaning_zh": "你想说明什么？",
+      "source_context_zh": "Leonard 听完物理解释后问目的。",
+      "use_case_zh": "追问对方的核心意思。",
+      "practice_example": "I'm not sure I follow. What's your main point?",
+      "usage_note_zh": "原句可能显得不耐烦；先练例句这类缓和表达。"
+    },
+    {
+      "id": "S01E01-042",
+      "tier": "B",
+      "source_lines": [
+        25
+      ],
+      "expression": "Are you kidding?",
+      "meaning_zh": "你开玩笑吧？",
+      "source_context_zh": "Leonard 对 Sheldon 临时反悔表示惊讶。",
+      "use_case_zh": "震惊、不信、觉得不可思议。",
+      "practice_example": "You finished already? Are you kidding?",
+      "usage_note_zh": "可喜可怒；音调与上下文决定情绪。"
+    },
+    {
+      "id": "S01E01-043",
+      "tier": "B",
+      "source_lines": [
+        27
+      ],
+      "expression": "There's no guarantee that ...",
+      "meaning_zh": "不能保证……",
+      "source_context_zh": "Sheldon 担忧后代智力没有保证。",
+      "use_case_zh": "讨论结果与不确定性。",
+      "practice_example": "There's no guarantee that we'll finish today.",
+      "usage_note_zh": "迁移时替换成日常主题，无需保留成人情节。"
+    },
+    {
+      "id": "S01E01-044",
+      "tier": "B",
+      "source_lines": [
+        33,
+        190
+      ],
+      "expression": "wind up ...",
+      "meaning_zh": "最后落得／结果成为……",
+      "source_context_zh": "第33条担忧最终的结果；第190条描述梦想当演员却当了服务员。",
+      "use_case_zh": "描述计划外的最终结果。",
+      "practice_example": "We wound up staying home because of the rain.",
+      "usage_note_zh": "wind up doing / wind up + 名词；过去式 wound up。"
+    },
+    {
+      "id": "S01E01-045",
+      "tier": "B",
+      "source_lines": [
+        44
+      ],
+      "expression": "Are you still mad about ...?",
+      "meaning_zh": "你还在为……生气吗？",
+      "source_context_zh": "Leonard 问 Sheldon 是否还为之前的事生气。",
+      "use_case_zh": "了解熟人的情绪。",
+      "practice_example": "Are you still mad about what I said yesterday?",
+      "usage_note_zh": "原文 made 应为 mad；也可问 upset，语气更温和。"
+    },
+    {
+      "id": "S01E01-046",
+      "tier": "B",
+      "source_lines": [
+        76
+      ],
+      "expression": "Should we have invited her for lunch?",
+      "meaning_zh": "我们刚才是不是该邀请她吃午饭？",
+      "source_context_zh": "道别后 Leonard 回想是否应该邀 Penny。",
+      "use_case_zh": "反思过去遗漏的行动。",
+      "practice_example": "Should I have called first?",
+      "usage_note_zh": "should have + 过去分词，谈已经过去的事；不是未来安排。"
+    },
+    {
+      "id": "S01E01-047",
+      "tier": "B",
+      "source_lines": [
+        80,
+        88
+      ],
+      "expression": "invite someone over",
+      "meaning_zh": "邀请某人来家里。",
+      "source_context_zh": "Leonard 决定请 Penny 来公寓吃饭。",
+      "use_case_zh": "邀请到自己所在处，常指家。",
+      "practice_example": "Let's invite Maya over for dinner.",
+      "usage_note_zh": "over 带“过来做客”之意，invite out 则偏邀请外出。"
+    },
+    {
+      "id": "S01E01-048",
+      "tier": "B",
+      "source_lines": [
+        87
+      ],
+      "expression": "That's the beauty of it.",
+      "meaning_zh": "这正是它妙的地方。",
+      "source_context_zh": "Sheldon 觉得不用线下见网友恰好是优点。",
+      "use_case_zh": "说明某特点正是好处。",
+      "practice_example": "You can work anywhere. That's the beauty of it.",
+      "usage_note_zh": "原场景是幽默反转；短语本身可真诚使用。"
+    },
+    {
+      "id": "S01E01-049",
+      "tier": "B",
+      "source_lines": [
+        98
+      ],
+      "expression": "Moving can be stressful.",
+      "meaning_zh": "搬家可能很让人心累。",
+      "source_context_zh": "Leonard 邀请 Penny 前承认搬家的压力。",
+      "use_case_zh": "表达理解、描述有压力的经历。",
+      "practice_example": "Starting a new job can be stressful.",
+      "usage_note_zh": "stressful 形容事情使人有压力；stressed 形容人的状态。"
+    },
+    {
+      "id": "S01E01-050",
+      "tier": "B",
+      "source_lines": [
+        103,
+        104
+      ],
+      "expression": "You might want to ...",
+      "meaning_zh": "你最好考虑……／你不妨……",
+      "source_context_zh": "Sheldon 建议 Leonard 邀饭时别提排便。",
+      "use_case_zh": "委婉建议、提醒。",
+      "practice_example": "You might want to leave a little earlier.",
+      "usage_note_zh": "形式较缓和，但也可能带纠正意味；不是单纯猜“你可能想”。"
+    },
+    {
+      "id": "S01E01-051",
+      "tier": "B",
+      "source_lines": [
+        145
+      ],
+      "expression": "What's the difference?",
+      "meaning_zh": "有什么区别？",
+      "source_context_zh": "Penny 不理解为什么必须坐固定位置。",
+      "use_case_zh": "比较选项，也可能表示“有区别吗”。",
+      "practice_example": "What's the difference between these two plans?",
+      "usage_note_zh": "原句带质疑，教学先用带具体比较对象的形式。"
+    },
+    {
+      "id": "S01E01-052",
+      "tier": "B",
+      "source_lines": [
+        153
+      ],
+      "expression": "I think I've made my point.",
+      "meaning_zh": "我想我已经说清楚了。",
+      "source_context_zh": "Sheldon 详细解释座位的好处后收尾。",
+      "use_case_zh": "结束说明或论证。",
+      "practice_example": "I hope that makes sense.",
+      "usage_note_zh": "原句容易显得强硬或自满；例句是更柔和的替代表达，不是同义逐字改写。"
+    },
+    {
+      "id": "S01E01-053",
+      "tier": "B",
+      "source_lines": [
+        191
+      ],
+      "expression": "It's based on your life.",
+      "meaning_zh": "这是以你的生活经历为基础的。",
+      "source_context_zh": "Leonard 听出 Penny 的剧本近似她自己经历。",
+      "use_case_zh": "描述改编来源。",
+      "practice_example": "The film is based on a true story.",
+      "usage_note_zh": "原文以 So 开头；based on 表示以……为基础，不保证每个细节真实。"
+    },
+    {
+      "id": "S01E01-054",
+      "tier": "B",
+      "source_lines": [
+        206
+      ],
+      "expression": "I can't believe I trusted him.",
+      "meaning_zh": "我真不敢相信自己竟然信了他。",
+      "source_context_zh": "Penny 对前男友失信感到后悔。",
+      "use_case_zh": "惊讶或后悔自己做过的事。",
+      "practice_example": "I can't believe I forgot your birthday.",
+      "usage_note_zh": "过去时 trusted 指已经发生的信任；不能一律理解为现在仍相信。"
+    },
+    {
+      "id": "S01E01-055",
+      "tier": "B",
+      "source_lines": [
+        208
+      ],
+      "expression": "You'll only make it worse.",
+      "meaning_zh": "你只会让事情更糟。",
+      "source_context_zh": "Leonard 阻止 Sheldon 尝试安慰 Penny。",
+      "use_case_zh": "担心干预会恶化问题。",
+      "practice_example": "I'm worried that might make things worse.",
+      "usage_note_zh": "原句责备感较强；例句提供更温和的说法。"
+    },
+    {
+      "id": "S01E01-056",
+      "tier": "B",
+      "source_lines": [
+        224
+      ],
+      "expression": "Would it be totally weird if I used it?",
+      "meaning_zh": "如果我用一下，会不会很奇怪？",
+      "source_context_zh": "Penny 犹豫是否借用刚认识邻居的浴室。",
+      "use_case_zh": "试探某个请求是否越界或尴尬。",
+      "practice_example": "Would it be okay if I used your charger?",
+      "usage_note_zh": "原句 if 后 used 是假设语气，不指过去；okay 版本适用面更广。"
+    },
+    {
+      "id": "S01E01-057",
+      "tier": "B",
+      "source_lines": [
+        231
+      ],
+      "expression": "How so?",
+      "meaning_zh": "怎么说／为什么这么说？",
+      "source_context_zh": "Leonard 追问 Sheldon 为什么说事情有了有趣进展。",
+      "use_case_zh": "请对方解释上一句判断。",
+      "practice_example": "You said it's different. How so?",
+      "usage_note_zh": "只用于追问理由或方式，不是 How are you?"
+    },
+    {
+      "id": "S01E01-058",
+      "tier": "B",
+      "source_lines": [
+        234
+      ],
+      "expression": "Point taken.",
+      "meaning_zh": "有道理，我接受这个纠正。",
+      "source_context_zh": "Sheldon 承认 Leonard 用奶奶的事反驳了自己。",
+      "use_case_zh": "承认对方有道理或更正成立。",
+      "practice_example": "Point taken. I'll check with you first next time.",
+      "usage_note_zh": "略显简短；不是“收到信息”所有场景都能代替 Got it。"
+    },
+    {
+      "id": "S01E01-059",
+      "tier": "B",
+      "source_lines": [
+        242
+      ],
+      "expression": "What makes you think ...?",
+      "meaning_zh": "你为什么觉得……？",
+      "source_context_zh": "Leonard 追问 Sheldon 作出判断的依据。",
+      "use_case_zh": "了解对方判断的理由。",
+      "practice_example": "What makes you think the meeting was canceled?",
+      "usage_note_zh": "可中性可带挑战；需注意语调。"
+    },
+    {
+      "id": "S01E01-060",
+      "tier": "B",
+      "source_lines": [
+        254
+      ],
+      "expression": "Wait till you see this.",
+      "meaning_zh": "等你看到这个就知道了。",
+      "source_context_zh": "朋友兴奋地拿来讲座资料。",
+      "use_case_zh": "分享前制造期待。",
+      "practice_example": "Wait till you see the photos.",
+      "usage_note_zh": "till = until；不是指真的必须一直站着等。"
+    },
+    {
+      "id": "S01E01-061",
+      "tier": "B",
+      "source_lines": [
+        274
+      ],
+      "expression": "Is there a trick to getting it to ...?",
+      "meaning_zh": "有什么窍门能让它……吗？",
+      "source_context_zh": "Penny 问如何把浴缸出水切换成淋浴。",
+      "use_case_zh": "请教设备操作或做事诀窍。",
+      "practice_example": "Is there a trick to getting this lid off?",
+      "usage_note_zh": "to 为介词，后接 getting；原句以 switch from tub to shower 结尾。"
+    },
+    {
+      "id": "S01E01-062",
+      "tier": "B",
+      "source_lines": [
+        288
+      ],
+      "expression": "It sticks.",
+      "meaning_zh": "它会卡住。",
+      "source_context_zh": "Leonard 解释淋浴开关操作不顺。",
+      "use_case_zh": "说明按钮、门或机械部件卡滞。",
+      "practice_example": "The drawer sticks sometimes.",
+      "usage_note_zh": "it 指开关，不是“它粘住了东西”；stuck 常形容已经卡住的状态。"
+    },
+    {
+      "id": "S01E01-063",
+      "tier": "B",
+      "source_lines": [
+        306
+      ],
+      "expression": "do someone a favor",
+      "meaning_zh": "帮某人一个忙。",
+      "source_context_zh": "Leonard 解释自己为何去取电视。",
+      "use_case_zh": "描述帮忙。",
+      "practice_example": "Could you do me a favor and close the door?",
+      "usage_note_zh": "与第293条 ask someone a favor 对照学习。"
+    },
+    {
+      "id": "S01E01-064",
+      "tier": "B",
+      "source_lines": [
+        312
+      ],
+      "expression": "You didn't have to come.",
+      "meaning_zh": "你本来不用来的。",
+      "source_context_zh": "争论取电视时，Leonard 回应 Sheldon 的抱怨。",
+      "use_case_zh": "表示过去没有义务做某事。",
+      "practice_example": "You didn't have to bring anything, but thank you.",
+      "usage_note_zh": "原场景偏防御；不等于“你不该来”，也不表示对方没来。"
+    },
+    {
+      "id": "S01E01-065",
+      "tier": "B",
+      "source_lines": [
+        315
+      ],
+      "expression": "You know how it is with ...",
+      "meaning_zh": "你知道……这事就是这样。",
+      "source_context_zh": "Leonard 以分手的难处解释 Penny 不愿自己出面。",
+      "use_case_zh": "唤起对方对共同经历的理解。",
+      "practice_example": "You know how it is with deadlines. Things get hectic.",
+      "usage_note_zh": "对方未必有同样经历；本集下一句正是在否认这个前提。"
+    },
+    {
+      "id": "S01E01-066",
+      "tier": "B",
+      "source_lines": [
+        322,
+        323
+      ],
+      "expression": "have a scene with someone",
+      "meaning_zh": "跟某人当众争吵／闹起来。",
+      "source_context_zh": "Penny 想避免和前男友正面冲突。",
+      "use_case_zh": "描述公开争吵或情绪化冲突。",
+      "practice_example": "I didn't want to make a scene at the restaurant.",
+      "usage_note_zh": "make a scene 是相关常用搭配；不是“和某人拍一场戏”。"
+    },
+    {
+      "id": "S01E01-067",
+      "tier": "B",
+      "source_lines": [
+        333,
+        353
+      ],
+      "expression": "I'll do the talking.",
+      "meaning_zh": "由我来交涉。",
+      "source_context_zh": "Leonard 决定出面向前男友要电视。",
+      "use_case_zh": "分工，由一人说明情况。",
+      "practice_example": "You handle the slides. I'll do the talking.",
+      "usage_note_zh": "不保证会说服对方；也可能显得控制欲强，看关系。"
+    },
+    {
+      "id": "S01E01-068",
+      "tier": "B",
+      "source_lines": [
+        340
+      ],
+      "expression": "give up just like that",
+      "meaning_zh": "就这样轻易放弃。",
+      "source_context_zh": "第一次被拒绝后 Leonard 不愿退缩。",
+      "use_case_zh": "讨论是否继续尝试。",
+      "practice_example": "I'm not going to give up just like that.",
+      "usage_note_zh": "give up 放弃；just like that 在此强调太轻易。"
+    },
+    {
+      "id": "S01E01-069",
+      "tier": "B",
+      "source_lines": [
+        352
+      ],
+      "expression": "This is it.",
+      "meaning_zh": "就是这里／就是这个了。",
+      "source_context_zh": "两人到达前男友门前。",
+      "use_case_zh": "确认地点、物品或关键时刻。",
+      "practice_example": "This is it. This is the apartment I told you about.",
+      "usage_note_zh": "本场景是找到目的地；其他场景也可能表示关键时刻到了。"
+    },
+    {
+      "id": "S01E01-070",
+      "tier": "B",
+      "source_lines": [
+        354
+      ],
+      "expression": "Good thinking.",
+      "meaning_zh": "好主意／想得周到。",
+      "source_context_zh": "Sheldon 回应 Leonard 由他交涉的安排，接着自称武力担当。",
+      "use_case_zh": "肯定对方考虑周到。",
+      "practice_example": "You brought a spare charger? Good thinking.",
+      "usage_note_zh": "后半句是喜剧反差，短语本身常用。"
+    },
+    {
+      "id": "S01E01-071",
+      "tier": "B",
+      "source_lines": [
+        371
+      ],
+      "expression": "She's out of my league.",
+      "meaning_zh": "我觉得我高攀不上她。",
+      "source_context_zh": "Leonard 灰心地认为自己追不到 Penny。",
+      "use_case_zh": "理解恋爱话题里的自我比较。",
+      "practice_example": "That job feels out of my league.",
+      "usage_note_zh": "常反映说话人的自我评价；不应当作对他人客观价值的判断。"
+    },
+    {
+      "id": "S01E01-072",
+      "tier": "B",
+      "source_lines": [
+        376
+      ],
+      "expression": "kick back",
+      "meaning_zh": "放松休息。",
+      "source_context_zh": "Howard 介绍游戏中探险后休息的地方。",
+      "use_case_zh": "工作或活动后放松。",
+      "practice_example": "I'm going to kick back and watch a movie.",
+      "usage_note_zh": "随意口语；名词 kickback 另有含义，不混用。"
+    },
+    {
+      "id": "S01E01-073",
+      "tier": "B",
+      "source_lines": [
+        398
+      ],
+      "expression": "You're not done with her, are you?",
+      "meaning_zh": "你还没放下／放弃她，对吧？",
+      "source_context_zh": "看到 Leonard 因晚饭邀请重燃希望，Sheldon 追问。",
+      "use_case_zh": "理解反意疑问及“还没结束”的含义。",
+      "practice_example": "You're not leaving yet, are you?",
+      "usage_note_zh": "be done with someone 也可能很决绝；本句依剧情是没放弃追求。"
+    },
+    {
+      "id": "S01E01-074",
+      "tier": "B",
+      "source_lines": [
+        400
+      ],
+      "expression": "Not to mention ...",
+      "meaning_zh": "更不用说……／而且还……",
+      "source_context_zh": "Sheldon 在“聪明漂亮的孩子”后补充“想象出来的”。",
+      "use_case_zh": "补充同方向的信息。",
+      "practice_example": "The hotel is expensive, not to mention far from the station.",
+      "usage_note_zh": "原句是挖苦；正常使用不必带讽刺。"
+    },
+    {
+      "id": "S01E01-075",
+      "tier": "B",
+      "source_lines": [
+        407
+      ],
+      "expression": "spell something out",
+      "meaning_zh": "把某事讲得明明白白。",
+      "source_context_zh": "Sheldon 觉得要向 Penny 详细解释自己的饮食逻辑。",
+      "use_case_zh": "要求明确说明规则、步骤。",
+      "practice_example": "Could you spell out what you need from me?",
+      "usage_note_zh": "原场景居高临下；例句是中性请求。也有逐字母拼出的本义。"
+    },
+    {
+      "id": "S01E01-076",
+      "tier": "B",
+      "source_lines": [
+        415
+      ],
+      "expression": "as far as ... goes",
+      "meaning_zh": "就……而言。",
+      "source_context_zh": "Sheldon 把恋爱竞争范围缩到车内的人。",
+      "use_case_zh": "限定评价范围。",
+      "practice_example": "As far as the schedule goes, Friday works for me.",
+      "usage_note_zh": "只截取可复用结构；原上下文是带挖苦的安慰。"
+    },
+    {
+      "id": "S01E01-077",
+      "tier": "C",
+      "source_lines": [
+        18
+      ],
+      "expression": "If you have to ask, ...",
+      "meaning_zh": "如果这都要问，那……",
+      "source_context_zh": "工作人员挖苦两人不该来。",
+      "use_case_zh": "听懂轻蔑的反问套路。",
+      "practice_example": "—",
+      "usage_note_zh": "不作为主动社交表达练习，容易冒犯。"
+    },
+    {
+      "id": "S01E01-078",
+      "tier": "C",
+      "source_lines": [
+        49
+      ],
+      "expression": "I don't care.",
+      "meaning_zh": "我不在乎。",
+      "source_context_zh": "Leonard 对楼梯话题失去耐心。",
+      "use_case_zh": "辨认冷淡回应。",
+      "practice_example": "I don't mind either way.",
+      "usage_note_zh": "替代句用于“我都可以”，不是原句在所有场景的同义词。"
+    },
+    {
+      "id": "S01E01-079",
+      "tier": "C",
+      "source_lines": [
+        146
+      ],
+      "expression": "Here we go.",
+      "meaning_zh": "又来了。",
+      "source_context_zh": "Leonard 预见 Sheldon 要长篇解释座位。",
+      "use_case_zh": "听懂对熟悉状况的反应。",
+      "practice_example": "—",
+      "usage_note_zh": "本场景是“又来了”；别处可以是“开始吧”，需结合语境。"
+    },
+    {
+      "id": "S01E01-080",
+      "tier": "C",
+      "source_lines": [
+        183
+      ],
+      "expression": "Do you have some sort of a job?",
+      "meaning_zh": "你有某种工作吗？",
+      "source_context_zh": "Leonard 生硬地询问 Penny 职业。",
+      "use_case_zh": "识别不自然的社交提问。",
+      "practice_example": "What do you do for work?",
+      "usage_note_zh": "some sort of 在这里显得冒失；练更自然的例句。"
+    },
+    {
+      "id": "S01E01-081",
+      "tier": "C",
+      "source_lines": [
+        286
+      ],
+      "expression": "Save it for your blog.",
+      "meaning_zh": "留着写你博客吧。",
+      "source_context_zh": "Sheldon 打断 Howard 炫耀语言能力。",
+      "use_case_zh": "听懂不耐烦地让人别说了。",
+      "practice_example": "—",
+      "usage_note_zh": "不是友好建议，别照搬到初次见面。"
+    },
+    {
+      "id": "S01E01-082",
+      "tier": "C",
+      "source_lines": [
+        338
+      ],
+      "expression": "Get lost.",
+      "meaning_zh": "滚开。",
+      "source_context_zh": "前男友拒绝两人进门。",
+      "use_case_zh": "辨认敌意。",
+      "practice_example": "—",
+      "usage_note_zh": "强烈无礼，只作识别。"
+    },
+    {
+      "id": "S01E01-083",
+      "tier": "C",
+      "source_lines": [
+        385
+      ],
+      "expression": "Smooth.",
+      "meaning_zh": "可真会说话啊。",
+      "source_context_zh": "Howard 邀请失败后，Leonard 挖苦他的搭讪。",
+      "use_case_zh": "识别反讽。",
+      "practice_example": "—",
+      "usage_note_zh": "本场景非真诚赞美；不能脱离语气机械翻成“干得漂亮”。"
+    },
+    {
+      "id": "S01E01-084",
+      "tier": "C",
+      "source_lines": [
+        388
+      ],
+      "expression": "send one's regards",
+      "meaning_zh": "向某人问好。",
+      "source_context_zh": "Sheldon 描述受辱经过时反讽前男友“带来问候”。",
+      "use_case_zh": "认识正常礼貌含义及反讽用法。",
+      "practice_example": "Please send my regards to your family.",
+      "usage_note_zh": "例句是真诚问候；原剧情不是正常寒暄。"
+    }
+  ]
+}

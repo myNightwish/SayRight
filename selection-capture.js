@@ -1,6 +1,7 @@
 // Isolated content script: no page text is transmitted until the learner clicks.
 (function () {
-  function installSelectionCapture(send) {
+  function installSelectionCapture(sendMessage, options={}) {
+    const send=message=>sendMessage({...message,...(selected?.source?{pdfSource:selected.source}:{})});
     const host=document.createElement('div');host.setAttribute('data-nuance-capture','');
     const shadow=host.attachShadow({mode:'open'});
     const style=document.createElement('style');style.textContent=`
@@ -19,7 +20,7 @@
     // The clipboard is read only from a paste event in our focused dialog.
     const launcher=document.createElement('button');launcher.textContent='＋ 记录截图';launcher.type='button';
     launcher.style.cssText='position:fixed;right:16px;bottom:20px;z-index:2147483646;border:1px solid #d9cef4;border-radius:24px;padding:9px 14px;background:white;color:#6544b0;cursor:pointer;font:13px sans-serif';
-    launcher.addEventListener('click',openImage);document.documentElement.append(launcher);
+    launcher.addEventListener('click',openImage);if(options.showLauncher!==false)document.documentElement.append(launcher);
     function openImage(){
       if(busy)return;
       saved={image:true};const panel=shell();position({left:innerWidth-374,bottom:Math.max(12,innerHeight-440)});
@@ -56,6 +57,7 @@
     function fitPanel(){host.style.top=`${Math.max(12,Math.min(parseFloat(host.style.top)||12,innerHeight-surface.getBoundingClientRect().height-12))}px`;}
     function position(rect){host.style.left=`${Math.max(12,Math.min(rect.left,innerWidth-362))}px`;host.style.top=`${Math.max(12,Math.min(rect.bottom+8,innerHeight-120))}px`;host.style.display='block';}
     function contextFor(range){
+      if(options.contextFor)return options.contextFor(range);
       const anchor=range.commonAncestorContainer.nodeType===Node.ELEMENT_NODE?range.commonAncestorContainer:range.commonAncestorContainer.parentElement;
       const message=anchor.closest('[data-message-author-role],article');
       const block=message||anchor.closest('blockquote,p,li,section')||anchor;
@@ -113,9 +115,9 @@
     }
     function showSaved(){
       const panel=shell();panel.append(node('p',saved.text,'quote'),node('strong','你想表达的意思'),node('p',saved.personalContext));
-      panel.append(node('strong',saved.active?'已安排下次练习':'已暂存'),node('p',saved.active?'下次先给你情境，不把答案摆出来。':'正在练的表达已有 20 条，先保留这次发现，不挤掉已有练习。'));
+      panel.append(node('strong',saved.active?'已标记想练':'已暂存'),node('p',saved.active?'到正在练里学习和造句；本轮已有卡片时，在候补中确认补入。':'先保留这次发现，可以到正在练中选择或调整本轮材料。'));
       panel.append(node('p',saved.preview?'这是隔离体验，已在本机预览保存，不会写入正式表达库。':(saved.localOnly?'已保存在插件；设置同步口令后可跨设备同步。':'已保存在插件，后台会同步到你的表达库。'),'hint'));
-      const actions=node('div','','actions');actions.append(button(saved.active?'现在试着用':'打开表达库',()=>send({type:'nuance:practice',key:saved.key})),button('修改练习情境',editCue,'secondary'));panel.append(actions);
+      const actions=node('div','','actions');actions.append(button(saved.active?'去正在练':'打开表达库',()=>send({type:'nuance:practice',key:saved.key})),button('修改练习情境',editCue,'secondary'));panel.append(actions);
       host.style.top=`${Math.max(12,Math.min(parseFloat(host.style.top)||12,innerHeight-panel.getBoundingClientRect().height-12))}px`;
     }
     function editCue(){
@@ -133,10 +135,10 @@
       if(busy)return;
       const selection=window.getSelection();
       if(!selection||selection.isCollapsed||!selection.rangeCount)return;
-      const range=selection.getRangeAt(0);const text=selection.toString().trim();
+      const range=selection.getRangeAt(0);const text=(options.selectionText?options.selectionText(range):selection.toString()).trim();
       const anchor=range.commonAncestorContainer.nodeType===Node.ELEMENT_NODE?range.commonAncestorContainer:range.commonAncestorContainer.parentElement;
       if(!anchor||host.contains(anchor)||shadow.contains(anchor)||anchor.closest('input,textarea,select,[contenteditable="true"],[role="textbox"]')||text.length<1||text.length>20000)return;
-      selected={text,range:range.cloneRange()};saved=null;
+      selected={text,range:range.cloneRange(),source:options.sourceFor?.(range)};saved=null;
       surface.replaceChildren();const mini=node('div','','mini');mini.setAttribute('role','toolbar');mini.setAttribute('aria-label','表达工具');
       const translate=iconButton('转化',['M4 7h13M14 4l3 3-3 3M20 17H7M10 14l-3 3 3 3'],lookup);
       const collect=iconButton('收藏',['M6 4h12v17l-6-4-6 4V4Z'],capture);
@@ -151,5 +153,5 @@
     window.addEventListener('scroll',()=>{if(!busy&&!saved)hide();},{passive:true});
   }
   globalThis.NuanceSelectionCapture=installSelectionCapture;
-  if(typeof chrome!=='undefined'&&chrome.runtime?.id)installSelectionCapture(message=>chrome.runtime.sendMessage(message));
+  if(!document.documentElement.hasAttribute('data-nuance-pdf-reader')&&typeof chrome!=='undefined'&&chrome.runtime?.id)installSelectionCapture(message=>chrome.runtime.sendMessage(message));
 })();

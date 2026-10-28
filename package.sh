@@ -10,7 +10,8 @@ rm -f "$OUT"
 
 zip -r "$OUT" \
   manifest.json \
-  config.js auth.js sync.js learning.js feedback-core.js dictionary-core.js capture-core.js extension-background.js selection-capture.js \
+  config.js auth.js sync.js learning.js queue-core.js queue-store.js learning-workspace.js feedback-core.js dictionary-core.js pdf-source.js capture-core.js extension-background.js selection-capture.js \
+  pdf-reader.html pdf-reader.js pdf-reader-bridge.js pdf-reader.css pdf-selection.js vendor/pdfjs \
   popup.html popup.js \
   collection.html collection.js \
   scene.html scene.js \

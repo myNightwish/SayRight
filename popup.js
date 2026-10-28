@@ -332,7 +332,7 @@ async function translateText(text, direction) {
 // __APPEND_POLISH__
 
 // 润色：请求本地桥接服务，由它用 Claude Agent SDK 跑严格受限的输出。
-// 服务返回 { natural, intent, better, note, impression, scores{grammar,idiomatic,fitness}, tones[] }。
+// 服务返回 { natural, intent, better, note, impression, scores{grammar,idiomatic,fitness} }。
 async function polishExpression(text, scene, tone, strictness) {
   let response;
   try {
@@ -408,23 +408,9 @@ function renderPolish(result) {
   //   ? `<div class="polish-status good">✅  ${ctx}</div>`
   //   : `<div class="polish-status warn">💡 更贴合该场景与语气的说法 ${ctx}</div>`;
 
-  // 语气版本（可点切换复制内容）—— 给出其它语气做对比
-  let tonesHtml = "";
-  if (Array.isArray(result.tones) && result.tones.length) {
-    const chips = result.tones.map((t, i) =>
-      `<button class="tone-chip" data-tone="${i}" type="button">${escapeHtml(t.label)}</button>`
-    ).join("");
-    tonesHtml = `
-      <div class="tones">
-        <div class="tones-label">换个语气对比</div>
-        <div class="tones-row">${chips}</div>
-        <div class="tone-text" id="toneText"></div>
-      </div>`;
-  }
-
   // 逻辑顺序：先「对方印象」（这句给人的感觉）→ 再「该场景语气下更好的说法」标题 → 紧接正确表达。
   // 地道说法带一个 🔊 朗读按钮，随时能听发音。
-  const html = `${impression}<div class="polish-better">${better}<button class="speak polish-speak" id="betterSpeak" title="朗读">🔊</button></div>${chunksHtml}${scoresHtml}${note}${tonesHtml}`;
+  const html = `${impression}<div class="polish-better">${better}<button class="speak polish-speak" id="betterSpeak" title="朗读">🔊</button></div>${chunksHtml}${scoresHtml}${note}`;
   setResult(result.better || "", html);
 
   // 朗读地道说法
@@ -434,22 +420,7 @@ function renderPolish(result) {
   // 绑定 chunks 就地编辑（改/删/加/切类型）——编辑作用于 currentPolish.chunks
   bindChunks();
 
-  // 绑定语气切换
-  if (Array.isArray(result.tones) && result.tones.length) {
-    const toneTextEl = resultText.querySelector("#toneText");
-    resultText.querySelectorAll(".tone-chip").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const t = result.tones[Number(btn.dataset.tone)];
-        if (!t) return;
-        resultText.querySelectorAll(".tone-chip").forEach((b) => b.classList.toggle("active", b === btn));
-        if (toneTextEl) toneTextEl.textContent = t.text;
-        // 选中某语气版本后，复制按钮复制该版本
-        currentResult = t.text;
-        copyButton.disabled = false;
-        setCopyButtonState("idle");
-      });
-    });
-  }
+
 }
 
 // --- 润色收藏（chrome.storage.local 的 corrections 键）---
@@ -505,7 +476,6 @@ function ensureSaved(map) {
       note: currentPolish.note || "",
       impression: currentPolish.impression || "",
       scores: currentPolish.scores || null,
-      tones: Array.isArray(currentPolish.tones) ? currentPolish.tones : [],
       natural: Boolean(currentPolish.natural),
       studyState: "inbox",
       stars: 0,          // 默认暂存，不自动增加复习任务

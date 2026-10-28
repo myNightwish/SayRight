@@ -31,10 +31,11 @@
     const parent=map[sessionKey],row=parent?.adjustments?.[index];if(!row)throw new Error('这条调整已不存在');
     const key=`${sessionKey}:adjustment:${index}`;
     const prior=Object.hasOwn(map,key)?map[key]:null;
-    if(!canActivate(map,prior||{studyState:'inbox'}))throw new Error('正在练的表达已有 20 条，先暂停或归档一条，再安排这次练习。');
+    if(!canActivate(map,prior||{studyState:'inbox'}))throw new Error('本轮最多 10 条，请先到正在练选择或调整本轮材料。');
     const item=prior?{...prior}:{input:row.before,better:row.after,origin:'feedback-adjustment',sourceLabel:parent.sourceLabel,
       feedbackId:parent.feedbackId,feedbackSessionKey:sessionKey,adjustmentKind:row.kind,construct:row.pattern,note:row.reason,
       personalContext:parent.personalContext,situation:row.practiceCue,situations:[row.transferCue],createdAt:now,stars:0};
+    if(!prior||root.NuanceLearning.stateOf(prior)!=='active'){item.queueChangedAt=now;item.queueJoinedAt=now;item.queueRoundId=null;}
     item.studyState='active';item.savedAt=now;
     const result={...map};Object.defineProperty(result,key,{value:item,enumerable:true,writable:true,configurable:true});
     return {map:result,key,item,existed:Boolean(prior)};

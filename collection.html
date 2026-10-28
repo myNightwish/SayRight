@@ -102,6 +102,7 @@
       /* 整张卡折叠：<details> 默认收起，只显示摘要行；点开才展开详情。
          一屏能扫更多条，感兴趣的再点开深入。 */
       .card {
+        container-type: inline-size;
         background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px;
         margin-bottom: 0; overflow: hidden;
         box-shadow: var(--shadow); backdrop-filter: blur(18px) saturate(160%);
@@ -115,14 +116,29 @@
       /* 摘要行：整块可点，收起时就是一条卡片的「门面」 */
       .card-summary {
         list-style: none; cursor: pointer; padding: 14px 16px; display: block;
-        outline: none; position: relative;
+        outline: none; position: relative; border-left: 3px solid transparent; padding-left: 13px;
       }
+
+      .card-icon { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 5px; border: 0; border-radius: 8px; background: transparent; cursor: pointer; flex: none; }
+      .title-with-edit { display: flex; align-items: flex-start; gap: 6px; min-width: 0; grid-column: 1 / -1; grid-row: 2; }
+      .title-with-edit .intent-title { min-width: 0; overflow-wrap: anywhere; }
+      .title-with-edit .card-edit { width: 24px; height: 24px; padding: 3px; margin-top: -2px; }
+      .card-edit { color: var(--violet-deep); }
+      .card-edit:hover { background: rgba(124,92,255,.12); }
+      .card-delete { position: absolute; top: 10px; right: 10px; color: #a29ab5; }
+      .card-delete:hover { color: var(--danger); background: rgba(214,51,108,.1); }
+      .card-icon:focus-visible { outline: 2px solid var(--violet); outline-offset: 2px; }
       .card-summary::-webkit-details-marker { display: none; }
       .card-summary:hover .intent-title { color: var(--violet-deep); }
       /* 展开时左侧亮一条竖条，视觉上"这条被打开了" */
       .card[open] .card-summary { border-left: 3px solid var(--violet); padding-left: 13px; }
-      .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-      .title-wrap { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1; min-width: 0; }
+      .card-head { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px 12px; }
+      .title-wrap { display: contents; }
+      .card-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; grid-column: 1; grid-row: 1; }
+      .card-source { display: block; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 12px; font-weight: 400; }
+      .card-source a { color: inherit; text-decoration: none; }
+      .card-source a:hover { color: var(--violet-deep); text-decoration: underline; }
+      .card-head > .head-right { grid-column: 2; grid-row: 1; margin-right: 26px; }
       .scene-tag {
         flex: none; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px;
         background: linear-gradient(120deg, var(--accent), var(--violet)); color: #fff;
@@ -191,31 +207,6 @@
       .score-pill.low { background: rgba(214,51,108,0.12); color: var(--danger); }
       .note { color: var(--muted); font-size: 13px; line-height: 1.6; padding-top: 6px; border-top: 1px dashed rgba(124,92,255,0.28); }
       /* 语气版本：默认展开、和主答案一样醒目。每种语气一行卡片，标签点亮、可朗读。 */
-      .tones-block {
-        margin-top: 12px; padding: 12px; border-radius: 12px;
-        background: rgba(124,92,255,0.06); border: 1px solid rgba(124,92,255,0.16);
-      }
-      .tones-title {
-        font-size: 12px; font-weight: 800; color: var(--violet-deep);
-        letter-spacing: .02em; margin-bottom: 8px;
-        display: flex; align-items: center; gap: 6px;
-      }
-      .tones-title::before {
-        content: ""; width: 6px; height: 6px; border-radius: 50%;
-        background: var(--accent);
-      }
-      .tone-row {
-        display: flex; align-items: flex-start; gap: 8px; padding: 7px 0;
-      }
-      .tone-row + .tone-row { border-top: 1px dashed rgba(124,92,255,0.18); }
-      .tone-name {
-        flex: none; min-width: 44px; text-align: center;
-        font-weight: 800; color: var(--violet-deep); font-size: 11px;
-        background: rgba(124,92,255,0.12); border-radius: 6px; padding: 3px 6px;
-        margin-top: 1px;
-      }
-      .tone-val { flex: 1; color: var(--ink); line-height: 1.55; font-size: 14px; }
-      .tone-speak { flex: none; font-size: 14px; }
       .meta { color: #b3adc9; font-size: 12px; flex: none; }
       /* 卡片操作区：删除按钮靠右、带背景色 */
       .card-actions { margin-top: 12px; display: flex; justify-content: flex-end; }
@@ -392,25 +383,173 @@
       .library-management { position: relative; font-size: 13px; color: var(--muted); }
       .library-management summary { cursor: pointer; padding: 8px; }
       .library-management[open] button { margin-top: 8px; }
-      #feedbackDetails { margin-top: 14px; }
       .feedback-row { padding: 16px 0; border-bottom: 1px solid #e2dcf0; }
       .feedback-row p { margin: 8px 0; overflow-wrap: anywhere; }
       .feedback-before { color: var(--muted); }
       .feedback-after { color: var(--violet-deep); font-weight: 650; }
       .feedback-source { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; max-height: 280px; overflow: auto; }
       .feedback-note { font-size: 13px; color: var(--muted); }
-      .capture-panel [hidden] { display: none !important; }
-      .capture-panel { padding: 20px; margin: 18px 0; border: 1px solid var(--glass-border); border-radius: 18px; background: var(--glass); }
-      .capture-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-      .capture-panel h2 { font-size: 20px; margin: 0; }
-      .capture-panel p { color: var(--muted); font-size: 13px; line-height: 1.6; }
-      .capture-panel label { display: block; margin: 14px 0 6px; }
-      .capture-panel textarea,.capture-panel input[type=text] { box-sizing: border-box; width: 100%; border: 1px solid #cbc5e1; border-radius: 10px; padding: 12px; font: inherit; background: white; color: #211b3b; }
-      .capture-panel textarea { resize: vertical; }
-      .capture-panel summary { cursor: pointer; width: fit-content; }
-      .capture-row { border-bottom: 1px solid #ded9ee; padding-bottom: 10px; overflow-wrap: anywhere; }
+      .header-study-state{font:inherit;font-size:12px;color:var(--violet-deep);background:rgba(124,92,255,.07);border:1px solid rgba(124,92,255,.16);border-radius:8px;padding:5px 7px;cursor:pointer;max-width:140px}
+      .header-star{width:32px;height:30px;display:inline-flex;align-items:center;justify-content:center;flex:none;border:0;background:transparent;color:#aaa0bb;font-size:22px;line-height:1;padding:3px 5px;cursor:pointer;border-radius:7px}
+      .header-star.is-starred{color:#e7a900}.header-star:hover{background:rgba(245,179,1,.12)}
+      .header-study-state:focus-visible,.header-star:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+      .head-right{flex-wrap:wrap;align-items:center}
+      @container (max-width: 380px) {
+        .card-head { grid-template-columns: minmax(0,1fr); }
+        .card-head > .head-right { grid-column: 1; grid-row: 2; margin-right: 0; justify-content: flex-start; }
+        .card-tags { padding-right: 30px; }
+        .title-with-edit { grid-row: 3; }
+      }
       .study-control { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 12px 0; }
       select { padding: 8px; border-radius: 8px; font: inherit; max-width: 100%; }
+      /* Keep toolbar controls compact; opening the menu never changes row height. */
+      .toolbar { align-items: center; flex-wrap: wrap; gap: 10px; }
+      .toolbar input[type="search"] { box-sizing: border-box; flex: 1 1 260px; min-width: 180px; height: 40px; padding: 0 14px; font: inherit; font-size: 13px; }
+      .toolbar > .pill, .library-management summary { box-sizing: border-box; height: 40px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 600; border-radius: 10px; white-space: nowrap; }
+      .toolbar > .pill { background: rgba(255,255,255,.65); color: var(--violet-deep); border: 1px solid rgba(124,92,255,.16); }
+      .toolbar > .pill:hover { background: #fff; }
+      .toolbar > .pill-quiz { background: #7956dc; color: white; border-color: transparent; box-shadow: none; }
+      .toolbar > .pill-quiz:hover { background: #6946cc; box-shadow: none; }
+      .filter-control { box-sizing: border-box; height: 40px; display: inline-flex; align-items: center; gap: 10px; position: relative; padding: 0 12px; background: rgba(255,255,255,.65); border: 1px solid rgba(124,92,255,.16); border-radius: 10px; white-space: nowrap; }
+      .filter-control > span { color: var(--muted); font-size: 12px; }
+      .filter-control select { appearance: none; -webkit-appearance: none; height: 100%; border: 0; outline: none; border-radius: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13px; padding: 0 22px 0 0; cursor: pointer; }
+      .filter-control::after { content: ''; position: absolute; right: 14px; width: 6px; height: 6px; border-right: 1.5px solid #9182ab; border-bottom: 1.5px solid #9182ab; transform: translateY(-2px) rotate(45deg); pointer-events: none; }
+      .filter-control:focus-within { border-color: var(--violet); box-shadow: 0 0 0 3px rgba(124,92,255,.1); }
+      .library-management { position: relative; flex: none; }
+      .library-management summary { list-style: none; color: #81758f; cursor: pointer; }
+      .library-management summary::-webkit-details-marker { display: none; }
+      .library-management summary:hover, .library-management[open] summary { background: rgba(124,92,255,.07); }
+      .management-menu { position: absolute; top: calc(100% + 6px); right: 0; min-width: 156px; padding: 5px; background: #fff; border: 1px solid #e5deef; border-radius: 12px; box-shadow: 0 8px 24px rgba(55,35,85,.12); z-index: 30; }
+      .library-management[open] .management-menu button { margin: 0; width: 100%; border: 0; background: transparent; font-weight: 500; text-align: left; justify-content: flex-start; }
+      .library-management[open] .management-menu button:hover { background: rgba(214,51,108,.07); }
+      @media (max-width: 900px) { .toolbar input[type="search"] { flex-basis: 100%; width: 100%; } }
+      @media (max-width: 480px) { .toolbar { gap: 8px; } .filter-control { flex: 1; } .filter-control select { width: 100%; min-width: 70px; } .toolbar > .pill, .library-management summary { padding: 0 10px; } .library-management summary span { display: none; } }
+
+      [hidden] { display: none !important; }
+      #queueTabCount { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; margin-left: 5px; border-radius: 7px; font-size: 11px; background: rgba(124,92,255,.10); }
+      .tab.active #queueTabCount { background: rgba(255,255,255,.22); }
+      .queue-overview { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; background: rgba(255,255,255,.56); border: 1px solid rgba(124,92,255,.12); border-radius: 16px; padding: 22px; margin-bottom: 18px; }
+      .queue-eyebrow { margin: 0 0 5px; color: var(--muted); font-size: 12px; }
+      .queue-overview h2 { font-size: 22px; margin: 0; color: var(--ink); }
+      #queueDescription { margin: 7px 0 0; color: var(--muted); font-size: 13px; }
+      .queue-overview-actions { display: flex; gap: 10px; align-items: center; }
+      .queue-end { background: rgba(255,255,255,.6); color: var(--muted); border: 1px solid #ddd4ee; }
+      .queue-overview .pill-quiz { background: #7956dc; box-shadow: none; }
+      .queue-warning { width: 100%; margin: 0; font-size: 13px; color: #865b27; }
+      .queue-status { font-size: 13px; color: var(--violet-deep); margin: 0 0 12px; }
+      .queue-status:empty { display: none; }
+      .queue-state { color: #9388a5; font-size: 11px; padding: 4px 7px; border-radius: 7px; background: rgba(124,92,255,.045); white-space: nowrap; }
+      .queue-state.is-active { color: #7050c4; background: rgba(124,92,255,.09); }
+      .summary-foot { gap: 8px; }
+      .summary-foot .chevron { margin-left: 0; }
+      .summary-foot > .queue-card-action { margin-left: auto; }
+      .queue-card-actions { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; }
+      .queue-card-action { border: 1px solid rgba(124,92,255,.15); border-radius: 8px; padding: 5px 9px; font: inherit; font-size: 12px; background: rgba(255,255,255,.48); color: #79668e; cursor: pointer; }
+      .queue-card-action:hover { background: #fff; color: var(--violet-deep); }
+      .queue-card-action.primary { color: var(--violet-deep); background: rgba(124,92,255,.07); }
+      .queue-card-action:disabled,.queue-end:disabled { opacity: .45; cursor: default; }
+      .queue-list { display: grid; gap: 12px; max-width: 860px; }
+      .queue-entry { display: grid; grid-template-columns: 24px minmax(0,1fr); gap: 12px; align-items: start; }
+      .queue-index { font-size: 12px; color: #a79bbd; padding-top: 19px; font-variant-numeric: tabular-nums; }
+      .scene-layout.is-queue { display: block; }
+      .is-queue #listNav { display: none; }
+      .queue-history { margin: 26px 0 0; color: var(--muted); font-size: 13px; }
+      .queue-history summary { cursor: pointer; padding: 8px 0; }
+      .round-record { border-top: 1px solid #e0d8ee; padding: 12px 0; }
+      .round-record h3 { color: var(--ink); font-size: 14px; margin: 0 0 8px; font-weight: 600; }
+      .round-record ul { margin: 7px 0; padding-left: 20px; line-height: 1.9; }
+      @media(max-width:600px){.queue-overview{padding:16px}.queue-overview-actions{width:100%}.queue-entry{grid-template-columns:18px minmax(0,1fr);gap:6px}.queue-card-actions{gap:5px}.queue-card-action{padding:5px 7px}}
+      .queue-dialog { max-width: 420px; width: calc(100% - 40px); box-sizing: border-box; padding: 26px; border: 1px solid #e2d9f1; border-radius: 20px; background: #fcfaff; color: var(--ink); box-shadow: 0 24px 70px #30224430; }
+      .queue-dialog::backdrop { background: #29203955; backdrop-filter: blur(3px); }
+      .queue-dialog h2 { margin: 0 0 14px; font-size: 20px; }
+      .queue-dialog p { font-size: 14px; line-height: 1.7; }
+      .queue-dialog-note { color: var(--muted); font-size: 13px !important; }
+      .queue-dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+
+      .learning-workspace,.workspace-setup,.workspace-empty { max-width: 880px; padding: clamp(22px,4vw,42px); border: 1px solid #ded7ef; border-radius: 22px; background: rgba(255,255,255,.8); box-shadow: 0 12px 35px rgba(75,47,117,.06); }
+      .workspace-heading { display: flex; align-items: center; justify-content: space-between; margin: 0 0 26px; gap: 12px; }
+      .workspace-kicker { color: #8a779f; font-size: 12px; font-weight: 500; }
+      .workspace-position { color: #a79bb4; font-size: 12px; }
+      .workspace-scene { margin-bottom: 28px; }
+      .workspace-scene h2,.workspace-setup h2,.workspace-empty h2 { margin: 0 0 12px; font-size: clamp(20px,2vw,25px); line-height: 1.5; font-weight: 600; color: #393049; }
+      .workspace-scene p,.workspace-setup > p,.workspace-empty p { margin: 0; line-height: 1.8; color: #776c85; font-size: 15px; }
+      .workspace-input-label { font-size: 13px; color: #70637f; display: block; margin-bottom: 9px; }
+      #workspaceAnswer { box-sizing: border-box; width: 100%; padding: 16px; font: inherit; line-height: 1.8; resize: vertical; border: 1px solid #dcd5e9; background: #fdfbff; border-radius: 13px; color: #393049; min-height: 130px; }
+      #workspaceAnswer:focus { outline: 2px solid #c7b4ec; outline-offset: 2px; }
+      .workspace-first-actions,.workspace-reference-actions,.workspace-footer,.workspace-setup-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 16px; }
+      .workspace-primary { font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; padding: 11px 17px; border-radius: 10px; border: 0; background: #7b58d5; color: white; }
+      .workspace-primary:disabled { opacity: .45; cursor: default; }
+      .workspace-link { font: inherit; font-size: 13px; cursor: pointer; border: 0; color: #8568af; background: none; padding: 7px 0; }
+      .workspace-link:hover { color: #65409b; text-decoration: underline; }
+      .workspace-note { font-size: 13px; line-height: 1.8; color: #85748e; white-space: pre-wrap; }
+      .workspace-reference { margin-top: 26px; padding: 22px; background: #f1ecfa; border-radius: 14px; }
+      .workspace-example { font-size: 19px; line-height: 1.7; color: #6747a8; margin: 10px 0; }
+      .workspace-footer { border-top: 1px solid #ece6f3; padding-top: 17px; margin-top: 28px; font-size: 12px; color: #a096ad; }
+      .workspace-materials { max-width: 880px; margin-top: 22px; color: #8f829d; font-size: 13px; }
+      .workspace-materials > summary { cursor: pointer; padding: 10px 0; }
+      .workspace-material { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-top: 1px solid #e0d9eb; }
+      .workspace-material-focus { flex: 1; min-width: 0; display: flex; gap: 12px; text-align: left; font: inherit; line-height: 1.6; border: 0; background: transparent; color: #80718e; cursor: pointer; }
+      .workspace-material-focus.is-current { color: #7650b6; }
+      .workspace-candidates { max-height: 360px; overflow-y: auto; margin-top: 18px; border-top: 1px solid #e6dff0; }
+      .workspace-candidate { display: flex; gap: 12px; padding: 13px 3px; align-items: flex-start; border-bottom: 1px solid #e6dff0; cursor: pointer; }
+      .workspace-candidate input { margin-top: 4px; accent-color: #7956dc; }
+      .workspace-candidate strong { display: block; font-size: 13px; color: #62556f; font-weight: 500; }
+      .workspace-candidate small { display: block; color: #9b8ea5; margin-top: 5px; font-size: 12px; }
+      .workspace-setup-actions { font-size: 13px; color: #8d7e9e; }
+      #workspaceCandidateSearch { box-sizing: border-box; width: 100%; height: 40px; margin-top: 20px; }
+      .workspace-primary:focus-visible,.workspace-link:focus-visible,.workspace-material-focus:focus-visible { outline: 2px solid #b69bdf; outline-offset: 3px; }
+      @media(max-width:540px){.workspace-heading{align-items:flex-start}.workspace-material{flex-wrap:wrap}.workspace-material-focus{flex-basis:100%}.workspace-example{font-size:17px}}
+      .workspace-attempt-history { margin-top: 22px; color: #8a7b99; font-size: 12px; }
+      .workspace-attempt-history summary { cursor: pointer; padding: 8px 0; }
+      .workspace-attempt-history > div { border-top: 1px solid #e8e1f0; padding: 12px 0; }
+      .workspace-attempt-history p { white-space: pre-wrap; line-height: 1.8; color: #71637d; font-size: 14px; margin: 5px 0; }
+      .workspace-attempt-history span { font-size: 11px; color: #a397ae; }
+      .workspace-reference .workspace-note { max-height: 180px; overflow: auto; }
+
+      .sentence-learning-note { max-width: 1020px; color: #93839f; font-size: 13px; line-height: 1.8; margin: 0 0 18px; }
+      .sentence-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; align-items: start; }
+      .sentence-card { min-width: 0; padding: 22px; background: rgba(255,255,255,.78); border: 1px solid #e2d8ef; border-radius: 18px; box-shadow: 0 8px 24px #54307908; }
+      .sentence-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; color: #ab9bb8; font-size: 12px; }
+      .sentence-order { font-variant-numeric: tabular-nums; }
+      .sentence-score-summary { margin-right: auto; color: #92819f; }
+      .sentence-quiet,.sentence-delete { border: 0; background: none; cursor: pointer; color: #a391b2; font: inherit; padding: 3px; }
+      .sentence-delete { font-size: 20px; line-height: 1; }
+      .sentence-delete:hover { color: var(--danger); }
+      .sentence-card h2 { font-size: 19px; color: #65449e; font-weight: 600; line-height: 1.6; margin: 0 0 9px; overflow-wrap: anywhere; }
+      .sentence-context { color: #93839e; font-size: 13px; line-height: 1.7; margin: 0 0 16px; }
+      .sentence-rating { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; margin: 15px 0 18px; }
+      .sentence-rating > span { font-size: 11px; color: #a491b4; margin-left: 4px; }
+      .sentence-score { width: 30px; height: 30px; border: 1px solid #e4dcee; background: #fcfaff; color: #a18bb2; border-radius: 9px; cursor: pointer; font: inherit; font-size: 12px; }
+      .sentence-score.selected { border-color: #8a65c8; color: #fff; background: #8a65c8; }
+      .sentence-score:focus-visible { outline: 2px solid #b297da; outline-offset: 2px; }
+      .sentence-compose { border-top: 1px solid #eee7f4; padding-top: 12px; }
+      .sentence-compose > summary { font-size: 13px; color: #80639f; cursor: pointer; }
+      .sentence-compose label > span { display: block; color: #a18cad; font-size: 12px; margin: 15px 0 8px; }
+      .sentence-compose textarea { box-sizing: border-box; width: 100%; border: 1px solid #e1d7ed; border-radius: 11px; background: #fdfbff; padding: 12px; color: #50415c; font: inherit; line-height: 1.7; resize: vertical; }
+      .sentence-compose textarea:focus { outline: 2px solid #c9b3e7; outline-offset: 2px; }
+      .sentence-compose-actions { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+      .sentence-check-status { color: #9a86a8; font-size: 12px; }
+      .sentence-feedback { background: #f3edf9; border-radius: 12px; padding: 15px; font-size: 13px; color: #877193; line-height: 1.8; margin-top: 15px; }
+      .sentence-feedback-label { color: #9e743e; font-size: 12px; font-weight: 600; }
+      .sentence-feedback-label.is-correct { color: #698875; }
+      .sentence-adopt { margin-top: 14px; }
+      .sentence-adopt-status { color: #a34664; font-size: 12px; line-height: 1.7; }
+      .sentence-adopt-status:empty { display: none; }
+      .sentence-adopt .queue-card-action { color: #65449e; border-color: #c8b3df; background: #fff9; }
+      .sentence-suggestion { color: #6d4e99; background: #fff8; border-radius: 8px; padding: 10px; }
+      .sentence-feedback small { display: block; color: #ab98b8; margin-top: 10px; font-size: 11px; }
+      .sentence-feedback summary { cursor: pointer; font-size: 12px; }
+      .sentence-candidates { margin: 26px 0; font-size: 13px; color: #9a86a8; }
+      .sentence-candidates > summary { cursor: pointer; padding: 8px 0; }
+      .sentence-candidates > p { font-size: 12px; }
+      #candidateSearch { box-sizing: border-box; width: 100%; height: 40px; margin: 8px 0 12px; }
+      .sentence-candidate { padding: 13px 0; border-top: 1px solid #e5dbee; display: flex; align-items: center; gap: 14px; }
+      .sentence-candidate > div { flex: 1; min-width: 0; }
+      .sentence-candidate strong { font-weight: 500; color: #846997; }
+      .sentence-candidate p { font-size: 12px; margin: 6px 0 0; color: #aa96b6; }
+      #startLearnedDialogue { background: #8862c5; color: white; box-shadow: none; }
+      #startLearnedDialogue:disabled { background: #eee7f5; color: #ac97b9; cursor: default; }
+      @media(max-width:760px){.sentence-grid{grid-template-columns:1fr}.sentence-card{padding:18px}.queue-overview-actions{flex-wrap:wrap}}
     </style>
   </head>
   <body>
@@ -424,38 +563,24 @@
 
       <div class="tabs">
         <button class="tab active" id="tabCorrections" data-tab="corrections">表达库</button>
+        <button class="tab" id="tabQueue" data-tab="queue">正在练 <span id="queueTabCount">0</span></button>
         <button class="tab" id="tabScenes" data-tab="scenes">场景预演 · 演练收藏</button>
       </div>
 
       <!-- tab 1：润色收藏（原有） -->
       <div id="paneCorrections">
-        <section class="capture-panel" aria-labelledby="captureTitle">
-          <div class="capture-heading"><div><h2 id="captureTitle">这句我想会用</h2><p>从 GPT 带回来的好表达，保留原句，直接加入。先暂存，再挑少量近期想用的表达练习。</p></div><a class="pill" href="quiz.html">练已有的表达 →</a></div>
-          <details id="captureDetails"><summary class="pill">＋ 粘贴本次学习表达</summary>
-            <label for="captureSource">来源（选填）</label><input id="captureSource" type="text" maxlength="120" placeholder="例如：每日英语 · 工作沟通" />
-            <label for="captureText">每行一句英文；可用全角 ｜ 补充中文使用情境</label>
-            <textarea id="captureText" rows="5" placeholder="I've had a lot on my plate lately.｜同事问我最近为什么没空
-That works for me.｜同意对方提出的时间"></textarea>
-            <p>仅支持逐行表达，不会自动解析整段聊天。不会改写原文，也不会自动产生复习任务。</p>
-            <button class="pill" id="previewCapture" type="button">预览并选择</button>
-            <div id="capturePreview"></div>
-            <button class="pill pill-quiz" id="saveCapture" type="button" hidden>将选中表达加入暂存</button>
-          </details>
-          <details id="feedbackDetails"><summary class="pill">＋ 记录本次 AI 反馈中的调整</summary>
-            <p>整段粘贴 AI 的纠正反馈。保留「原来怎么说 → 调整成什么 → 为什么」，不重新润色，不把所有调整变成复习任务。</p>
-            <label for="feedbackTitle">这次聊的是什么（选填）</label><input id="feedbackTitle" type="text" maxlength="120" placeholder="例如：今天聊投资时的吐槽" />
-            <label for="feedbackImage">粘贴或上传对比截图（最多 5 MB）</label><input id="feedbackImage" type="file" accept="image/png,image/jpeg,image/webp" /><p>也可直接在下方输入框按 ⌘V / Ctrl+V 粘贴截图，自动识别并记下。原图不保存，识别结果请核对。</p>
-            <label for="feedbackText">AI 反馈（包含原表达与调整后的对比）</label><textarea id="feedbackText" rows="7" maxlength="20000" placeholder="可以直接粘贴包含对比表、润色段落和解释的完整反馈。不需要手动拆成句子。"></textarea>
-            <button class="pill pill-quiz" id="saveFeedback" type="button">整理并记下这次调整</button>
-            <p id="feedbackStatus" role="status" aria-live="polite"></p>
-          </details>
-          <p id="captureStatus" role="status" aria-live="polite"></p>
+        <section id="queueOverview" class="queue-overview" hidden>
+          <div><p class="queue-eyebrow">近期想会用的表达</p><h2 id="queueTitle">正在练 · 0 / 10</h2><p id="queueDescription">不必填满。移出后不会自动补位。</p></div>
+          <div class="queue-overview-actions"><button class="pill queue-end" id="manageRound" type="button">查看候补</button><button class="pill pill-quiz" id="startLearnedDialogue" type="button" disabled>情境对话</button><button class="pill queue-end" id="endRound" type="button">结束本轮</button></div>
+          <p id="queueWarning" class="queue-warning" hidden></p>
         </section>
+        <p id="queueStatus" class="queue-status" role="status" aria-live="polite"></p>
         <div class="toolbar">
           <input type="search" id="search" placeholder="搜索意图、场景、原句或地道说法…" />
-          <label>学习状态 <select id="studyFilter"><option value="all">全部</option><option value="feedback">本次调整记录</option><option value="active">正在练</option><option value="inbox">暂存</option><option value="archived">已能用 / 归档</option></select></label>
-          <a class="pill pill-quiz" href="quiz.html">开始今日练习</a>
-          <details class="library-management"><summary>更多操作</summary><button class="pill pill-danger" id="clearAll">清空表达库</button></details>
+          <label class="filter-control"><span>状态</span><select id="studyFilter" aria-label="学习状态"><option value="all">全部</option><option value="feedback">本次调整记录</option><option value="active">正在练</option><option value="inbox">暂存</option><option value="archived">归档保留</option></select></label>
+          <a class="pill" href="pdf-reader.html" target="_blank">PDF 阅读</a>
+          <a class="pill pill-quiz" href="collection.html#queue" id="openPracticeWindow">去正在练</a>
+          <details class="library-management" id="libraryManagement"><summary aria-label="更多操作"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>更多</span></summary><div class="management-menu"><button class="pill pill-danger" id="clearAll" type="button">清空表达库</button></div></details>
         </div>
         <div class="scene-layout">
           <nav id="listNav" class="scene-nav"></nav>
@@ -463,6 +588,8 @@ That works for me.｜同意对方提出的时间"></textarea>
         </div>
       </div>
 
+      <section id="queueHistory" class="queue-history" hidden><details><summary>已结束的练习轮次 <span id="roundCount">0</span></summary><div id="roundHistoryList"></div></details></section>
+      <dialog id="queueEndDialog" class="queue-dialog" aria-labelledby="queueEndTitle"><h2 id="queueEndTitle">结束本轮关注？</h2><p id="queueEndMessage"></p><p class="queue-dialog-note">表达、来源和练习历史都会保留。归档不代表永久掌握，下一轮由你主动开始。</p><div class="queue-dialog-actions"><button class="pill queue-end" id="cancelEndRound" type="button">继续练这一轮</button><button class="pill pill-quiz" id="confirmEndRound" type="button">结束并归档</button></div></dialog>
       <!-- tab 2：场景预演收藏（按场景空间分组） -->
       <div id="paneScenes" class="hidden">
         <div class="toolbar">
@@ -479,8 +606,9 @@ That works for me.｜同意对方提出的时间"></textarea>
     <script src="config.js"></script>
     <script src="auth.js"></script>
     <script src="sync.js"></script>
-    <script src="learning.js"></script>
+    <script src="learning.js"></script><script src="queue-core.js"></script><script src="queue-store.js"></script>
     <script src="feedback-core.js"></script>
+    <script src="learning-workspace.js"></script>
     <script src="collection.js"></script>
   </body>
 </html>

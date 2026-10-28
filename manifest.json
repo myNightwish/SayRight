@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Nuance 语差",
   "description": "遇到想会用的表达，选中后带回真实情境，下一次用自己的话说出来。",
-  "version": "0.2.0",
+  "version": "0.4.3",
   "permissions": [
     "clipboardWrite",
     "storage",

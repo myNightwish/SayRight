@@ -21,9 +21,9 @@ test('duplicate capture preserves prior wording, cues, notes, timestamps and sch
  assert.equal(out.item.situation,'My own prompt');assert.equal(out.item.createdAt,1);assert.equal(out.item.situations[0],'My transfer');
  assert.equal(map[key].studyState,'archived');
 });
-test('full active set defers new discovery without evicting or deleting existing expressions',()=>{
+test('marking more material preserves existing flags without evicting expressions',()=>{
  const map=Object.fromEntries(Array.from({length:20},(_,i)=>[i,{studyState:'active'}]));
- const out=core.captureInto(map,selection,generated,100);assert.equal(out.active,false);assert.equal(out.item.studyState,'inbox');assert.equal(Object.keys(out.map).length,21);
+ const out=core.captureInto(map,selection,generated,100);assert.equal(out.active,true);assert.equal(out.item.studyState,'active');assert.equal(Object.keys(out.map).length,21);
 });
 test('unreliable or answer-leaking prompts cannot be silently saved',()=>{
  assert.ok(core.validate(generated,selection.text));
