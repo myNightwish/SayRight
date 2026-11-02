@@ -23,11 +23,13 @@
    const created=root.NuanceFeedback.activate(map,action.sessionKey,Number(action.index),Date.now(),root.NuanceLearning.canActivate);
    map=created.map;operation={type:'reconcile'};
   }
-  const result=root.NuanceQueue.apply(map,previous.drillState,operation);
+  const result=operation.type.startsWith('dialogue-')?root.NuanceConversation.apply(map,previous.drillState,operation):root.NuanceQueue.apply(map,previous.drillState,operation);
   if(result.changed||map!==previous.corrections){
    await backup(previous);
    // Backup is async: retain notes, stars, new captures and progress changed while it ran.
    const fresh=await read(),combined={...fresh.corrections};
+   if(['dialogue-message','dialogue-response','dialogue-support'].includes(operation.type)&&fresh.drillState[root.NuanceConversation.EVENT+operation.sessionId+':end'])throw Error('这场对话已结束，未把反馈写入其他对话。');
+   if(operation.type==='dialogue-start'&&root.NuanceQueue.dialogueSignature(root.NuanceQueue.snapshot(fresh.corrections,fresh.drillState))!==operation.signature)throw Error('学习材料已变化，请重新开始对话');
    if(operation.type==='adopt'){
     const before=previous.corrections[operation.key],current=fresh.corrections[operation.key];
     if(!current||current.better!==before?.better||(current.expressionChangedAt||0)!==(before?.expressionChangedAt||0))throw Error('保存期间原句已被其他页面更新，未覆盖新内容。请重新检查后再替换。');
@@ -47,7 +49,7 @@
    }
   }
   if(operation.type==='adopt'){const persisted=await read();verifyAdoption(operation,persisted.corrections,persisted.drillState);result.corrections=persisted.corrections;result.drillState=persisted.drillState;}
-  return {ok:true,changed:result.changed,attemptId:result.attemptId,corrections:result.corrections,drillState:result.drillState};
+  return {ok:true,changed:result.changed,attemptId:result.attemptId,sessionId:result.sessionId,collectedKey:result.collectedKey,corrections:result.corrections,drillState:result.drillState};
  }
  function verifyAdoption(action,corrections,drillState){
   const attempt=drillState?.['@nuance/practice/'+action.attemptId],item=corrections?.[action.key];
@@ -56,15 +58,15 @@
  function runLocal(action){const task=()=>root.navigator?.locks?root.navigator.locks.request('nuance-learning-queue',()=>applyLocal(action)):applyLocal(action);const work=pending.then(task);pending=work.catch(()=>{});return work;}
  async function requireCurrentWorker(){
   let info;try{info=await chrome.runtime.sendMessage({type:'nuance:queue-capabilities'});}catch(_){}
-  if(!info?.ok||info.queueProtocol<3||!Number.isFinite(info.queueProtocol))throw Error('插件后台版本较旧：请到 chrome://extensions 重新加载 Nuance，再刷新此页重试。原句和造句仍保留。');
+  if(!info?.ok||info.queueProtocol<5||!Number.isFinite(info.queueProtocol))throw Error('插件后台版本较旧：请到 chrome://extensions 重新加载 Nuance，再刷新此页重试。原句和造句仍保留。');
  }
  async function run(action){
   const viaWorker=extension()&&typeof document!=='undefined';
-  if(viaWorker&&action.type==='adopt')await requireCurrentWorker();
+  if(viaWorker&&(action.type==='adopt'||action.type.startsWith('dialogue-')))await requireCurrentWorker();
   const result=viaWorker?await chrome.runtime.sendMessage({type:'nuance:queue',action}):await runLocal(action);
   if(!result?.ok)throw Error(result?.error||'队列未保存，请重新加载插件后重试');
   if(action.type==='adopt')verifyAdoption(action,result.corrections,result.drillState);
-  if(!viaWorker&&result.changed)root.NuanceSync?.syncSoon();return result;
+  if(!viaWorker&&result.changed&&action.type!=='dialogue-message')root.NuanceSync?.syncSoon();return result;
  }
  async function checkLocal(input,{origin,access=''}={}){
   const state=await read(),snapshot=root.NuanceQueue.snapshot(state.corrections,state.drillState);

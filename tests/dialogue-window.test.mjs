@@ -1,9 +1,9 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
-const source=fs.readFileSync('chat.js','utf8');const boot=source.slice(source.indexOf('async function readLearnedWindow()'),source.indexOf('chatSend.addEventListener'));
-const rules={};vm.createContext(rules);for(const f of ['learning.js','queue-core.js'])vm.runInContext(fs.readFileSync(f,'utf8'),rules);
+const source=fs.readFileSync('chat.js','utf8');const boot=source.slice(source.indexOf('async function persistDialogue('),source.indexOf('chatSend.addEventListener'));
+const rules={};vm.createContext(rules);for(const f of ['learning.js','queue-core.js','conversation-core.js'])vm.runInContext(fs.readFileSync(f,'utf8'),rules);
 async function start(ready,search='?talk=1'){
  let calls=0;const materials=[{key:'current',better:'knock something over',personalContext:'A cat and a glass'}];
- const ctx={conversationGeneration:0,conversationSignature:null,conversationMaterials:null,conversationStale:false,chatThread:{},rehearseCard:null,checklistPanel:null,weakPanel:{classList:{add(){}}},planCalls:[],currentState:{ready,windowId:'batch-a',items:materials},URLSearchParams,location:{search},NuanceQueueStore:{run:async()=>({corrections:{},drillState:{}})},NuanceQueue:{snapshot:()=>ctx.currentState,dialogueMaterials:rules.NuanceQueue.dialogueMaterials,dialogueSignature:rules.NuanceQueue.dialogueSignature},setComposer(value){ctx.composer=value;},setHint(value){ctx.hint=value;},swapBtn:{classList:{add(){}}},restartBtn:{disabled:false},chatScene:{},appendMsg:()=>({wrap:{append(){}}}),document:{querySelector:()=>null,createElement:()=>({}),body:{classList:{add(){}}}},roleTag:{classList:{add(){}}},endBtn:{classList:{remove(){}}},chatInput:{},loadRehearsePlan:async()=>{calls++;ctx.planCalls.push(structuredClone(ctx.conversationMaterials));}};
+ const ctx={restoreDialogue:async()=>{},dialogueSessionId:null,dialogueReferenceKeys:new Set(),dialogueHintKeys:new Set(),NuanceConversation:rules.NuanceConversation,conversationGeneration:0,conversationSignature:null,conversationMaterials:null,conversationStale:false,chatThread:{},rehearseCard:null,checklistPanel:null,weakPanel:{classList:{add(){}}},planCalls:[],currentState:{ready,windowId:'batch-a',items:materials},URLSearchParams,location:{search},NuanceQueueStore:{run:async()=>({corrections:{},drillState:{}})},NuanceQueue:{snapshot:()=>ctx.currentState,dialogueMaterials:rules.NuanceQueue.dialogueMaterials,dialogueSignature:rules.NuanceQueue.dialogueSignature},setComposer(value){ctx.composer=value;},setHint(value){ctx.hint=value;},swapBtn:{classList:{add(){}}},restartBtn:{disabled:false},chatScene:{},appendMsg:()=>({wrap:{append(){}}}),document:{querySelector:()=>null,createElement:()=>({}),body:{classList:{add(){}}}},roleTag:{classList:{add(){}}},endBtn:{classList:{remove(){}}},chatInput:{},loadRehearsePlan:async()=>{calls++;ctx.planCalls.push(structuredClone(ctx.conversationMaterials));}};
  vm.createContext(ctx);vm.runInContext(boot,ctx);await ctx.boot();return {ctx,calls};
 }
 test('legacy daily-chat links cannot call a model before all self-ratings are ready',async()=>{const {ctx,calls}=await start(false);assert.equal(calls,0);assert.equal(ctx.restartBtn.disabled,true);assert.equal(ctx.conversationMaterials,null);});
@@ -27,11 +27,9 @@ test('updated sentences invalidate the old dialogue; restart rereads replacement
 });
 
 test('old and newer asynchronous scene requests cannot overwrite each other',async()=>{
- const load=source.slice(source.indexOf('async function loadRehearsePlan('),source.indexOf('async function readLearnedWindow()'));
- let resolveResponse,startRequest,resets=0;const fetched=new Promise(resolve=>{startRequest=resolve;});const ctx={conversationGeneration:1,rehearsePlan:null,REHEARSE_PLAN_API:'/rehearse-plan',appendMsg:()=>({enEl:{},wrap:{remove(){}}}),pickDueMaterials:async()=>[{expression:'My latest sentence'}],apiHeaders:()=>({}),fetch:()=>new Promise(resolve=>{resolveResponse=resolve;startRequest();}),checkDialogueMaterials:async()=>true,setComposer(){},restartBtn:{disabled:true},renderRehearsePlan(){},resetChat(){resets++;},chatScene:{}};
- vm.createContext(ctx);vm.runInContext(load,ctx);const pending=ctx.loadRehearsePlan();await fetched;ctx.conversationGeneration=2;
- resolveResponse({ok:true,json:async()=>({checklist:[{expression:'My latest sentence'}],opener:'An old response'})});await pending;
- assert.equal(ctx.rehearsePlan,null);assert.equal(resets,0);
+ const load=source.slice(source.indexOf('async function loadRehearsePlan('),source.indexOf('async function persistDialogue('));
+ let resets=0;const ctx={conversationGeneration:1,conversationRecentScenes:[],rehearsePlan:null,REHEARSE_PLAN_API:'/rehearse-plan',appendMsg:()=>({enEl:{},wrap:{remove(){}}}),pickDueMaterials:async()=>[{expression:'My latest sentence'}],apiHeaders:()=>({}),fetch:async()=>{ctx.conversationGeneration=2;return {ok:true,json:async()=>({checklist:[{expression:'My latest sentence'}],opener:'An old response'})};},checkDialogueMaterials:async()=>true,setComposer(){},restartBtn:{disabled:true},renderRehearsePlan(){},resetChat(){resets++;},chatScene:{}};
+ vm.createContext(ctx);vm.runInContext(load,ctx);await ctx.loadRehearsePlan();assert.equal(ctx.rehearsePlan,null);assert.equal(resets,0);
 });
 
 test('the scene endpoint retries a model plan that reintroduces an old expression',async()=>{

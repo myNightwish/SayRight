@@ -94,7 +94,7 @@ test('adopting an approved sentence changes the main expression but preserves id
  s=run(s,{type:'adopt',key:'a',attemptId:id},300);
  assert.equal(s.corrections.a.better,'My own example');assert.equal(s.corrections.a.originalBetter,'An expression');
  assert.equal(s.corrections.a.note,'my note');assert.equal(s.corrections.a.sourceLabel,'PDF p8');assert.equal(s.corrections.a.createdAt,10);assert.equal(s.corrections.a.stars,1);
- assert.equal(Object.keys(s.corrections).length,1);assert.equal(s.snapshot.items[0].key,'a');assert.equal(s.snapshot.items[0].selfRating,0);assert.equal(s.snapshot.ready,false);
+ assert.equal(Object.keys(s.corrections).length,1);assert.equal(s.snapshot.items[0].key,'a');assert.equal(s.snapshot.items[0].selfRating,4);assert.equal(s.snapshot.ready,true);
  assert.equal(s.snapshot.attempts[0].reference,'An expression');assert.equal(s.snapshot.attempts[0].answer,'My own example');assert.equal(s.snapshot.replacements[0].before,'An expression');assert.equal(s.drillState['a::replay'].box,3);
  const again=run(s,{type:'adopt',key:'a',attemptId:id},400);assert.equal(again.changed,false);assert.equal(again.snapshot.replacements.length,1);
 });

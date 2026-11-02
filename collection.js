@@ -249,7 +249,7 @@ function render(items) {
 
   if(collectionView==='queue'){
     listNavEl.innerHTML='';
-    NuanceWorkspace.render(queueData,{host:listEl,openLibrary:()=>switchTab('corrections'),notice:message=>document.querySelector('#queueStatus').textContent=message,
+    NuanceWorkspace.render({...queueData,dialogueProgress:NuanceConversation.progress(Object.fromEntries(queueData.items.map(x=>[x.key,x])),queueDrill)},{host:listEl,openLibrary:()=>switchTab('corrections'),notice:message=>document.querySelector('#queueStatus').textContent=message,
       admit:async key=>{await NuanceQueueStore.run({type:'admit',key});await load();},
       newWindow:async()=>{await NuanceQueueStore.run({type:'new-window'});await load();},
       rate:async(key,score)=>{pendingLearningRatings.add(key);try{const saved=await NuanceQueueStore.run({type:'rate',key,score});return updateLearningState(saved);}finally{pendingLearningRatings.delete(key);}},
@@ -505,6 +505,7 @@ function switchTab(tab) {
   document.querySelector('#queueOverview').hidden=isScenes||collectionView!=='queue';
   document.querySelector('#paneCorrections .toolbar').hidden=collectionView==='queue';
   document.querySelector('#queueHistory').hidden=isScenes||collectionView!=='queue';
+  document.querySelector('#dialogueHistory').hidden=isScenes||collectionView!=='queue';
   document.querySelector('#studyFilter').closest('label').hidden=collectionView==='queue';
   document.querySelector('#libraryManagement').hidden=collectionView==='queue';
   for(const link of document.querySelectorAll('#paneCorrections .toolbar > a'))link.hidden=collectionView==='queue';
@@ -718,6 +719,7 @@ document.addEventListener('pointerdown',event=>{if(libraryMenu?.open&&!libraryMe
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&libraryMenu?.open){libraryMenu.open=false;libraryMenu.querySelector('summary').focus();}});
 
 function renderQueueOverview(){
+  NuanceDialogueUI.history(document.querySelector('#dialogueHistoryList'),queueDrill);
   const count=queueData.items.length;
   document.querySelector('#queueTabCount').textContent=count;
   document.querySelector('#queueTitle').textContent=`正在练 · ${count} / 10`;
@@ -726,7 +728,7 @@ function renderQueueOverview(){
   document.querySelector('#queueWarning').hidden=true;
   document.querySelector('#endRound').disabled=!queueData.open.length;
   document.querySelector('#manageRound').hidden=!queueData.candidates?.length;
-  const dialogue=document.querySelector('#startLearnedDialogue');dialogue.disabled=!queueData.ready;dialogue.textContent=queueData.ready?'开启情境对话':count?`情境对话 · 还差 ${count-(queueData.readyCount||0)} 张达到 4 分`:'情境对话';
+  const dialogue=document.querySelector('#startLearnedDialogue');dialogue.disabled=!queueData.ready;dialogue.textContent=queueData.ready?(NuanceConversation.resumable(queueData,queueDrill)?'继续上次对话':'开启情境对话'):count?`情境对话 · 还差 ${count-(queueData.readyCount||0)} 张达到 4 分`:'情境对话';
   document.querySelector('#roundCount').textContent=queueData.history.length;
   document.querySelector('#roundHistoryList').innerHTML=queueData.history.length?queueData.history.map(round=>`<article class="round-record"><h3>${new Date(round.startedAt).toLocaleDateString('zh-CN')} — ${new Date(round.endedAt).toLocaleDateString('zh-CN')} · ${round.members.size} 条表达</h3><p>${round.endReason==='selection'?'历史标记已整理，原资料保留。':'已结束本轮关注，归档不代表永久掌握。'}</p><ul>${[...round.members.values()].map(item=>`<li>${escapeHtml(item.expression)} <span class="meta">${item.status==='archive'?'归档保留':item.status==='leave'?'已移出':'本轮记录'}</span></li>`).join('')}</ul></article>`).join(''):'<p>结束本轮后，可在这里回看成员记录。</p>';
 }

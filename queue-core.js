@@ -9,6 +9,14 @@
   if(!value||typeof value.correct!=='boolean'||typeof value.patternUsed!=='boolean'||typeof value.explanation!=='string'||!value.explanation.trim()||value.explanation.length>1000||typeof value.suggestion!=='string'||value.suggestion.length>1500)return null;
   return {correct:value.correct,patternUsed:value.patternUsed,explanation:value.explanation.trim(),suggestion:value.suggestion.trim()};
  }
+ // Only reviewed, same-pattern adoption edges connect examples. Arbitrary edits reset progress.
+ function learningReferences(item,key,drill){
+  const refs=new Set([item.better]),edges=Object.values(drill||{}).filter(x=>x?.kind==='practice-adoption'&&x.itemKey===key);
+  let grew=true;while(grew){grew=false;for(const edge of edges){
+   const attempt=drill?.['@nuance/practice/'+edge.attemptId];
+   if(refs.has(edge.after)&&!refs.has(edge.before)&&attempt?.itemKey===key&&attempt.reference===edge.before&&attempt.answer===edge.after&&attempt.feedback?.correct===true&&attempt.feedback.patternUsed===true){refs.add(edge.before);grew=true;}
+  }}return refs;
+ }
  function snapshot(map,drill){
   const all=Object.values(drill||{}),events=all.filter(x=>x?.kind==='practice-queue-event').sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));
   const windows=all.filter(x=>x?.kind==='practice-window-event'&&x.version===3).sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));
@@ -22,7 +30,7 @@
   }
   const rawSlots=[...slots];
   const seen=new Set();slots=Array.from({length:10},(_,i)=>{const key=slots[i],item=key&&Object.hasOwn(map,key)?map[key]:null;if(closed||!item||L().stateOf(item)!=='active'||seen.has(key))return null;seen.add(key);return key;});
-  const items=slots.flatMap((key,index)=>{if(!key)return [];const item=map[key],rating=drill?.[RATING+encodeURIComponent(key)];const score=rating?.reference===item.better&&Number.isInteger(rating.score)&&rating.score>=1&&rating.score<=5?rating.score:0;return [{...item,key,slot:index,selfRating:score}];});
+  const items=slots.flatMap((key,index)=>{if(!key)return [];const item=map[key],rating=drill?.[RATING+encodeURIComponent(key)];const score=learningReferences(item,key,drill).has(rating?.reference)&&Number.isInteger(rating.score)&&rating.score>=1&&rating.score<=5?rating.score:0;return [{...item,key,slot:index,selfRating:score}];});
   const candidates=pool.filter(x=>!seen.has(x.key));
   const rounds=new Map();for(const e of events){if(!rounds.has(e.roundId))rounds.set(e.roundId,{id:e.roundId,startedAt:e.at,endedAt:null,members:new Map()});const r=rounds.get(e.roundId);if(e.action==='start')r.startedAt=Math.min(r.startedAt,e.at);if(e.action==='end'){r.endedAt=e.at;r.endReason=e.reason||'';}if(e.itemKey){const old=r.members.get(e.itemKey);r.members.set(e.itemKey,{key:e.itemKey,expression:e.expression||old?.expression||'',joinedAt:old?.joinedAt||(e.action==='join'?e.at:null),leftAt:e.action==='join'?null:e.at,status:e.action});}}
   const history=[...rounds.values()].filter(r=>r.endedAt).sort((a,b)=>b.endedAt-a.endedAt);
@@ -95,5 +103,5 @@
    intent:item.adoptedAttemptId?'':item.personalContext||item.situation||item.intent||'',construct:item.adoptedAttemptId?'':item.construct||(item.chunks||[]).map(x=>x.text).join('; ')}));
  }
  function dialogueSignature(state){return JSON.stringify([state.windowId,state.ready,dialogueMaterials(state)]);}
- root.NuanceQueue={snapshot,apply,feedback,dialogueMaterials,dialogueSignature,PREFIX,PROTOCOL:3};
+ root.NuanceQueue={learningReferences,snapshot,apply,feedback,dialogueMaterials,dialogueSignature,PREFIX,PROTOCOL:5};
 })();

@@ -33,6 +33,9 @@ let conversationWindow=null;
 let conversationSignature=null;
 let conversationGeneration=0;
 let conversationStale=false;
+let dialogueSessionId=null,lastUserTurnId=null,dialogueReviewState=null;
+let conversationRecentScenes=[];
+const dialogueReferenceKeys=new Set(),dialogueHintKeys=new Set();
 
 // ---- 朗读（与 scene.js 一致的高质量美音）----
 const PREFERRED_VOICES = [
@@ -326,7 +329,7 @@ function typeOut(enEl, text, avatarEl, skipSpeakBtn) {
 
 // 先听后看：日常对练里对方的气泡默认遮盖文字（模糊），你先听声音；
 // 角标 👁 切换显示/隐藏，🔊 随时复听。逼你先用耳朵而不是眼睛。
-function setupListenFirst(wrap, text) {
+function setupListenFirst(wrap, text, source) {
   wrap.classList.add("masked");
   const body = wrap.querySelector(".msg-body");
   const ctrls = document.createElement("div");
@@ -346,6 +349,7 @@ function setupListenFirst(wrap, text) {
   spk.addEventListener("click", () => speak(text));
   ctrls.appendChild(eye);
   ctrls.appendChild(spk);
+  if(source){const save=document.createElement('button');save.type='button';save.className='dialogue-bookmark';save.title=save.ariaLabel='收藏这条回复';save.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';save.onclick=()=>NuanceDialogueUI.collector(body,{...source,text});ctrls.appendChild(save);}
   body.appendChild(ctrls);
 }
 
@@ -364,6 +368,7 @@ function renderRehearsePlan() {
 
 function renderChecklist() {
   if (!checklistEl || !rehearsePlan) return;
+  const openReferences=new Set([...checklistEl.querySelectorAll('[data-reference-key][open]')].map(x=>x.dataset.referenceKey));
   const total = rehearsePlan.checklist.length;
   const done = checklistHit.filter(Boolean).length;
   checklistEl.innerHTML =
@@ -374,10 +379,11 @@ function renderChecklist() {
           <span class="cl-mark">${checklistHit[i] ? "✓" : "○"}</span>
           <div class="cl-body">
             ${c.intent ? `<div class="cl-intent">${escapeHtml(c.intent)}</div>` : ""}
-            <div class="cl-expr">${escapeHtml(c.expression)}<button class="speak" data-i="${i}" title="朗读">🔊</button></div>
+            <details class="cl-reference" data-reference-key="${escapeHtml(c.key||c.expression)}" ${openReferences.has(c.key||c.expression)?'open':''}><summary>参考用法</summary><div class="cl-expr">${escapeHtml(c.expression)}<button class="speak" data-i="${i}" title="朗读">🔊</button></div></details>
           </div>
         </div>`)
       .join("");
+  for(const reference of checklistEl.querySelectorAll('[data-reference-key]'))reference.addEventListener('toggle',()=>{if(reference.open){dialogueReferenceKeys.add(reference.dataset.referenceKey);void persistDialogue({type:'dialogue-support',sessionId:dialogueSessionId,id:crypto.randomUUID(),support:{referenceKeys:[...dialogueReferenceKeys]}}).catch(()=>setHint('参考查看记录暂未保存，请保持当前页面并稍后重试。'));}});
   checklistEl.querySelectorAll(".speak").forEach((btn) => {
     btn.addEventListener("click", () => {
       const it = rehearsePlan.checklist[Number(btn.getAttribute("data-i"))];
@@ -390,14 +396,15 @@ function renderChecklist() {
 async function applyUsed(used) {
   if (!rehearsePlan || !Array.isArray(used) || !used.length) return;
   let changed = false;
-  for (const expr of used) {
+  for (const evidence of used) {
+    if(evidence.outcome!=='used')continue;const expr=evidence.expression||evidence.reference;
     const idx = rehearsePlan.checklist.findIndex(
       (c) => c.expression.trim().toLowerCase() === String(expr).trim().toLowerCase()
     );
     if (idx >= 0 && !checklistHit[idx]) {
       checklistHit[idx] = true;
       changed = true;
-      bumpMasteryByExpression(rehearsePlan.checklist[idx].expression);
+      // A check means an observed use, not a mastery score or automatic graduation.
     }
   }
   if (changed) {
@@ -421,10 +428,10 @@ function setHint(text) {
 }
 
 // 即时反馈：地道绿勾一闪；不地道气泡下方展开，并记进 weakLines 供赛后复盘。
-function renderFeedback(fb) {
+function renderFeedback(fb,restoring=false) {
   if (!fb) return;
   if (fb.ok) {
-    if (history.some((h) => h.role === "me")) {
+    if (!restoring && history.some((h) => h.role === "me")) {
       flashCompanion("happy"); // Coco 开心：眼睛弯成月牙、蹦一下
       const flash = document.createElement("div");
       flash.className = "ok-flash";
@@ -435,7 +442,7 @@ function renderFeedback(fb) {
     return;
   }
   if (!fb.better && !fb.tip) return;
-  flashCompanion("concerned", 2600); // Coco 关切：歪头帮你调一下（非负面）
+  if(!restoring)flashCompanion("concerned", 2600); // Coco 关切：歪头帮你调一下（非负面）
   // 记录这条不够地道（对应你刚说的那句）。
   const lastMe = [...history].reverse().find((h) => h.role === "me");
   weakLines.push({ said: lastMe ? lastMe.text : "", better: fb.better, tip: fb.tip });
@@ -467,6 +474,7 @@ async function advance() {
         aiRole: rehearsePlan.aiRole,
         goal: rehearsePlan.goal,
         checklist: rehearsePlan.checklist,
+        support:{referenceExpressions:conversationMaterials.filter(x=>dialogueReferenceKeys.has(x.key)).map(x=>x.expression),hintedExpressions:conversationMaterials.filter(x=>dialogueHintKeys.has(x.key)).map(x=>x.expression)},
         history,
       };
       api = REHEARSE_API;
@@ -487,13 +495,20 @@ async function advance() {
     typing.remove();
     if(generation!==conversationGeneration)return;
     if(rehearseMode&&!(await checkDialogueMaterials()))return;
-    if (!resp.ok) { toast(data.error || "对练出错了，请重试"); setComposer("active"); return; }
+    if (!resp.ok) { toast(data.error || "对练出错了，请重试"); showPendingReply(); return; }
+    if(data.dialogueProtocol!==1||!Array.isArray(data.uses)){toast('模型服务需要更新，请更新后台服务后重新开始。你的回应已保存在对话记录。');setHint('模型服务版本较旧，请更新本地服务或重新部署线上服务。');setComposer('waiting');return;}
+    const responseId=lastUserTurnId+':reply';
+    const recorded=await persistDialogue({type:'dialogue-response',sessionId:dialogueSessionId,id:responseId,userTurnId:lastUserTurnId,text:data.reply,translation:data.reply_zh,feedback:data.feedback,uses:data.uses,done:data.done,hintRevealed:/[A-Za-z]{3}/.test(data.hint||'')});
+    if(generation!==conversationGeneration||conversationStale)return;
+    const accepted=recorded.drillState[NuanceConversation.EVENT+responseId]?.uses||[];
+    for(const use of accepted)if(data.feedback?.better)dialogueReferenceKeys.add(use.itemKey);
+    if(/[A-Za-z]{3}/.test(data.hint||''))for(const item of conversationMaterials)dialogueHintKeys.add(item.key);
     renderFeedback(data.feedback);
     // 情景对练：先把本轮命中的清单表达打勾（含 Coco 开心 + bump 掌握度）。
-    if (rehearseMode && data.used) await applyUsed(data.used);
+    if (rehearseMode) await applyUsed(accepted);
     const { enEl, wrap } = appendMsg("them", "", data.reply_zh);
     // 「先听后看」：日常/情景对练都遮盖对方文字（角标 👁 显隐 / 🔊 复听），逼你先听声音。
-    if (talkMode || rehearseMode) setupListenFirst(wrap, data.reply);
+    if (talkMode || rehearseMode) setupListenFirst(wrap, data.reply,{sessionId:dialogueSessionId,messageId:responseId});
     // 让 Coco 的即时反应（开心/关切）先亮一下，再开口说下一句。
     if ((talkMode || rehearseMode) && data.feedback && (data.feedback.ok ? history.some((h) => h.role === "me") : (data.feedback.better || data.feedback.tip))) {
       await new Promise((r) => setTimeout(r, 750));
@@ -502,38 +517,44 @@ async function advance() {
     await typeOut(enEl, data.reply, wrap.querySelector(".avatar"), talkMode || rehearseMode);
     if(generation!==conversationGeneration||conversationStale)return;
     history.push({ role: "them", text: data.reply });
-    if (data.done) { ended = true; finish(); }
+    if (data.done) { ended = true; await finish(); }
     else { setComposer("active"); setHint(data.hint || ""); }
   } catch (_) {
     typing.remove();
     if(generation!==conversationGeneration)return;
-    toast("连不上本地服务，请确认 tutor-server.mjs 已启动");
-    setComposer(conversationStale?"waiting":"active");
+    toast("本次回复或学习记录未能保存，请稍后重试；已提交的回应仍保留。");
+    if(!conversationStale)showPendingReply();else setComposer("waiting");
   } finally {
     if(generation===conversationGeneration)busy = false;
   }
 }
 
 async function send() {
-  const text = chatInput.value.trim();
-  if (!text || busy || ended || conversationStale || (rehearseMode&&!rehearsePlan)) return;
-  appendMsg("me", text, "");
-  history.push({ role: "me", text });
-  chatInput.value = "";
-  await advance();
+  const text=chatInput.value.trim(),generation=conversationGeneration;
+  if(!text||busy||ended||conversationStale||!dialogueSessionId||!rehearsePlan)return;
+  busy=true;setComposer('waiting');
+  try{
+    const id=crypto.randomUUID();await persistDialogue({type:'dialogue-message',sessionId:dialogueSessionId,id,text,support:{referenceKeys:[...dialogueReferenceKeys],hintedKeys:[...dialogueHintKeys]}});
+    if(generation!==conversationGeneration)return;
+    lastUserTurnId=id;appendMsg('me',text,'');history.push({role:'me',text});chatInput.value='';busy=false;await advance();
+  }catch(error){if(generation===conversationGeneration){toast(error.message||'回应未保存，请重试。');setComposer(conversationStale?'waiting':'active');}}
+  finally{if(generation===conversationGeneration)busy=false;}
 }
 
 // 对练结束：渲染中段「不够地道」复盘（可收藏），展开下段原始剧本。
-function finish() {
+async function finish() {
+  try{await closeDialogue('finished');}catch(error){ended=false;toast(error.message||'结束状态未保存，请再试一次');return;}
   setComposer("waiting");
   setHint("");
   renderWeak();
+  const recap=document.querySelector('#dialogueRecap');if(recap&&dialogueReviewState){const evidence=dialogueReviewState.evidence,used=new Set(evidence.filter(x=>x.outcome==='used').map(x=>x.itemKey)),independent=new Set(evidence.filter(x=>x.outcome==='used'&&x.support==='independent').map(x=>x.itemKey));recap.innerHTML=`<p>本场用上了 ${used.size} 个核心表达，其中 ${independent.size} 个没有依赖语言提示。</p><p>回应与反馈已保存。下次会优先带回需要再用的表达，换个情境继续聊。</p>`;}
   weakPanel.classList.remove("hidden");
 }
 
 function renderWeak() {
   if (!weakLines.length) {
-    weakList.innerHTML = `<div class="empty">这场你表现得很地道，没有需要改的地方 👏</div>`;
+    const evaluated=dialogueReviewState?.entries.filter(x=>x.type==='response')||[];
+    weakList.innerHTML=`<div class="empty">${!evaluated.length?'本场还没有收到可评估的回应反馈，已有记录已保留。':evaluated.every(x=>x.feedback?.ok)?'本场反馈没有提出需要调整的地方。':'本场没有可展示的具体调整建议。'}</div>`;
     return;
   }
   weakList.innerHTML = weakLines
@@ -661,7 +682,7 @@ async function openRehearse() {
   if (!rehearsePlan) return;
   const generation=conversationGeneration,plan=rehearsePlan;
   const { enEl, wrap } = appendMsg("them", "", rehearsePlan.opener_zh);
-  setupListenFirst(wrap, rehearsePlan.opener);
+  setupListenFirst(wrap, rehearsePlan.opener,{sessionId:dialogueSessionId,messageId:dialogueSessionId+':opener'});
   await typeOut(enEl, plan.opener, wrap.querySelector(".avatar"), true);
   if(generation!==conversationGeneration||conversationStale)return;
   history.push({ role: "them", text: plan.opener });
@@ -682,7 +703,7 @@ async function loadRehearsePlan(generation=conversationGeneration) {
     const resp = await fetch(REHEARSE_PLAN_API, {
       method: "POST",
       headers: apiHeaders(),
-      body: JSON.stringify({ materials }),
+      body: JSON.stringify({ materials, recentScenes:conversationRecentScenes }),
     });
     const data = await resp.json();
     if(generation!==conversationGeneration){loading.wrap.remove();return;}
@@ -692,23 +713,61 @@ async function loadRehearsePlan(generation=conversationGeneration) {
       setComposer("waiting");
       return;
     }
+    if(data.dialogueProtocol!==1){loading.enEl.textContent='模型服务版本较旧，请更新本地后台或重新部署线上服务后再开始。';setComposer('waiting');return;}
     const allowed=new Set(materials.map(x=>x.expression));
     if(!Array.isArray(data.checklist)||!data.checklist.length||data.checklist.some(x=>!allowed.has(x.expression))){loading.enEl.textContent='对话素材未能与本轮卡片对应，请重新开启。';setComposer('waiting');return;}
-    rehearsePlan = data;
+    const id=crypto.randomUUID();
+    await persistDialogue({type:'dialogue-start',sessionId:id,signature:conversationSignature,plan:data});
+    if(generation!==conversationGeneration){await NuanceQueueStore.run({type:'dialogue-end',sessionId:id,reason:'superseded'});return;}
+    dialogueSessionId=id;dialogueReferenceKeys.clear();dialogueHintKeys.clear();lastUserTurnId=null;
+    rehearsePlan={...data,checklist:data.checklist.map(item=>({...item,key:conversationMaterials.find(x=>x.expression===item.expression)?.key}))};
     if(restartBtn)restartBtn.disabled=false;
     scene = data.scene || "情景对练";
     chatScene.textContent = scene;
     loading.wrap.remove();
     renderRehearsePlan();
     resetChat();
-  } catch (_) {
+  } catch (error) {
     if(generation!==conversationGeneration)return;
-    loading.enEl.textContent = "连不上本地服务，请确认 tutor-server.mjs 已启动。";
+    loading.enEl.textContent = error.message || "对话或学习记录暂未准备好，请重试。";
     setComposer("waiting");
   } finally {if(generation===conversationGeneration&&restartBtn)restartBtn.disabled=false;}
 }
 
-async function readLearnedWindow(){const saved=await NuanceQueueStore.run({type:'reconcile'});return NuanceQueue.snapshot(saved.corrections,saved.drillState);}
+function showPendingReply(){
+  setComposer('waiting');setHint('你的回应已保存，AI 尚未回复。可以重试，不需要重新输入。');
+  if(document.querySelector('#retryDialogueReply'))return;
+  const retry=document.createElement('button');retry.id='retryDialogueReply';retry.type='button';retry.className='pill';retry.textContent='重试这条回应';
+  retry.onclick=async()=>{if(busy||conversationStale)return;retry.disabled=true;await advance();if(history.at(-1)?.role==='them'||conversationStale)retry.remove();else retry.disabled=false;};
+  chatThread.appendChild(retry);
+}
+
+// Restore saved messages directly: no retyping, speech, or model request on reopening.
+async function restoreDialogue(saved){
+  const {session,plan,messages,pendingTurnId}=saved;
+  dialogueSessionId=session.id;dialogueReviewState=session;rehearsePlan=plan;
+  dialogueReferenceKeys.clear();dialogueHintKeys.clear();for(const key of saved.referenceKeys)dialogueReferenceKeys.add(key);for(const key of saved.hintedKeys)dialogueHintKeys.add(key);
+  scene=session.scene;chatScene.textContent=scene;
+  checklistHit=plan.checklist.map(c=>session.evidence.some(e=>e.expression===c.expression&&e.outcome==='used'));
+  renderRehearsePlan();history=[];weakLines=[];
+  for(const entry of messages){
+    if(entry.type==='response')renderFeedback(entry.feedback,true);
+    const {wrap}=appendMsg(entry.role,entry.text,entry.translation||'');
+    if(entry.role==='them')setupListenFirst(wrap,entry.text,{sessionId:session.id,messageId:entry.id});
+    history.push({role:entry.role,text:entry.text});
+  }
+  lastUserTurnId=messages.filter(x=>x.role==='me').at(-1)?.id||null;
+  if(restartBtn)restartBtn.disabled=false;
+  if(messages.at(-1)?.done){ended=true;await finish();return;}
+  if(pendingTurnId){
+    showPendingReply();
+  }else{setComposer('active');setHint('已接上上次的对话，继续回应就好。');}
+  scrollChat();
+}
+
+async function persistDialogue(action){const saved=await NuanceQueueStore.run(action);dialogueReviewState=NuanceConversation.snapshot(saved.drillState).find(x=>x.id===action.sessionId)||dialogueReviewState;return saved;}
+async function closeDialogue(reason){if(dialogueSessionId)await persistDialogue({type:'dialogue-end',sessionId:dialogueSessionId,reason});}
+async function readLearnedWindow(){const saved=await NuanceQueueStore.run({type:'reconcile'});return {...NuanceQueue.snapshot(saved.corrections,saved.drillState),learningDrill:saved.drillState};}
 async function checkDialogueMaterials(){
   if(!conversationSignature||conversationStale)return false;
   const generation=conversationGeneration,signature=conversationSignature;
@@ -719,14 +778,18 @@ async function checkDialogueMaterials(){
   }catch(_){if(generation!==conversationGeneration)return false;setHint('暂时无法确认最新学习材料，请稍后重新开始。');setComposer('waiting');if(restartBtn)restartBtn.disabled=false;return false;}
   conversationStale=true;setComposer('waiting');
   const notice=document.querySelector('#materialUpdateNotice');
-  if(notice){notice.textContent='你更新了正在练的句子。点击「重新开始」，将按最新句子生成这场对话。';notice.classList.remove('hidden');}
+  if(notice){notice.textContent='你更新了正在练的句子。点击「换个情境」，将按最新句子生成这场对话。';notice.classList.remove('hidden');}
   if(restartBtn)restartBtn.disabled=false;
   setHint('当前显示的是上一版对话；重新开始后使用最新材料。');return false;
 }
 
 // Every start, including restart, rereads the current learned sentences.
-async function boot() {
+async function boot(fresh=false) {
   const generation=++conversationGeneration;
+  setComposer('waiting');if(restartBtn)restartBtn.disabled=true;
+  try{if(fresh)await closeDialogue('restart');}catch(error){setHint(error.message);if(restartBtn)restartBtn.disabled=false;return;}
+  if(generation!==conversationGeneration)return;
+  dialogueSessionId=null;dialogueReviewState=null;dialogueReferenceKeys.clear();dialogueHintKeys.clear();
   conversationSignature=null;conversationMaterials=null;conversationStale=false;setHint('');
   const params=new URLSearchParams(location.search);
   setComposer('waiting');if(restartBtn)restartBtn.disabled=true;if(swapBtn)swapBtn.classList.add('hidden');
@@ -743,17 +806,19 @@ async function boot() {
       if(restartBtn)restartBtn.disabled=true;return;
     }
     conversationWindow=learned.windowId;
-    conversationMaterials=NuanceQueue.dialogueMaterials(learned);conversationSignature=NuanceQueue.dialogueSignature(learned);
+    conversationMaterials=NuanceConversation.planMaterials(learned,learned.learningDrill||{});conversationRecentScenes=NuanceConversation.snapshot(learned.learningDrill||{}).slice(0,3).map(x=>x.scene);conversationSignature=NuanceQueue.dialogueSignature(learned);
     rehearseMode=true;talkMode=false;document.body.classList.add('talk-mode');chatScene.textContent=`本轮情境对话 · ${conversationMaterials.length} 条已学表达`;
     if(roleTag)roleTag.classList.add('hidden');if(endBtn)endBtn.classList.remove('hidden');
     chatInput.placeholder='用英文回应，试着把学过的表达用起来……';
+    const previous=!fresh&&NuanceConversation.resumable(learned,learned.learningDrill||{});
+    if(previous){await restoreDialogue(previous);return;}
     await loadRehearsePlan(generation);
   }catch(error){if(generation!==conversationGeneration)return;if(restartBtn)restartBtn.disabled=false;chatScene.textContent='暂时无法读取本轮学习记录';const message=appendMsg('them',error.message||'请返回正在练重试。','');setComposer('waiting');}
 }
 
 chatSend.addEventListener("click", send);
 chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
-restartBtn.addEventListener("click", boot);
+restartBtn.addEventListener("click", ()=>boot(true));
 swapBtn.addEventListener("click", swapRoles);
 // 日常对练没有剧本终点，用户手动「结束并复盘」→ 收尾展示不够地道的句子。
 if (endBtn) endBtn.addEventListener("click", () => {

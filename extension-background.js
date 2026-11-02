@@ -1,5 +1,5 @@
 /* global chrome, NuanceLearning, NuanceCapture */
-importScripts('learning.js', 'capture-core.js', 'feedback-core.js', 'dictionary-core.js', 'pdf-source.js', 'queue-core.js', 'queue-store.js');
+importScripts('learning.js', 'capture-core.js', 'feedback-core.js', 'dictionary-core.js', 'pdf-source.js', 'queue-core.js', 'conversation-core.js', 'queue-store.js');
 const MODEL_ORIGIN = 'http://127.0.0.1:48773';
 const SYNC_ORIGIN = 'https://nuance-drfi.onrender.com';
 const FIELDS = ['corrections','sceneSaves','sceneScripts','drillState'];
@@ -87,7 +87,7 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
   }
   if(message.type==='nuance:queue'){
     if(!ownedPages.some(page=>sender.url?.split(/[?#]/)[0]===chrome.runtime.getURL(page)))return false;
-    serialized(()=>NuanceQueueStore.runLocal(message.action)).then(result=>{if(result.changed)requestSync();respond(result);},error=>respond({ok:false,error:error.message}));return true;
+    serialized(()=>NuanceQueueStore.runLocal(message.action)).then(result=>{if(result.changed){if(message.action.type==='dialogue-message')chrome.alarms.create('nuance-capture-sync',{delayInMinutes:1});else requestSync();}respond(result);},error=>respond({ok:false,error:error.message}));return true;
   }
   const web=sender.tab&&/^https?:\/\//.test(sender.tab.url||'');
   const reader=!web&&typeof sender.url==='string'&&sender.url.split(/[?#]/)[0]===chrome.runtime.getURL('pdf-reader.html');

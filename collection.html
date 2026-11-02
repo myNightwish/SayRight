@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#0d0b1a" />
     <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="dialogue.css" />
     <title>我的表达 · 语差 Nuance</title>
     <style>
       :root {
@@ -589,6 +590,7 @@
       </div>
 
       <section id="queueHistory" class="queue-history" hidden><details><summary>已结束的练习轮次 <span id="roundCount">0</span></summary><div id="roundHistoryList"></div></details></section>
+      <section id="dialogueHistory" hidden><details class="dialogue-history"><summary>对话记录</summary><div id="dialogueHistoryList"></div></details></section>
       <dialog id="queueEndDialog" class="queue-dialog" aria-labelledby="queueEndTitle"><h2 id="queueEndTitle">结束本轮关注？</h2><p id="queueEndMessage"></p><p class="queue-dialog-note">表达、来源和练习历史都会保留。归档不代表永久掌握，下一轮由你主动开始。</p><div class="queue-dialog-actions"><button class="pill queue-end" id="cancelEndRound" type="button">继续练这一轮</button><button class="pill pill-quiz" id="confirmEndRound" type="button">结束并归档</button></div></dialog>
       <!-- tab 2：场景预演收藏（按场景空间分组） -->
       <div id="paneScenes" class="hidden">
@@ -606,7 +608,7 @@
     <script src="config.js"></script>
     <script src="auth.js"></script>
     <script src="sync.js"></script>
-    <script src="learning.js"></script><script src="queue-core.js"></script><script src="queue-store.js"></script>
+    <script src="learning.js"></script><script src="queue-core.js"></script><script src="conversation-core.js"></script><script src="queue-store.js"></script><script src="dialogue-ui.js"></script>
     <script src="feedback-core.js"></script>
     <script src="learning-workspace.js"></script>
     <script src="collection.js"></script>

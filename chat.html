@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#0d0b1a" />
     <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="dialogue.css" />
     <title>对练 · Rehearse</title>
     <style>
       :root {
@@ -378,7 +379,7 @@
         <a href="polish.html" class="pill topbar-home" title="返回表达页">‹ 表达</a>
         <button id="swapBtn" class="pill top-action" type="button" title="互换角色"><span aria-hidden="true">↔</span><span class="action-label">互换角色</span></button>
         <button id="endBtn" class="pill top-action hidden" type="button" title="结束并复盘"><span aria-hidden="true">✓</span><span class="action-label">结束并复盘</span></button>
-        <button id="restartBtn" class="pill top-action" type="button" title="重新开始"><span aria-hidden="true">↻</span><span class="action-label">重新开始</span></button>
+        <button id="restartBtn" class="pill top-action" type="button" title="结束当前对话，换个情境"><span aria-hidden="true">↻</span><span class="action-label">换个情境</span></button>
       </div>
 
       <!-- 上：对话窗口 -->
@@ -415,6 +416,8 @@
       <!-- 中：不够地道的句子（对练结束后出现） -->
       <section id="weakPanel" class="panel hidden">
         <div class="section-title"><span class="dot"></span>这场里你可以说得更地道的地方</div>
+        <div id="dialogueRecap" class="dialogue-recap"></div>
+        <a class="pill" href="collection.html#queue">回到正在练 · 查看学习记录</a>
         <div id="weakList"></div>
       </section>
 
@@ -430,7 +433,7 @@
     <script src="config.js"></script>
     <script src="auth.js"></script>
     <script src="sync.js"></script>
-    <script src="learning.js"></script><script src="queue-core.js"></script><script src="queue-store.js"></script>
+    <script src="learning.js"></script><script src="queue-core.js"></script><script src="conversation-core.js"></script><script src="queue-store.js"></script><script src="dialogue-ui.js"></script>
     <script src="chat.js"></script>
   </body>
 </html>
